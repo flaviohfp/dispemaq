@@ -387,6 +387,12 @@ body {
     font-size: 0.95rem;
 }
 
+.card-peca img {
+    height: 250px;
+    width: 280px;
+    border-radius: 10px;
+}
+
 
 /* ===================================
    BANNER DE CHAMADA PARA AÇÃO
