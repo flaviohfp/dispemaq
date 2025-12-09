@@ -1,382 +1,471 @@
-/* ===================================
-   MENU MOBILE - BOTÃO HAMBÚRGUER
-   =================================== */
+/* ===== BANCO DE DADOS DE PRODUTOS ===== */
+const produtos = [
+    // Filtros
+    { id: 1, nome: 'Filtro de Óleo Motor Diesel', categoria: 'filtros', codigo: 'FO-2840', preco: 89.90, precoAntigo: 119.90, estoque: 45, desconto: 25 },
+    { id: 2, nome: 'Filtro de Ar Primário', categoria: 'filtros', codigo: 'FA-1523', preco: 156.00, precoAntigo: null, estoque: 32, desconto: 0 },
+    { id: 3, nome: 'Filtro de Combustível Separador', categoria: 'filtros', codigo: 'FC-3341', preco: 198.50, precoAntigo: 245.00, estoque: 28, desconto: 19 },
+    { id: 4, nome: 'Filtro Hidráulico de Retorno', categoria: 'filtros', codigo: 'FH-5612', preco: 213.00, precoAntigo: null, estoque: 5, desconto: 0 },
+    
+    // Motores
+    { id: 5, nome: 'Jogo de Anéis Pistão Motor MWM', categoria: 'motores', codigo: 'AN-7842', preco: 445.00, precoAntigo: 520.00, estoque: 18, desconto: 14 },
+    { id: 6, nome: 'Bronzina de Biela 0.25mm', categoria: 'motores', codigo: 'BB-2134', preco: 234.90, precoAntigo: null, estoque: 41, desconto: 0 },
+    { id: 7, nome: 'Kit de Reparo Bomba Injetora', categoria: 'motores', codigo: 'BI-9876', preco: 678.00, precoAntigo: 780.00, estoque: 12, desconto: 13 },
+    { id: 8, nome: 'Turbo Compressor Garrett', categoria: 'motores', codigo: 'TC-4421', preco: 2890.00, precoAntigo: 3200.00, estoque: 8, desconto: 10 },
+    
+    // Hidráulica
+    { id: 9, nome: 'Bomba Hidráulica Dupla', categoria: 'hidraulica', codigo: 'BH-3345', preco: 1567.00, precoAntigo: 1890.00, estoque: 15, desconto: 17 },
+    { id: 10, nome: 'Cilindro Hidráulico 80x40x800', categoria: 'hidraulica', codigo: 'CH-7712', preco: 892.50, precoAntigo: null, estoque: 22, desconto: 0 },
+    { id: 11, nome: 'Válvula Direcional 4/3 Vias', categoria: 'hidraulica', codigo: 'VD-5523', preco: 456.00, precoAntigo: 540.00, estoque: 3, desconto: 16 },
+    { id: 12, nome: 'Mangueira Hidráulica SAE100 R2', categoria: 'hidraulica', codigo: 'MH-8891', preco: 45.00, precoAntigo: null, estoque: 150, desconto: 0 },
+    
+    // Freios
+    { id: 13, nome: 'Cilindro Mestre de Freio', categoria: 'freios', codigo: 'CF-1123', preco: 387.00, precoAntigo: 450.00, estoque: 19, desconto: 14 },
+    { id: 14, nome: 'Lona de Freio Traseira', categoria: 'freios', codigo: 'LF-6634', preco: 234.50, precoAntigo: null, estoque: 56, desconto: 0 },
+    { id: 15, nome: 'Disco de Freio Ventilado', categoria: 'freios', codigo: 'DF-4412', preco: 567.00, precoAntigo: 620.00, estoque: 24, desconto: 9 },
+    { id: 16, nome: 'Kit Reparo Cilindro Roda', categoria: 'freios', codigo: 'KR-9981', preco: 89.90, precoAntigo: null, estoque: 73, desconto: 0 },
+    
+    // Elétrica
+    { id: 17, nome: 'Alternador 24V 90A', categoria: 'eletrica', codigo: 'AL-3356', preco: 789.00, precoAntigo: 920.00, estoque: 14, desconto: 14 },
+    { id: 18, nome: 'Motor de Partida 24V', categoria: 'eletrica', codigo: 'MP-7723', preco: 1234.00, precoAntigo: 1450.00, estoque: 9, desconto: 15 },
+    { id: 19, nome: 'Sensor de Temperatura Motor', categoria: 'eletrica', codigo: 'ST-5567', preco: 145.00, precoAntigo: null, estoque: 62, desconto: 0 },
+    { id: 20, nome: 'Chicote Elétrico Principal', categoria: 'eletrica', codigo: 'CE-8834', preco: 567.50, precoAntigo: 680.00, estoque: 4, desconto: 17 },
+    
+    // Transmissão
+    { id: 21, nome: 'Embreagem Completa 14"', categoria: 'transmissao', codigo: 'EM-2245', preco: 1456.00, precoAntigo: 1680.00, estoque: 11, desconto: 13 },
+    { id: 22, nome: 'Rolamento Piloto Transmissão', categoria: 'transmissao', codigo: 'RP-6678', preco: 178.00, precoAntigo: null, estoque: 38, desconto: 0 },
+    { id: 23, nome: 'Eixo Cardan Completo', categoria: 'transmissao', codigo: 'EC-9912', preco: 2345.00, precoAntigo: 2700.00, estoque: 6, desconto: 13 },
+    { id: 24, nome: 'Sincronizador 3ª/4ª Marcha', categoria: 'transmissao', codigo: 'SI-4456', preco: 567.00, precoAntigo: 650.00, estoque: 21, desconto: 13 },
+];
 
-// Pega os elementos do menu pelo ID
-const botaoMenuMobile = document.getElementById('botaoMenuMobile');
-const listaMenu = document.getElementById('listaMenu');
+/* ===== SISTEMA DE CARRINHO ===== */
+let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
 
-// Quando clicar no botão, abre/fecha o menu
-botaoMenuMobile.addEventListener('click', () => {
-    // Adiciona ou remove a classe 'active' (alterna)
-    botaoMenuMobile.classList.toggle('active');
-    listaMenu.classList.toggle('active');
+// Função para salvar carrinho
+function salvarCarrinho() {
+    localStorage.setItem('carrinho', JSON.stringify(carrinho));
+    atualizarBadgeCarrinho();
+    renderizarCarrinho();
+}
+
+// Atualizar badge do carrinho
+function atualizarBadgeCarrinho() {
+    const badge = document.getElementById('badgeCarrinho');
+    const totalItens = carrinho.reduce((total, item) => total + item.quantidade, 0);
+    badge.textContent = totalItens;
+    badge.style.display = totalItens > 0 ? 'flex' : 'none';
+}
+
+// Adicionar ao carrinho
+function adicionarAoCarrinho(idProduto) {
+    const produto = produtos.find(p => p.id === idProduto);
+    if (!produto) return;
+
+    const itemExistente = carrinho.find(item => item.id === idProduto);
+    
+    if (itemExistente) {
+        itemExistente.quantidade++;
+    } else {
+        carrinho.push({
+            id: produto.id,
+            nome: produto.nome,
+            preco: produto.preco,
+            quantidade: 1
+        });
+    }
+
+    salvarCarrinho();
+    mostrarNotificacao('Produto adicionado ao carrinho!');
+    abrirCarrinhoLateral();
+}
+
+// Remover do carrinho
+function removerDoCarrinho(idProduto) {
+    carrinho = carrinho.filter(item => item.id !== idProduto);
+    salvarCarrinho();
+    mostrarNotificacao('Produto removido do carrinho');
+}
+
+// Alterar quantidade
+function alterarQuantidade(idProduto, operacao) {
+    const item = carrinho.find(i => i.id === idProduto);
+    if (!item) return;
+
+    if (operacao === 'aumentar') {
+        item.quantidade++;
+    } else if (operacao === 'diminuir') {
+        if (item.quantidade > 1) {
+            item.quantidade--;
+        } else {
+            removerDoCarrinho(idProduto);
+            return;
+        }
+    }
+
+    salvarCarrinho();
+}
+
+// Renderizar carrinho
+function renderizarCarrinho() {
+    const conteudo = document.getElementById('carrinhoConteudo');
+    const totalElement = document.getElementById('carrinhoTotal');
+
+    if (carrinho.length === 0) {
+        conteudo.innerHTML = `
+            <div class="carrinho-vazio">
+                <i class="fas fa-shopping-cart"></i>
+                <p>Seu carrinho está vazio</p>
+            </div>
+        `;
+        totalElement.textContent = 'R$ 0,00';
+        return;
+    }
+
+    const total = carrinho.reduce((sum, item) => sum + (item.preco * item.quantidade), 0);
+
+    conteudo.innerHTML = carrinho.map(item => `
+        <div class="item-carrinho">
+            <div class="item-carrinho-imagem">
+                <i class="fas fa-cog"></i>
+            </div>
+            <div class="item-carrinho-info">
+                <div class="item-carrinho-nome">${item.nome}</div>
+                <div class="item-carrinho-preco">R$ ${item.preco.toFixed(2)}</div>
+                <div class="item-carrinho-quantidade">
+                    <button class="btn-quantidade" onclick="alterarQuantidade(${item.id}, 'diminuir')">-</button>
+                    <span>${item.quantidade}</span>
+                    <button class="btn-quantidade" onclick="alterarQuantidade(${item.id}, 'aumentar')">+</button>
+                    <button class="btn-remover" onclick="removerDoCarrinho(${item.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    totalElement.textContent = `R$ ${total.toFixed(2)}`;
+}
+
+// Abrir/Fechar carrinho lateral
+function abrirCarrinhoLateral() {
+    document.getElementById('carrinhoLateral').classList.add('aberto');
+    document.getElementById('carrinhoOverlay').classList.add('ativo');
+    document.body.style.overflow = 'hidden';
+}
+
+function fecharCarrinhoLateral() {
+    document.getElementById('carrinhoLateral').classList.remove('aberto');
+    document.getElementById('carrinhoOverlay').classList.remove('ativo');
+    document.body.style.overflow = '';
+}
+
+// Event listeners do carrinho
+document.getElementById('abrirCarrinho').addEventListener('click', abrirCarrinhoLateral);
+document.getElementById('fecharCarrinho').addEventListener('click', fecharCarrinhoLateral);
+document.getElementById('carrinhoOverlay').addEventListener('click', fecharCarrinhoLateral);
+
+// Finalizar compra
+document.getElementById('finalizarCompra').addEventListener('click', () => {
+    if (carrinho.length === 0) {
+        mostrarNotificacao('Seu carrinho está vazio!', 'erro');
+        return;
+    }
+
+    const mensagem = `*Novo Pedido - Dispemaq*\n\n` +
+        carrinho.map(item => 
+            `• ${item.nome}\n  Qtd: ${item.quantidade} | R$ ${(item.preco * item.quantidade).toFixed(2)}`
+        ).join('\n\n') +
+        `\n\n*Total: R$ ${carrinho.reduce((sum, item) => sum + (item.preco * item.quantidade), 0).toFixed(2)}*`;
+
+    const url = `https://api.whatsapp.com/send/?phone=5549984276503&text=${encodeURIComponent(mensagem)}`;
+    window.open(url, '_blank');
 });
 
+/* ===== RENDERIZAR PRODUTOS ===== */
+let categoriaAtiva = 'todos';
 
-/* ===================================
-   FECHAR MENU AO CLICAR EM UM LINK
-   =================================== */
+function renderizarProdutos(categoria = 'todos') {
+    const grade = document.getElementById('gradeProdutos');
+    const produtosFiltrados = categoria === 'todos' 
+        ? produtos 
+        : produtos.filter(p => p.categoria === categoria);
 
-// Pega todos os links do menu
-const linksMenu = document.querySelectorAll('.lista-menu a');
+    grade.innerHTML = produtosFiltrados.map(produto => {
+        const precoComDesconto = produto.preco * 0.9; // 10% desc no PIX
+        
+        return `
+            <div class="card-produto">
+                <div class="produto-imagem">
+                    <i class="fas fa-cog"></i>
+                    ${produto.desconto > 0 ? `<span class="badge-desconto">-${produto.desconto}%</span>` : ''}
+                    ${produto.estoque < 10 ? '<span class="badge-estoque-baixo">Últimas unidades</span>' : ''}
+                </div>
+                <div class="produto-info">
+                    <div class="produto-categoria">${produto.categoria}</div>
+                    <h3 class="produto-nome">${produto.nome}</h3>
+                    <p class="produto-codigo">Cód: ${produto.codigo}</p>
+                    <div class="produto-precos">
+                        ${produto.precoAntigo ? `<span class="preco-antigo">De R$ ${produto.precoAntigo.toFixed(2)}</span>` : ''}
+                        <span class="preco-atual">R$ ${produto.preco.toFixed(2)}</span>
+                        <div class="preco-pix">
+                            <i class="fab fa-pix"></i>
+                            R$ ${precoComDesconto.toFixed(2)} no PIX
+                        </div>
+                    </div>
+                    <div class="produto-acoes">
+                        <button class="botao-adicionar" onclick="adicionarAoCarrinho(${produto.id})">
+                            <i class="fas fa-cart-plus"></i> Adicionar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
 
-// Para cada link do menu
-linksMenu.forEach(link => {
-    // Quando clicar, fecha o menu
-    link.addEventListener('click', () => {
-        botaoMenuMobile.classList.remove('active');
-        listaMenu.classList.remove('active');
+// Filtros de categoria
+document.querySelectorAll('.filtro-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('ativo'));
+        btn.classList.add('ativo');
+        const categoria = btn.dataset.categoria;
+        renderizarProdutos(categoria);
     });
 });
 
+// Função para filtrar por categoria (usada nos cards de categoria)
+function filtrarPorCategoria(categoria) {
+    document.querySelector(`[data-categoria="${categoria}"]`).click();
+    document.querySelector('#loja').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 
-/* ===================================
-   ROLAGEM SUAVE PARA SEÇÕES
-   =================================== */
+/* ===== BUSCA DE PRODUTOS ===== */
+const campoBusca = document.getElementById('campoBusca');
+const botaoBuscar = document.getElementById('botaoBuscar');
 
-// Pega todos os links que começam com # (links internos)
+function realizarBusca() {
+    const termo = campoBusca.value.trim().toLowerCase();
+    if (!termo) return;
+
+    const grade = document.getElementById('gradeProdutos');
+    const resultados = produtos.filter(p => 
+        p.nome.toLowerCase().includes(termo) ||
+        p.codigo.toLowerCase().includes(termo) ||
+        p.categoria.toLowerCase().includes(termo)
+    );
+
+    if (resultados.length === 0) {
+        grade.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+                <i class="fas fa-search" style="font-size: 4rem; color: var(--cinza-medio); opacity: 0.3; margin-bottom: 20px; display: block;"></i>
+                <h3>Nenhum produto encontrado</h3>
+                <p style="color: var(--cinza-medio); margin-top: 10px;">Tente buscar por outro termo ou entre em contato conosco</p>
+            </div>
+        `;
+    } else {
+        renderizarProdutos('todos');
+        document.querySelector('#loja').scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+botaoBuscar.addEventListener('click', realizarBusca);
+campoBusca.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') realizarBusca();
+});
+
+/* ===== NOTIFICAÇÕES ===== */
+function mostrarNotificacao(mensagem, tipo = 'sucesso') {
+    const notificacao = document.createElement('div');
+    notificacao.className = `notificacao notificacao-${tipo}`;
+    notificacao.innerHTML = `
+        <i class="fas fa-${tipo === 'sucesso' ? 'check-circle' : 'exclamation-circle'}"></i>
+        <span>${mensagem}</span>
+    `;
+    
+    // Adicionar estilos
+    notificacao.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        background: ${tipo === 'sucesso' ? '#10b981' : '#ef4444'};
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 9999;
+        animation: slideInRight 0.3s ease;
+    `;
+
+    document.body.appendChild(notificacao);
+
+    setTimeout(() => {
+        notificacao.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => notificacao.remove(), 300);
+    }, 3000);
+}
+
+// Adicionar animações ao CSS
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from { transform: translateX(400px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOutRight {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(400px); opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
+
+/* ===== MENU MOBILE ===== */
+const botaoMenu = document.getElementById('botaoMenuMobile');
+const menuNav = document.getElementById('menuNavegacao');
+
+botaoMenu.addEventListener('click', (e) => {
+    e.stopPropagation();
+    menuNav.classList.toggle('ativo');
+    botaoMenu.classList.toggle('ativo');
+});
+
+document.querySelectorAll('.lista-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+        menuNav.classList.remove('ativo');
+        botaoMenu.classList.remove('ativo');
+    });
+});
+
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.cabecalho-principal')) {
+        menuNav.classList.remove('ativo');
+        botaoMenu.classList.remove('ativo');
+    }
+});
+
+/* ===== ROLAGEM SUAVE ===== */
 document.querySelectorAll('a[href^="#"]').forEach(link => {
-    link.addEventListener('click', function (evento) {
-        // Evita o comportamento padrão do link
-        evento.preventDefault();
-        
-        // Pega o elemento de destino pelo ID
-        const destino = document.querySelector(this.getAttribute('href'));
-        
-        // Se o destino existe
-        if (destino) {
-            // Calcula a posição considerando o cabeçalho fixo
-            const alturaHeader = 100;
-            const posicaoElemento = destino.getBoundingClientRect().top;
-            const posicaoFinal = posicaoElemento + window.pageYOffset - alturaHeader;
-
-            // Rola suavemente até a posição
-            window.scrollTo({
-                top: posicaoFinal,
-                behavior: 'smooth'
-            });
+    link.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (href.length > 1) {
+            e.preventDefault();
+            const elemento = document.querySelector(href);
+            if (elemento) {
+                const posicao = elemento.offsetTop - 80;
+                window.scrollTo({
+                    top: posicao,
+                    behavior: 'smooth'
+                });
+            }
         }
     });
 });
 
-
-/* ===================================
-   EFEITO DE ESCONDER/MOSTRAR HEADER AO ROLAR
-   =================================== */
-
-let ultimaRolagem = 0;
-const cabecalho = document.querySelector('.cabecalho');
+/* ===== BOTÃO VOLTAR AO TOPO ===== */
+const botaoTopo = document.getElementById('botaoTopo');
 
 window.addEventListener('scroll', () => {
-    // Pega a posição atual da rolagem
+    if (window.pageYOffset > 300) {
+        botaoTopo.classList.add('visivel');
+    } else {
+        botaoTopo.classList.remove('visivel');
+    }
+});
+
+botaoTopo.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+/* ===== MODALS ===== */
+function abrirModal(idModal) {
+    const modal = document.getElementById(idModal);
+    if (modal) {
+        modal.classList.add('ativo');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function fecharModal(idModal) {
+    const modal = document.getElementById(idModal);
+    if (modal) {
+        modal.classList.remove('ativo');
+        document.body.style.overflow = '';
+    }
+}
+
+document.querySelectorAll('.modal-overlay').forEach(modal => {
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.remove('ativo');
+            document.body.style.overflow = '';
+        }
+    });
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.ativo').forEach(modal => {
+            modal.classList.remove('ativo');
+            document.body.style.overflow = '';
+        });
+        fecharCarrinhoLateral();
+    }
+});
+
+/* ===== ANIMAÇÕES ===== */
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+        }
+    });
+}, {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+});
+
+const elementosAnimados = document.querySelectorAll(
+    '.card-categoria, .item-beneficio, .card-flutuante'
+);
+
+elementosAnimados.forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(30px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+});
+
+/* ===== HEADER FIXO COM EFEITO ===== */
+let ultimaRolagem = 0;
+const cabecalho = document.querySelector('.cabecalho-principal');
+
+window.addEventListener('scroll', () => {
     const rolagemAtual = window.pageYOffset;
     
-    // Se está no topo da página
-    if (rolagemAtual <= 0) {
-        cabecalho.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-        return;
-    }
-    
-    // Se está rolando para baixo e já rolou mais de 100px
     if (rolagemAtual > ultimaRolagem && rolagemAtual > 100) {
-        // Esconde o header
         cabecalho.style.transform = 'translateY(-100%)';
     } else {
-        // Mostra o header
         cabecalho.style.transform = 'translateY(0)';
-        cabecalho.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
     }
     
-    // Atualiza a última posição de rolagem
     ultimaRolagem = rolagemAtual;
 });
 
-
-/* ===================================
-   ANIMAÇÃO DOS CARDS AO ROLAR A PÁGINA
-   =================================== */
-
-// Configurações do observador
-const opcoesObservador = {
-    threshold: 0.1,  // Ativa quando 10% do elemento está visível
-    rootMargin: '0px 0px -50px 0px'  // Margem para ativar antes
-};
-
-// Cria um observador para animar elementos
-const observador = new IntersectionObserver((elementos) => {
-    elementos.forEach(elemento => {
-        // Se o elemento está visível na tela
-        if (elemento.isIntersecting) {
-            // Torna visível com animação
-            elemento.target.style.opacity = '1';
-            elemento.target.style.transform = 'translateY(0)';
-        }
-    });
-}, opcoesObservador);
-
-// Pega todos os cards que serão animados
-const elementosAnimados = document.querySelectorAll('.card-peca, .card-contato, .card-estatistica, .caixa-info');
-
-// Para cada elemento
-elementosAnimados.forEach(elemento => {
-    // Define estado inicial (invisível e deslocado para baixo)
-    elemento.style.opacity = '0';
-    elemento.style.transform = 'translateY(30px)';
-    elemento.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-    // Observa o elemento
-    observador.observe(elemento);
-});
-
-
-/* ===================================
-   ANIMAÇÃO DE CONTAGEM NOS NÚMEROS
-   =================================== */
-
-// Pega todos os números de estatística
-const numerosEstatistica = document.querySelectorAll('.card-estatistica h4');
-
-// Função que anima a contagem de um número
-const animarContagem = (elemento) => {
-    const textoCompleto = elemento.textContent;
-    const temNumero = /\d+/.test(textoCompleto);
+/* ===== INICIALIZAÇÃO ===== */
+document.addEventListener('DOMContentLoaded', () => {
+    renderizarProdutos();
+    atualizarBadgeCarrinho();
+    renderizarCarrinho();
     
-    // Se não tem número, não anima
-    if (!temNumero) return;
-    
-    // Extrai o número e o sufixo (ex: "12" e "+")
-    const numero = parseInt(textoCompleto.match(/\d+/)[0]);
-    const sufixo = textoCompleto.replace(/\d+/, '');
-    const duracao = 2000;  // 2 segundos
-    const incremento = numero / (duracao / 16);  // 60 FPS
-    let numeroAtual = 0;
-    
-    // Cria um timer para animar
-    const timer = setInterval(() => {
-        numeroAtual += incremento;
-        if (numeroAtual >= numero) {
-            // Chegou no número final
-            elemento.textContent = numero + sufixo;
-            clearInterval(timer);
-        } else {
-            // Atualiza com o número arredondado
-            elemento.textContent = Math.floor(numeroAtual) + sufixo;
-        }
-    }, 16);  // Atualiza a cada 16ms (60 FPS)
-};
-
-// Observador para as estatísticas
-const observadorEstatisticas = new IntersectionObserver((elementos) => {
-    elementos.forEach(elemento => {
-        if (elemento.isIntersecting) {
-            // Anima o número e para de observar
-            animarContagem(elemento.target);
-            observadorEstatisticas.unobserve(elemento.target);
-        }
-    });
-}, { threshold: 0.5 });  // Ativa quando 50% está visível
-
-// Observa cada número de estatística
-numerosEstatistica.forEach(numero => observadorEstatisticas.observe(numero));
-
-
-/* ===================================
-   LAZY LOAD DE IMAGENS (CARREGAMENTO PREGUIÇOSO)
-   =================================== */
-
-// Pega todas as imagens com data-src (carregamento adiado)
-const imagensLazy = document.querySelectorAll('img[data-src]');
-
-const observadorImagens = new IntersectionObserver((elementos) => {
-    elementos.forEach(elemento => {
-        if (elemento.isIntersecting) {
-            const imagem = elemento.target;
-            // Troca o data-src pelo src (carrega a imagem)
-            imagem.src = imagem.dataset.src;
-            imagem.removeAttribute('data-src');
-            observadorImagens.unobserve(imagem);
-        }
-    });
+    console.log('%c🛒 Dispemaq - Loja Online', 'color: #1e3a8a; font-size: 20px; font-weight: bold;');
+    console.log('%c✨ Sistema de e-commerce completo', 'color: #f59e0b; font-size: 14px;');
+    console.log('%c📞 Contato: +55 49 98427-6503', 'color: #10b981; font-size: 14px;');
 });
-
-// Observa cada imagem
-imagensLazy.forEach(imagem => observadorImagens.observe(imagem));
-
-
-/* ===================================
-   DESTACAR ITEM DO MENU ATIVO
-   =================================== */
-
-// Pega o hash da URL (ex: #inicio)
-const localizacaoAtual = window.location.hash;
-
-// Se existe um hash na URL
-if (localizacaoAtual) {
-    linksMenu.forEach(link => {
-        // Se o link corresponde ao hash atual
-        if (link.getAttribute('href') === localizacaoAtual) {
-            link.style.color = 'var(--cor-secundaria)';
-        }
-    });
-}
-
-
-/* ===================================
-   BOTÃO VOLTAR AO TOPO
-   =================================== */
-
-// Cria o botão de voltar ao topo
-let botaoTopo = document.createElement('button');
-botaoTopo.innerHTML = '<i class="fas fa-arrow-up"></i>';
-botaoTopo.className = 'botao-topo';
-botaoTopo.style.cssText = `
-    position: fixed;
-    bottom: 100px;
-    right: 30px;
-    width: 50px;
-    height: 50px;
-    background: var(--cor-primaria);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    z-index: 998;
-    font-size: 1.2rem;
-    box-shadow: 0 4px 15px rgba(26, 35, 126, 0.4);
-`;
-
-// Adiciona o botão no body
-document.body.appendChild(botaoTopo);
-
-// Mostra/esconde o botão conforme a rolagem
-window.addEventListener('scroll', () => {
-    if (window.pageYOffset > 300) {
-        // Mostra o botão
-        botaoTopo.style.opacity = '1';
-        botaoTopo.style.visibility = 'visible';
-    } else {
-        // Esconde o botão
-        botaoTopo.style.opacity = '0';
-        botaoTopo.style.visibility = 'hidden';
-    }
-});
-
-// Quando clicar no botão, volta ao topo
-botaoTopo.addEventListener('click', () => {
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-    });
-});
-
-// Efeitos ao passar o mouse no botão
-botaoTopo.addEventListener('mouseenter', () => {
-    botaoTopo.style.transform = 'scale(1.1)';
-    botaoTopo.style.background = 'var(--cor-secundaria)';
-});
-
-botaoTopo.addEventListener('mouseleave', () => {
-    botaoTopo.style.transform = 'scale(1)';
-    botaoTopo.style.background = 'var(--cor-primaria)';
-});
-
-
-/* ===================================
-   ANIMAÇÃO DE CARREGAMENTO DA PÁGINA
-   =================================== */
 
 window.addEventListener('load', () => {
-    // Começa invisível
     document.body.style.opacity = '0';
-    setTimeout(() => {
-        // Fade in suave da página
-        document.body.style.transition = 'opacity 0.5s ease';
-        document.body.style.opacity = '1';
-    }, 100);
+    document.body.style.transition = 'opacity 0.5s ease';
+    setTimeout(() => document.body.style.opacity = '1', 100);
 });
-
-
-/* ===================================
-   FECHAR MENU AO CLICAR FORA DELE
-   =================================== */
-
-document.addEventListener('click', (evento) => {
-    // Se clicou fora do menu e o menu está aberto
-    if (!evento.target.closest('.menu-navegacao') && listaMenu.classList.contains('active')) {
-        botaoMenuMobile.classList.remove('active');
-        listaMenu.classList.remove('active');
-    }
-});
-
-// Impede que clique no botão feche o menu
-botaoMenuMobile.addEventListener('click', (evento) => {
-    evento.stopPropagation();
-});
-
-
-/* ===================================
-   EFEITO DE CARREGAMENTO NOS BOTÕES DO WHATSAPP
-   =================================== */
-
-document.querySelectorAll('.botao').forEach(botao => {
-    // Se o botão é um link do WhatsApp
-    if (botao.href && botao.href.includes('whatsapp')) {
-        botao.addEventListener('click', (evento) => {
-            const textoOriginal = botao.innerHTML;
-            // Mostra loading
-            botao.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Abrindo...';
-            botao.style.pointerEvents = 'none';
-            
-            // Volta ao normal depois de 2 segundos
-            setTimeout(() => {
-                botao.innerHTML = textoOriginal;
-                botao.style.pointerEvents = 'auto';
-            }, 2000);
-        });
-    }
-});
-
-
-/* ===================================
-   EFEITO DE HOVER PERSONALIZADO NOS CARDS
-   =================================== */
-
-document.querySelectorAll('.card-peca, .card-contato').forEach(card => {
-    // Ao entrar com o mouse
-    card.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-10px) scale(1.02)';
-    });
-    
-    // Ao sair com o mouse
-    card.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0) scale(1)';
-    });
-});
-
-
-/* ===================================
-   MENSAGEM DE BOAS-VINDAS NO CONSOLE
-   =================================== */
-
-console.log('%c🔧 Dispemaq - Peças para Máquinas Pesadas', 'color: #1a237e; font-size: 20px; font-weight: bold;');
-console.log('%cSite desenvolvido com HTML, CSS e JavaScript', 'color: #ffa000; font-size: 14px;');
-console.log('%c📞 Contato: +55 49 98427-6503', 'color: #00897b; font-size: 14px;');
-
-
-/* ===================================
-   MONITORAMENTO DE PERFORMANCE (OPCIONAL)
-   =================================== */
-
-if ('performance' in window) {
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            // Pega dados de performance do navegador
-            const dadosPerformance = performance.getEntriesByType('navigation')[0];
-            const tempoCarregamento = Math.round(dadosPerformance.loadEventEnd - dadosPerformance.fetchStart);
-            console.log(`⚡ Página carregada em ${tempoCarregamento}ms`);
-        }, 0);
-    });
-}
