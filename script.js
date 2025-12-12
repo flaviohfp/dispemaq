@@ -1,3 +1,132 @@
+/* ===== SISTEMA DE MARCAS E FILTROS ===== */
+let marcaSelecionada = null;
+let categoriaSelecionada = null;
+
+// Abrir menu de categorias ao clicar em uma marca
+document.querySelectorAll('.item-marca').forEach(botao => {
+    botao.addEventListener('click', function() {
+        const marca = this.dataset.marca;
+        marcaSelecionada = marca;
+        
+        // Remove ativa de todos e adiciona no clicado
+        document.querySelectorAll('.item-marca').forEach(b => b.classList.remove('ativa'));
+        this.classList.add('ativa');
+        
+        // Atualiza o título do menu
+        const nomeMarca = this.textContent.trim();
+        document.getElementById('nomeMarcaSelecionada').innerHTML = `
+            <i class="fas fa-filter"></i> ${nomeMarca} - Selecione a categoria
+        `;
+        
+        // Abre o menu de categorias
+        document.getElementById('menuCategoriasMarca').classList.add('aberto');
+        document.getElementById('overlayCategorias').classList.add('ativo');
+        document.body.style.overflow = 'hidden';
+    });
+});
+
+// Fechar menu de categorias
+function fecharMenuCategorias() {
+    document.getElementById('menuCategoriasMarca').classList.remove('aberto');
+    document.getElementById('overlayCategorias').classList.remove('ativo');
+    document.body.style.overflow = '';
+}
+
+document.getElementById('fecharMenuCategorias').addEventListener('click', fecharMenuCategorias);
+document.getElementById('overlayCategorias').addEventListener('click', fecharMenuCategorias);
+
+// Filtrar por marca e categoria
+function filtrarPorMarcaCategoria(categoria) {
+    categoriaSelecionada = categoria;
+    
+    // Fecha o menu
+    fecharMenuCategorias();
+    
+    // Remove marcas ativas
+    document.querySelectorAll('.item-marca').forEach(b => b.classList.remove('ativa'));
+    
+    // Rola até a loja
+    document.querySelector('#loja').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    
+    // Aguarda um pouco e filtra os produtos
+    setTimeout(() => {
+        filtrarProdutosPorMarcaECategoria(marcaSelecionada, categoria);
+        mostrarNotificacao(`Exibindo ${categoria} da marca ${marcaSelecionada || 'todas'}`, 'sucesso');
+    }, 600);
+}
+
+// Função para filtrar produtos por marca e categoria
+function filtrarProdutosPorMarcaECategoria(marca, categoria) {
+    const grade = document.getElementById('gradeProdutos');
+    
+    // Mapear categorias do menu para categorias dos produtos
+    const mapaCategorias = {
+        'motor': ['motores', 'filtros'],
+        'combustivel': ['motores', 'filtros'],
+        'transmissao': ['transmissao'],
+        'direcao': ['freios'],
+        'eletrico': ['eletrica'],
+        'hidraulico': ['hidraulica'],
+        'chassi': ['transmissao'],
+        'cabine': ['eletrica'],
+        'ar-condicionado': ['filtros'],
+        'fps': ['hidraulica'],
+        'rodante': ['transmissao']
+    };
+    
+    const categoriasPermitidas = mapaCategorias[categoria] || [];
+    
+    const produtosFiltrados = produtos.filter(p => 
+        categoriasPermitidas.includes(p.categoria)
+    );
+    
+    if (produtosFiltrados.length === 0) {
+        grade.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+                <i class="fas fa-inbox" style="font-size: 4rem; color: var(--cinza-medio); opacity: 0.3; margin-bottom: 20px; display: block;"></i>
+                <h3>Nenhum produto encontrado</h3>
+                <p style="color: var(--cinza-medio); margin: 10px 0 20px;">Não encontramos produtos nesta categoria para a marca selecionada.</p>
+                <button onclick="renderizarProdutos('todos')" class="botao botao-primario">Ver todos os produtos</button>
+            </div>
+        `;
+    } else {
+        grade.innerHTML = produtosFiltrados.map(produto => {
+            const precoComDesconto = produto.preco * 0.9;
+            
+            return `
+                <div class="card-produto">
+                    <div class="produto-imagem">
+                        <i class="fas fa-cog"></i>
+                        ${produto.desconto > 0 ? `<span class="badge-desconto">-${produto.desconto}%</span>` : ''}
+                        ${produto.estoque < 10 ? '<span class="badge-estoque-baixo">Últimas unidades</span>' : ''}
+                    </div>
+                    <div class="produto-info">
+                        <div class="produto-categoria">${produto.categoria}</div>
+                        <h3 class="produto-nome">${produto.nome}</h3>
+                        <p class="produto-codigo">Cód: ${produto.codigo}</p>
+                        <div class="produto-precos">
+                            ${produto.precoAntigo ? `<span class="preco-antigo">De R$ ${produto.precoAntigo.toFixed(2)}</span>` : ''}
+                            <span class="preco-atual">R$ ${produto.preco.toFixed(2)}</span>
+                            <div class="preco-pix">
+                                <i class="fab fa-pix"></i>
+                                R$ ${precoComDesconto.toFixed(2)} no PIX
+                            </div>
+                        </div>
+                        <div class="produto-acoes">
+                            <button class="botao-adicionar" onclick="adicionarAoCarrinho(${produto.id})">
+                                <i class="fas fa-cart-plus"></i> Adicionar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // Atualiza os filtros visualmente
+    document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('ativo'));
+}
+
 /* ===== BANCO DE DADOS DE PRODUTOS ===== */
 const produtos = [
     // Filtros

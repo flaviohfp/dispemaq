@@ -24,8 +24,8 @@
                 
                 <!-- Logo -->
                 <div class="logo-empresa">
-                    <h1>DISPEMAQ</h1>
-                    <span class="badge-estoque">+20 MIL ITENS</span>
+                    <img src="./assets/SITE-LOGO-ESTENDIDA.-PNG-2048x819.png" alt="logo">
+                    
                 </div>
 
                 <!-- Barra de Busca -->
@@ -57,18 +57,113 @@
                 </button>
             </div>
 
-            <!-- Menu de Navegação -->
+            <!-- Barra de Marcas -->
+            <div class="barra-marcas">
+                <button class="item-marca" data-marca="john-deere">
+                    <i class="fas fa-tractor"></i> John Deere
+                </button>
+                <button class="item-marca" data-marca="caterpillar">
+                    <i class="fas fa-hard-hat"></i> Caterpillar
+                </button>
+                <button class="item-marca" data-marca="hyundai">
+                    <i class="fas fa-truck-moving"></i> Hyundai
+                </button>
+                <button class="item-marca" data-marca="jcb">
+                    <i class="fas fa-wrench"></i> J.C.B.
+                </button>
+                <button class="item-marca" data-marca="komatsu">
+                    <i class="fas fa-industry"></i> Komatsu
+                </button>
+                <button class="item-marca" data-marca="volvo">
+                    <i class="fas fa-truck"></i> Volvo
+                </button>
+                <button class="item-marca" data-marca="xcmg">
+                    <i class="fas fa-cogs"></i> XCMG
+                </button>
+                <button class="item-marca" data-marca="case">
+                    <i class="fas fa-tools"></i> Case
+                </button>
+                <button class="item-marca" data-marca="new-holland">
+                    <i class="fas fa-tractor"></i> New Holland
+                </button>
+                <button class="item-marca item-marca-destaque" data-marca="todas">
+                    <i class="fas fa-plus"></i> Todas Marcas
+                </button>
+            </div>
+
+            <!-- Menu de Navegação Principal -->
             <nav class="menu-navegacao" id="menuNavegacao">
                 <ul class="lista-menu">
                     <li><a href="#inicio"><i class="fas fa-home"></i> Início</a></li>
                     <li><a href="#loja"><i class="fas fa-store"></i> Loja</a></li>
-                    <li><a href="#categorias"><i class="fas fa-th-large"></i> Categorias</a></li>
                     <li><a href="#sobre"><i class="fas fa-info-circle"></i> Sobre</a></li>
                     <li><a href="#contato"><i class="fas fa-envelope"></i> Contato</a></li>
                 </ul>
             </nav>
         </div>
     </header>
+
+    <!-- Menu Dropdown de Categorias por Marca -->
+    <div class="menu-categorias-marca" id="menuCategoriasMarca">
+        <div class="container">
+            <div class="titulo-marca-selecionada">
+                <h3 id="nomeMarcaSelecionada">Selecione uma categoria</h3>
+                <button class="fechar-menu-categorias" id="fecharMenuCategorias">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="grade-categorias-marca">
+                <button class="categoria-marca-item" data-categoria="motor" onclick="filtrarPorMarcaCategoria('motor')">
+                    <i class="fas fa-cog"></i>
+                    <span>Motor</span>
+                </button>
+                <button class="categoria-marca-item" data-categoria="combustivel" onclick="filtrarPorMarcaCategoria('combustivel')">
+                    <i class="fas fa-gas-pump"></i>
+                    <span>Sistema de Combustível</span>
+                </button>
+                <button class="categoria-marca-item" data-categoria="transmissao" onclick="filtrarPorMarcaCategoria('transmissao')">
+                    <i class="fas fa-gears"></i>
+                    <span>Transmissão / Comando Final</span>
+                </button>
+                <button class="categoria-marca-item" data-categoria="direcao" onclick="filtrarPorMarcaCategoria('direcao')">
+                    <i class="fas fa-steering-wheel"></i>
+                    <span>Direção / Freios / Eixos</span>
+                </button>
+                <button class="categoria-marca-item" data-categoria="eletrico" onclick="filtrarPorMarcaCategoria('eletrico')">
+                    <i class="fas fa-bolt"></i>
+                    <span>Sistema Elétrico</span>
+                </button>
+                <button class="categoria-marca-item" data-categoria="hidraulico" onclick="filtrarPorMarcaCategoria('hidraulico')">
+                    <i class="fas fa-tint"></i>
+                    <span>Sistema Hidráulico</span>
+                </button>
+                <button class="categoria-marca-item" data-categoria="chassi" onclick="filtrarPorMarcaCategoria('chassi')">
+                    <i class="fas fa-truck-monster"></i>
+                    <span>Chassi / Estruturas</span>
+                </button>
+                <button class="categoria-marca-item" data-categoria="cabine" onclick="filtrarPorMarcaCategoria('cabine')">
+                    <i class="fas fa-chair"></i>
+                    <span>Posto Operação / Cabine</span>
+                </button>
+                <button class="categoria-marca-item" data-categoria="ar-condicionado" onclick="filtrarPorMarcaCategoria('ar-condicionado')">
+                    <i class="fas fa-wind"></i>
+                    <span>Sistema de Ar Condicionado</span>
+                </button>
+                <button class="categoria-marca-item" data-categoria="fps" onclick="filtrarPorMarcaCategoria('fps')">
+                    <i class="fas fa-tools"></i>
+                    <span>F.P.S. / Implementos</span>
+                </button>
+                <button class="categoria-marca-item" data-categoria="rodante" onclick="filtrarPorMarcaCategoria('rodante')">
+                    <i class="fas fa-circle-notch"></i>
+                    <span>Material Rodante</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay do Menu Categorias -->
+    <div class="overlay-categorias" id="overlayCategorias"></div>
+                        
 
     <!-- ===== BANNER HERO PRINCIPAL ===== -->
     <section class="hero-principal" id="inicio">

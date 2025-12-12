@@ -35,7 +35,7 @@ body {
 .barra-anuncio {
     background: linear-gradient(135deg, var(--azul-escuro), #1e40af);
     color: var(--branco);
-    padding: 12px 0;
+    padding: 5px 0;
     text-align: center;
     font-size: 0.9rem;
     font-weight: 500;
@@ -64,27 +64,16 @@ body {
 }
 
 /* Logo */
-.logo-empresa {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.logo-empresa img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100px;
+    object-fit: contain;
+    padding-left: 20px; /* opcional */
 }
 
-.logo-empresa h1 {
-    font-size: 1.8rem;
-    color: var(--azul-escuro);
-    font-weight: 800;
-    letter-spacing: -1px;
-}
 
-.badge-estoque {
-    background: var(--laranja);
-    color: var(--branco);
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.7rem;
-    font-weight: 700;
-}
 
 /* Barra de Busca */
 .barra-busca {
@@ -93,12 +82,13 @@ body {
     background: var(--cinza-claro);
     border-radius: 8px;
     overflow: hidden;
+    
 }
 
 .barra-busca input {
     flex: 1;
     border: none;
-    padding: 12px 15px;
+    padding: 15px 25px;
     font-size: 0.95rem;
     background: transparent;
 }
@@ -172,6 +162,183 @@ body {
     height: 3px;
     background: var(--azul-escuro);
     transition: 0.3s;
+}
+
+/* ===== BARRA DE MARCAS ===== */
+.barra-marcas {
+    position: relative;
+    width: 100vw;
+    height: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--laranja) 0%, #ea580c 100%);
+    padding: 0;
+    display: flex;
+    overflow-x: auto;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    z-index: 10;
+    
+}
+
+.barra-marcas::-webkit-scrollbar {
+    height: 6px;
+}
+
+.barra-marcas::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.3);
+    border-radius: 4px;
+}
+
+.item-marca {
+    
+    flex: 0 0 auto;
+    padding: 15px 25px;
+    background: transparent;
+    border: none;
+    color: var(--branco);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    border-bottom: 3px solid transparent;
+}
+
+.item-marca:hover {
+    background: rgba(255,255,255,0.1);
+    border-bottom-color: var(--branco);
+}
+
+.item-marca.ativa {
+    background: rgba(255,255,255,0.2);
+    border-bottom-color: var(--branco);
+}
+
+.item-marca-destaque {
+    background: rgba(255,255,255,0.15);
+    margin-left: auto;
+}
+
+.item-marca-destaque:hover {
+    background: rgba(255,255,255,0.25);
+}
+
+/* ===== MENU DROPDOWN DE CATEGORIAS POR MARCA ===== */
+.menu-categorias-marca {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--branco);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    z-index: 1999;
+    transform: translateY(-100%);
+    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.menu-categorias-marca.aberto {
+    transform: translateY(0);
+}
+
+.titulo-marca-selecionada {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 0;
+    border-bottom: 2px solid var(--cinza-claro);
+}
+
+.titulo-marca-selecionada h3 {
+    color: var(--azul-escuro);
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.fechar-menu-categorias {
+    background: var(--cinza-claro);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 1.2rem;
+    color: var(--cinza-escuro);
+}
+
+.fechar-menu-categorias:hover {
+    background: var(--azul-escuro);
+    color: var(--branco);
+    transform: rotate(90deg);
+}
+
+.grade-categorias-marca {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    padding: 30px 0;
+}
+
+.categoria-marca-item {
+    background: var(--cinza-claro);
+    padding: 20px;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--cinza-escuro);
+    text-align: left;
+}
+
+.categoria-marca-item:hover {
+    background: var(--branco);
+    border-color: var(--laranja);
+    transform: translateX(10px);
+    box-shadow: var(--sombra-media);
+}
+
+.categoria-marca-item i {
+    font-size: 1.8rem;
+    color: var(--laranja);
+    width: 40px;
+    height: 40px;
+    background: var(--branco);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.overlay-categorias {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 1998;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.3s;
+    backdrop-filter: blur(3px);
+}
+
+.overlay-categorias.ativo {
+    opacity: 1;
+    visibility: visible;
 }
 
 /* Menu de Navegação */
@@ -1440,6 +1607,24 @@ body {
         gap: 0;
     }
 
+    .barra-marcas {
+        justify-content: flex-start;
+        padding: 0;
+    }
+
+    .item-marca {
+        padding: 12px 20px;
+        font-size: 0.9rem;
+    }
+
+    .grade-categorias-marca {
+        grid-template-columns: 1fr;
+    }
+
+    .menu-categorias-marca {
+        max-height: 90vh;
+    }
+
     .conteudo-hero,
     .conteudo-sobre,
     .mapa-local {
@@ -1466,6 +1651,11 @@ body {
     .conteudo-rodape {
         grid-template-columns: 1fr 1fr;
     }
+
+    .carrinho-lateral {
+        width: 100%;
+        right: -100%;
+    }
 }
 
 /* ===== RESPONSIVO - MOBILE ===== */
@@ -1476,6 +1666,41 @@ body {
 
     .cabecalho-secao h2 {
         font-size: 1.8rem;
+    }
+
+    .barra-marcas {
+        padding: 0;
+    }
+
+    .item-marca {
+        padding: 10px 15px;
+        font-size: 0.85rem;
+        gap: 6px;
+    }
+
+    .item-marca i {
+        font-size: 0.9rem;
+    }
+
+    .titulo-marca-selecionada {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .titulo-marca-selecionada h3 {
+        font-size: 1.2rem;
+    }
+
+    .categoria-marca-item {
+        padding: 15px;
+        font-size: 0.9rem;
+    }
+
+    .categoria-marca-item i {
+        font-size: 1.5rem;
+        width: 35px;
+        height: 35px;
     }
 
     .grade-beneficios,
@@ -1500,5 +1725,9 @@ body {
         width: 50px;
         height: 50px;
         font-size: 1.5rem;
+    }
+
+    .carrinho-lateral {
+        width: 100%;
     }
 }
