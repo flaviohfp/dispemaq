@@ -2,8 +2,53 @@
 let marcaSelecionada = null;
 let categoriaSelecionada = null;
 
-// Abrir menu de categorias ao clicar em uma marca
-document.querySelectorAll('.item-marca').forEach(botao => {
+// Controle do dropdown +MARCAS
+const btnMarcas = document.getElementById("btnMarcas");
+const menuMarcas = document.getElementById("menuMarcas");
+
+if (btnMarcas && menuMarcas) {
+    btnMarcas.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const aberto = menuMarcas.style.display === "block";
+        menuMarcas.style.display = aberto ? "none" : "block";
+        btnMarcas.querySelector(".setinha").textContent = aberto ? "▼" : "▲";
+    });
+
+    // Fecha o menu ao clicar fora
+    document.addEventListener("click", (e) => {
+        if (!e.target.closest(".dropdown-marcas")) {
+            menuMarcas.style.display = "none";
+            if (btnMarcas.querySelector(".setinha")) {
+                btnMarcas.querySelector(".setinha").textContent = "▼";
+            }
+        }
+    });
+
+    // Adiciona funcionalidade aos itens do dropdown
+    document.querySelectorAll('.marca-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const marca = this.textContent.trim().toLowerCase().replace(/\s+/g, '-');
+            marcaSelecionada = marca;
+            
+            // Atualiza o título do menu
+            document.getElementById('nomeMarcaSelecionada').innerHTML = `
+                <i class="fas fa-filter"></i> ${this.textContent.trim()} - Selecione a categoria
+            `;
+            
+            // Fecha o dropdown
+            menuMarcas.style.display = "none";
+            btnMarcas.querySelector(".setinha").textContent = "▼";
+            
+            // Abre o menu de categorias
+            document.getElementById('menuCategoriasMarca').classList.add('aberto');
+            document.getElementById('overlayCategorias').classList.add('ativo');
+            document.body.style.overflow = 'hidden';
+        });
+    });
+}
+
+// Abrir menu de categorias ao clicar em uma marca principal
+document.querySelectorAll('.item-marca:not(.dropdown-marcas *)').forEach(botao => {
     botao.addEventListener('click', function() {
         const marca = this.dataset.marca;
         marcaSelecionada = marca;

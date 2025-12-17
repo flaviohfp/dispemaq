@@ -1,653 +1,871 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Dispemaq - Loja de peças multimarcas para máquinas pesadas. Mais de 20 mil itens em estoque com entrega para todo Brasil.">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Dispemaq - Loja de peças multimarcas para máquinas pesadas. Mais de 20 mil itens em estoque com entrega para todo Brasil."
+    />
     <title>Dispemaq | Loja de Peças para Máquinas Pesadas</title>
-    <link rel="stylesheet" href="./style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
-
+    <link rel="stylesheet" href="./style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
     <!-- ===== BARRA DE ANÚNCIO SUPERIOR ===== -->
     <div class="barra-anuncio">
-        <div class="container">
-            <p><i class="fas fa-shipping-fast"></i> FRETE GRÁTIS para compras acima de R$ 500 | <i class="fas fa-percent"></i> Até 10% OFF no PIX</p>
-        </div>
+      <div class="container">
+        <p>
+          <i class="fas fa-shipping-fast"></i> FRETE GRÁTIS para compras acima
+          de R$ 500 | <i class="fas fa-percent"></i> Até 10% OFF no PIX
+        </p>
+      </div>
     </div>
 
     <!-- ===== CABEÇALHO PRINCIPAL ===== -->
     <header class="cabecalho-principal">
-        <div class="container">
-            <div class="topo-cabecalho">
-                
-                <!-- Logo -->
-                <div class="logo-empresa">
-                    <img src="./assets/SITE-LOGO-ESTENDIDA.-PNG-2048x819.png" alt="logo">
-                    
-                </div>
+      <div class="container">
+        <div class="topo-cabecalho">
+          <!-- Logo -->
+          <div class="logo-empresa">
+            <img
+              src="./assets/SITE-LOGO-ESTENDIDA.-PNG-2048x819.png"
+              alt="logo"
+            />
+          </div>
 
-                <!-- Barra de Busca -->
-                <div class="barra-busca">
-                    <input type="text" placeholder="Buscar peças por código, marca ou categoria..." id="campoBusca">
-                    <button class="botao-buscar" id="botaoBuscar">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
+          <!-- Barra de Busca -->
+          <div class="barra-busca">
+            <input
+              type="text"
+              placeholder="Buscar peças por código, marca ou categoria..."
+              id="campoBusca"
+            />
+            <button class="botao-buscar" id="botaoBuscar">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
 
-                <!-- Ações do Usuário -->
-                <div class="acoes-usuario">
-                    <a href="tel:+5549984276503" class="item-acao">
-                        <i class="fas fa-phone"></i>
-                        <span>Ligar</span>
-                    </a>
-                    <button class="item-acao carrinho-botao" id="abrirCarrinho">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>Carrinho</span>
-                        <span class="badge-carrinho" id="badgeCarrinho">0</span>
-                    </button>
-                </div>
+          <!-- Ações do Usuário -->
+          <div class="acoes-usuario">
+            <a href="tel:+5549984276503" class="item-acao">
+              <i class="fas fa-phone"></i>
+              <span>Ligar</span>
+            </a>
+            <button class="item-acao carrinho-botao" id="abrirCarrinho">
+              <i class="fas fa-shopping-cart"></i>
+              <span>Carrinho</span>
+              <span class="badge-carrinho" id="badgeCarrinho">0</span>
+            </button>
+          </div>
 
-                <!-- Menu Mobile -->
-                <button class="botao-menu-mobile" id="botaoMenuMobile">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-            </div>
-
-            <!-- Barra de Marcas -->
-            <div class="barra-marcas">
-                <button class="item-marca" data-marca="john-deere">
-                    <i class="fas fa-tractor"></i> John Deere
-                </button>
-                <button class="item-marca" data-marca="caterpillar">
-                    <i class="fas fa-hard-hat"></i> Caterpillar
-                </button>
-                <button class="item-marca" data-marca="hyundai">
-                    <i class="fas fa-truck-moving"></i> Hyundai
-                </button>
-                <button class="item-marca" data-marca="jcb">
-                    <i class="fas fa-wrench"></i> J.C.B.
-                </button>
-                <button class="item-marca" data-marca="komatsu">
-                    <i class="fas fa-industry"></i> Komatsu
-                </button>
-                <button class="item-marca" data-marca="volvo">
-                    <i class="fas fa-truck"></i> Volvo
-                </button>
-                <button class="item-marca" data-marca="xcmg">
-                    <i class="fas fa-cogs"></i> XCMG
-                </button>
-                <button class="item-marca" data-marca="case">
-                    <i class="fas fa-tools"></i> Case
-                </button>
-                <button class="item-marca" data-marca="new-holland">
-                    <i class="fas fa-tractor"></i> New Holland
-                </button>
-                <button class="item-marca item-marca-destaque" data-marca="todas">
-                    <i class="fas fa-plus"></i> Todas Marcas
-                </button>
-            </div>
-
-            <!-- Menu de Navegação Principal -->
-            <nav class="menu-navegacao" id="menuNavegacao">
-                <ul class="lista-menu">
-                    <li><a href="#inicio"><i class="fas fa-home"></i> Início</a></li>
-                    <li><a href="#loja"><i class="fas fa-store"></i> Loja</a></li>
-                    <li><a href="#sobre"><i class="fas fa-info-circle"></i> Sobre</a></li>
-                    <li><a href="#contato"><i class="fas fa-envelope"></i> Contato</a></li>
-                </ul>
-            </nav>
+          <!-- Menu Mobile -->
+          <button class="botao-menu-mobile" id="botaoMenuMobile">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
         </div>
+
+        <!-- Barra de Marcas -->
+        <div class="barra-marcas">
+          <button class="item-marca" data-marca="cnh-fiatitallis">
+            CNH / FIATALLIS
+          </button>
+          <button class="item-marca" data-marca="caterpillar">
+            CATERPILLAR
+          </button>
+          <button class="item-marca" data-marca="jcb">J.C.B.</button>
+          <button class="item-marca" data-marca="hyundai">HYUNDAI</button>
+          <button class="item-marca" data-marca="komatsu">KOMATSU</button>
+          <button class="item-marca" data-marca="volvo-michigan">
+            VOLVO/MICHIGAN
+          </button>
+          <button class="item-marca" data-marca="bodcat">BODCAT</button>
+          <button class="item-marca" data-marca="cummins">CUMMINS</button>
+          <button class="item-marca" data-marca="new-holland">
+            NEW HOLLAND
+          </button>
+          <button class="item-marca" data-marca="dossan-develon">
+            DOSSAN - DEVELON
+          </button>
+
+          <div class="dropdown-marcas">
+            <button class="dropdown-toggle" id="btnMarcas">
+              + MARCAS <span class="setinha">▼</span>
+            </button>
+
+            <div class="dropdown-menu" id="menuMarcas">
+              <button class="marca-item">Bobcat</button>
+              <button class="marca-item">Cummins</button>
+              <button class="marca-item">Doosan – Develon</button>
+              <button class="marca-item">Isuzu</button>
+              <button class="marca-item">Kubota</button>
+              <button class="marca-item">Link-Belt</button>
+              <button class="marca-item">Massey Ferguson – Maxion</button>
+              <button class="marca-item">Muller – Randon</button>
+              <button class="marca-item">Perkins</button>
+              <button class="marca-item">SANY</button>
+              <button class="marca-item">SDLG</button>
+              <button class="marca-item">XCMG</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Menu de Navegação Principal -->
+        <nav class="menu-navegacao" id="menuNavegacao">
+          <ul class="lista-menu">
+            <li>
+              <a href="#inicio"><i class="fas fa-home"></i> Início</a>
+            </li>
+            <li>
+              <a href="#loja"><i class="fas fa-store"></i> Loja</a>
+            </li>
+            <li>
+              <a href="#sobre"><i class="fas fa-info-circle"></i> Sobre</a>
+            </li>
+            <li>
+              <a href="#contato"><i class="fas fa-envelope"></i> Contato</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
     </header>
 
     <!-- Menu Dropdown de Categorias por Marca -->
     <div class="menu-categorias-marca" id="menuCategoriasMarca">
-        <div class="container">
-            <div class="titulo-marca-selecionada">
-                <h3 id="nomeMarcaSelecionada">Selecione uma categoria</h3>
-                <button class="fechar-menu-categorias" id="fecharMenuCategorias">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="grade-categorias-marca">
-                <button class="categoria-marca-item" data-categoria="motor" onclick="filtrarPorMarcaCategoria('motor')">
-                    <i class="fas fa-cog"></i>
-                    <span>Motor</span>
-                </button>
-                <button class="categoria-marca-item" data-categoria="combustivel" onclick="filtrarPorMarcaCategoria('combustivel')">
-                    <i class="fas fa-gas-pump"></i>
-                    <span>Sistema de Combustível</span>
-                </button>
-                <button class="categoria-marca-item" data-categoria="transmissao" onclick="filtrarPorMarcaCategoria('transmissao')">
-                    <i class="fas fa-gears"></i>
-                    <span>Transmissão / Comando Final</span>
-                </button>
-                <button class="categoria-marca-item" data-categoria="direcao" onclick="filtrarPorMarcaCategoria('direcao')">
-                    <i class="fas fa-steering-wheel"></i>
-                    <span>Direção / Freios / Eixos</span>
-                </button>
-                <button class="categoria-marca-item" data-categoria="eletrico" onclick="filtrarPorMarcaCategoria('eletrico')">
-                    <i class="fas fa-bolt"></i>
-                    <span>Sistema Elétrico</span>
-                </button>
-                <button class="categoria-marca-item" data-categoria="hidraulico" onclick="filtrarPorMarcaCategoria('hidraulico')">
-                    <i class="fas fa-tint"></i>
-                    <span>Sistema Hidráulico</span>
-                </button>
-                <button class="categoria-marca-item" data-categoria="chassi" onclick="filtrarPorMarcaCategoria('chassi')">
-                    <i class="fas fa-truck-monster"></i>
-                    <span>Chassi / Estruturas</span>
-                </button>
-                <button class="categoria-marca-item" data-categoria="cabine" onclick="filtrarPorMarcaCategoria('cabine')">
-                    <i class="fas fa-chair"></i>
-                    <span>Posto Operação / Cabine</span>
-                </button>
-                <button class="categoria-marca-item" data-categoria="ar-condicionado" onclick="filtrarPorMarcaCategoria('ar-condicionado')">
-                    <i class="fas fa-wind"></i>
-                    <span>Sistema de Ar Condicionado</span>
-                </button>
-                <button class="categoria-marca-item" data-categoria="fps" onclick="filtrarPorMarcaCategoria('fps')">
-                    <i class="fas fa-tools"></i>
-                    <span>F.P.S. / Implementos</span>
-                </button>
-                <button class="categoria-marca-item" data-categoria="rodante" onclick="filtrarPorMarcaCategoria('rodante')">
-                    <i class="fas fa-circle-notch"></i>
-                    <span>Material Rodante</span>
-                </button>
-            </div>
+      <div class="container">
+        <div class="titulo-marca-selecionada">
+          <h3 id="nomeMarcaSelecionada">Selecione uma categoria</h3>
+          <button class="fechar-menu-categorias" id="fecharMenuCategorias">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
+        <div class="grade-categorias-marca">
+          <button
+            class="categoria-marca-item"
+            data-categoria="motor"
+            onclick="filtrarPorMarcaCategoria('motor')"
+          >
+            <i class="fas fa-cog"></i>
+            <span>Motor</span>
+          </button>
+          <button
+            class="categoria-marca-item"
+            data-categoria="combustivel"
+            onclick="filtrarPorMarcaCategoria('combustivel')"
+          >
+            <i class="fas fa-gas-pump"></i>
+            <span>Sistema de Combustível</span>
+          </button>
+          <button
+            class="categoria-marca-item"
+            data-categoria="transmissao"
+            onclick="filtrarPorMarcaCategoria('transmissao')"
+          >
+            <i class="fas fa-gears"></i>
+            <span>Transmissão / Comando Final</span>
+          </button>
+          <button
+            class="categoria-marca-item"
+            data-categoria="direcao"
+            onclick="filtrarPorMarcaCategoria('direcao')"
+          >
+            <i class="fas fa-steering-wheel"></i>
+            <span>Direção / Freios / Eixos</span>
+          </button>
+          <button
+            class="categoria-marca-item"
+            data-categoria="eletrico"
+            onclick="filtrarPorMarcaCategoria('eletrico')"
+          >
+            <i class="fas fa-bolt"></i>
+            <span>Sistema Elétrico</span>
+          </button>
+          <button
+            class="categoria-marca-item"
+            data-categoria="hidraulico"
+            onclick="filtrarPorMarcaCategoria('hidraulico')"
+          >
+            <i class="fas fa-tint"></i>
+            <span>Sistema Hidráulico</span>
+          </button>
+          <button
+            class="categoria-marca-item"
+            data-categoria="chassi"
+            onclick="filtrarPorMarcaCategoria('chassi')"
+          >
+            <i class="fas fa-truck-monster"></i>
+            <span>Chassi / Estruturas</span>
+          </button>
+          <button
+            class="categoria-marca-item"
+            data-categoria="cabine"
+            onclick="filtrarPorMarcaCategoria('cabine')"
+          >
+            <i class="fas fa-chair"></i>
+            <span>Posto Operação / Cabine</span>
+          </button>
+          <button
+            class="categoria-marca-item"
+            data-categoria="ar-condicionado"
+            onclick="filtrarPorMarcaCategoria('ar-condicionado')"
+          >
+            <i class="fas fa-wind"></i>
+            <span>Sistema de Ar Condicionado</span>
+          </button>
+          <button
+            class="categoria-marca-item"
+            data-categoria="fps"
+            onclick="filtrarPorMarcaCategoria('fps')"
+          >
+            <i class="fas fa-tools"></i>
+            <span>F.P.S. / Implementos</span>
+          </button>
+          <button
+            class="categoria-marca-item"
+            data-categoria="rodante"
+            onclick="filtrarPorMarcaCategoria('rodante')"
+          >
+            <i class="fas fa-circle-notch"></i>
+            <span>Material Rodante</span>
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Overlay do Menu Categorias -->
     <div class="overlay-categorias" id="overlayCategorias"></div>
-                        
 
     <!-- ===== BANNER HERO PRINCIPAL ===== -->
     <section class="hero-principal" id="inicio">
-        <div class="container">
-            <div class="conteudo-hero">
-                <div class="texto-hero">
-                    <span class="tag-destaque">🔧 Loja Online</span>
-                    <h1>Compre Peças de Qualidade Online</h1>
-                    <p class="descricao-hero">Mais de 20 mil itens em estoque à pronta entrega. Garantia de qualidade e os melhores preços do mercado.</p>
-                    
-                    <div class="marcas-atendidas">
-                        <strong>Marcas:</strong> FIATALLIS · CASE · CATERPILLAR · DEERE · HYUNDAI · JCB · KOMATSU · MICHIGAN · NEW HOLLAND · MWM · PERKINS · SDLG · XCMG · VOLVO
-                    </div>
+      <div class="container">
+        <div class="conteudo-hero">
+          <div class="texto-hero">
+            <span class="tag-destaque">🔧 Loja Online</span>
+            <h1>Compre Peças de Qualidade Online</h1>
+            <p class="descricao-hero">
+              Mais de 20 mil itens em estoque à pronta entrega. Garantia de
+              qualidade e os melhores preços do mercado.
+            </p>
 
-                    <div class="botoes-cta">
-                        <a href="#loja" class="botao botao-primario">
-                            <i class="fas fa-shopping-bag"></i> Ver Produtos
-                        </a>
-                        <a href="https://api.whatsapp.com/send/?phone=5549984276503&text=Olá! Gostaria de informações sobre peças." class="botao botao-outline" target="_blank">
-                            <i class="fab fa-whatsapp"></i> Falar com Especialista
-                        </a>
-                    </div>
-                </div>
-
-                <div class="imagem-hero">
-                    <div class="card-flutuante card-1">
-                        <i class="fas fa-truck"></i>
-                        <div>
-                            <strong>Entrega</strong>
-                            <p>Todo Brasil</p>
-                        </div>
-                    </div>
-                    <div class="card-flutuante card-2">
-                        <i class="fas fa-shield-alt"></i>
-                        <div>
-                            <strong>Garantia</strong>
-                            <p>Qualidade</p>
-                        </div>
-                    </div>
-                    <div class="card-flutuante card-3">
-                        <i class="fas fa-credit-card"></i>
-                        <div>
-                            <strong>Pagamento</strong>
-                            <p>Facilitado</p>
-                        </div>
-                    </div>
-                </div>
+            <div class="marcas-atendidas">
+              <strong>Marcas:</strong> FIATALLIS · CASE · CATERPILLAR · DEERE ·
+              HYUNDAI · JCB · KOMATSU · MICHIGAN · NEW HOLLAND · MWM · PERKINS ·
+              SDLG · XCMG · VOLVO
             </div>
+
+            <div class="botoes-cta">
+              <a href="#loja" class="botao botao-primario">
+                <i class="fas fa-shopping-bag"></i> Ver Produtos
+              </a>
+              <a
+                href="https://api.whatsapp.com/send/?phone=5549984276503&text=Olá! Gostaria de informações sobre peças."
+                class="botao botao-outline"
+                target="_blank"
+              >
+                <i class="fab fa-whatsapp"></i> Falar com Especialista
+              </a>
+            </div>
+          </div>
+
+          <div class="imagem-hero">
+            <div class="card-flutuante card-1">
+              <i class="fas fa-truck"></i>
+              <div>
+                <strong>Entrega</strong>
+                <p>Todo Brasil</p>
+              </div>
+            </div>
+            <div class="card-flutuante card-2">
+              <i class="fas fa-shield-alt"></i>
+              <div>
+                <strong>Garantia</strong>
+                <p>Qualidade</p>
+              </div>
+            </div>
+            <div class="card-flutuante card-3">
+              <i class="fas fa-credit-card"></i>
+              <div>
+                <strong>Pagamento</strong>
+                <p>Facilitado</p>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </section>
 
     <!-- ===== BARRA DE BENEFÍCIOS ===== -->
     <section class="barra-beneficios">
-        <div class="container">
-            <div class="grade-beneficios">
-                <div class="item-beneficio">
-                    <i class="fas fa-box"></i>
-                    <div>
-                        <strong>+20 Mil Itens</strong>
-                        <p>Em estoque</p>
-                    </div>
-                </div>
-                <div class="item-beneficio">
-                    <i class="fas fa-shipping-fast"></i>
-                    <div>
-                        <strong>Entrega Rápida</strong>
-                        <p>Para todo Brasil</p>
-                    </div>
-                </div>
-                <div class="item-beneficio">
-                    <i class="fas fa-credit-card"></i>
-                    <div>
-                        <strong>Pagamento Seguro</strong>
-                        <p>PIX, Cartão e Boleto</p>
-                    </div>
-                </div>
-                <div class="item-beneficio">
-                    <i class="fas fa-certificate"></i>
-                    <div>
-                        <strong>Peças Originais</strong>
-                        <p>Garantidas</p>
-                    </div>
-                </div>
+      <div class="container">
+        <div class="grade-beneficios">
+          <div class="item-beneficio">
+            <i class="fas fa-box"></i>
+            <div>
+              <strong>+20 Mil Itens</strong>
+              <p>Em estoque</p>
             </div>
+          </div>
+          <div class="item-beneficio">
+            <i class="fas fa-shipping-fast"></i>
+            <div>
+              <strong>Entrega Rápida</strong>
+              <p>Para todo Brasil</p>
+            </div>
+          </div>
+          <div class="item-beneficio">
+            <i class="fas fa-credit-card"></i>
+            <div>
+              <strong>Pagamento Seguro</strong>
+              <p>PIX, Cartão e Boleto</p>
+            </div>
+          </div>
+          <div class="item-beneficio">
+            <i class="fas fa-certificate"></i>
+            <div>
+              <strong>Peças Originais</strong>
+              <p>Garantidas</p>
+            </div>
+          </div>
         </div>
+      </div>
     </section>
 
     <!-- ===== LOJA / CATÁLOGO DE PRODUTOS ===== -->
     <section class="secao-loja" id="loja">
-        <div class="container">
-            <div class="cabecalho-secao">
-                <div>
-                    <span class="tag-secao">Catálogo</span>
-                    <h2>Nossos Produtos</h2>
-                    <p>Encontre a peça ideal para sua máquina</p>
-                </div>
-            </div>
-
-            <!-- Filtros de Categoria -->
-            <div class="filtros-produtos">
-                <button class="filtro-btn ativo" data-categoria="todos">Todos</button>
-                <button class="filtro-btn" data-categoria="filtros">Filtros</button>
-                <button class="filtro-btn" data-categoria="motores">Motores</button>
-                <button class="filtro-btn" data-categoria="hidraulica">Hidráulica</button>
-                <button class="filtro-btn" data-categoria="freios">Freios</button>
-                <button class="filtro-btn" data-categoria="eletrica">Elétrica</button>
-                <button class="filtro-btn" data-categoria="transmissao">Transmissão</button>
-            </div>
-
-            <!-- Grade de Produtos -->
-            <div class="grade-produtos" id="gradeProdutos">
-                <!-- Os produtos serão carregados aqui pelo JavaScript -->
-            </div>
-
-            <div class="carregando" id="carregando" style="display: none;">
-                <i class="fas fa-spinner fa-spin"></i> Carregando produtos...
-            </div>
+      <div class="container">
+        <div class="cabecalho-secao">
+          <div>
+            <span class="tag-secao">Catálogo</span>
+            <h2>Nossos Produtos</h2>
+            <p>Encontre a peça ideal para sua máquina</p>
+          </div>
         </div>
+
+        <!-- Filtros de Categoria -->
+        <div class="filtros-produtos">
+          <button class="filtro-btn ativo" data-categoria="todos">Todos</button>
+          <button class="filtro-btn" data-categoria="filtros">Filtros</button>
+          <button class="filtro-btn" data-categoria="motores">Motores</button>
+          <button class="filtro-btn" data-categoria="hidraulica">
+            Hidráulica
+          </button>
+          <button class="filtro-btn" data-categoria="freios">Freios</button>
+          <button class="filtro-btn" data-categoria="eletrica">Elétrica</button>
+          <button class="filtro-btn" data-categoria="transmissao">
+            Transmissão
+          </button>
+        </div>
+
+        <!-- Grade de Produtos -->
+        <div class="grade-produtos" id="gradeProdutos">
+          <!-- Os produtos serão carregados aqui pelo JavaScript -->
+        </div>
+
+        <div class="carregando" id="carregando" style="display: none">
+          <i class="fas fa-spinner fa-spin"></i> Carregando produtos...
+        </div>
+      </div>
     </section>
 
     <!-- ===== CATEGORIAS ===== -->
     <section class="secao-categorias" id="categorias">
-        <div class="container">
-            <div class="cabecalho-secao centralizado">
-                <span class="tag-secao">Catálogo</span>
-                <h2>Categorias de Peças</h2>
-                <p>Navegue por categoria para encontrar o que precisa</p>
-            </div>
-
-            <div class="grade-categorias">
-                <div class="card-categoria" data-categoria="filtros">
-                    <div class="icone-categoria">
-                        <i class="fas fa-filter"></i>
-                    </div>
-                    <h3>Filtros</h3>
-                    <p>Ar, óleo, combustível e hidráulico</p>
-                    <button class="link-categoria" onclick="filtrarPorCategoria('filtros')">Ver produtos <i class="fas fa-arrow-right"></i></button>
-                </div>
-
-                <div class="card-categoria" data-categoria="motores">
-                    <div class="icone-categoria">
-                        <i class="fas fa-cog"></i>
-                    </div>
-                    <h3>Motores Diesel</h3>
-                    <p>Peças e componentes para motores</p>
-                    <button class="link-categoria" onclick="filtrarPorCategoria('motores')">Ver produtos <i class="fas fa-arrow-right"></i></button>
-                </div>
-
-                <div class="card-categoria" data-categoria="hidraulica">
-                    <div class="icone-categoria">
-                        <i class="fas fa-tint"></i>
-                    </div>
-                    <h3>Hidráulica</h3>
-                    <p>Sistemas e componentes hidráulicos</p>
-                    <button class="link-categoria" onclick="filtrarPorCategoria('hidraulica')">Ver produtos <i class="fas fa-arrow-right"></i></button>
-                </div>
-
-                <div class="card-categoria" data-categoria="freios">
-                    <div class="icone-categoria">
-                        <i class="fas fa-stop-circle"></i>
-                    </div>
-                    <h3>Freios</h3>
-                    <p>Sistema completo de freios</p>
-                    <button class="link-categoria" onclick="filtrarPorCategoria('freios')">Ver produtos <i class="fas fa-arrow-right"></i></button>
-                </div>
-
-                <div class="card-categoria" data-categoria="eletrica">
-                    <div class="icone-categoria">
-                        <i class="fas fa-bolt"></i>
-                    </div>
-                    <h3>Eletroeletrônica</h3>
-                    <p>Sistemas elétricos e eletrônicos</p>
-                    <button class="link-categoria" onclick="filtrarPorCategoria('eletrica')">Ver produtos <i class="fas fa-arrow-right"></i></button>
-                </div>
-
-                <div class="card-categoria" data-categoria="transmissao">
-                    <div class="icone-categoria">
-                        <i class="fas fa-gears"></i>
-                    </div>
-                    <h3>Transmissões</h3>
-                    <p>Sistemas de transmissão completos</p>
-                    <button class="link-categoria" onclick="filtrarPorCategoria('transmissao')">Ver produtos <i class="fas fa-arrow-right"></i></button>
-                </div>
-            </div>
+      <div class="container">
+        <div class="cabecalho-secao centralizado">
+          <span class="tag-secao">Catálogo</span>
+          <h2>Categorias de Peças</h2>
+          <p>Navegue por categoria para encontrar o que precisa</p>
         </div>
+
+        <div class="grade-categorias">
+          <div class="card-categoria" data-categoria="filtros">
+            <div class="icone-categoria">
+              <i class="fas fa-filter"></i>
+            </div>
+            <h3>Filtros</h3>
+            <p>Ar, óleo, combustível e hidráulico</p>
+            <button
+              class="link-categoria"
+              onclick="filtrarPorCategoria('filtros')"
+            >
+              Ver produtos <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+
+          <div class="card-categoria" data-categoria="motores">
+            <div class="icone-categoria">
+              <i class="fas fa-cog"></i>
+            </div>
+            <h3>Motores Diesel</h3>
+            <p>Peças e componentes para motores</p>
+            <button
+              class="link-categoria"
+              onclick="filtrarPorCategoria('motores')"
+            >
+              Ver produtos <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+
+          <div class="card-categoria" data-categoria="hidraulica">
+            <div class="icone-categoria">
+              <i class="fas fa-tint"></i>
+            </div>
+            <h3>Hidráulica</h3>
+            <p>Sistemas e componentes hidráulicos</p>
+            <button
+              class="link-categoria"
+              onclick="filtrarPorCategoria('hidraulica')"
+            >
+              Ver produtos <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+
+          <div class="card-categoria" data-categoria="freios">
+            <div class="icone-categoria">
+              <i class="fas fa-stop-circle"></i>
+            </div>
+            <h3>Freios</h3>
+            <p>Sistema completo de freios</p>
+            <button
+              class="link-categoria"
+              onclick="filtrarPorCategoria('freios')"
+            >
+              Ver produtos <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+
+          <div class="card-categoria" data-categoria="eletrica">
+            <div class="icone-categoria">
+              <i class="fas fa-bolt"></i>
+            </div>
+            <h3>Eletroeletrônica</h3>
+            <p>Sistemas elétricos e eletrônicos</p>
+            <button
+              class="link-categoria"
+              onclick="filtrarPorCategoria('eletrica')"
+            >
+              Ver produtos <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+
+          <div class="card-categoria" data-categoria="transmissao">
+            <div class="icone-categoria">
+              <i class="fas fa-gears"></i>
+            </div>
+            <h3>Transmissões</h3>
+            <p>Sistemas de transmissão completos</p>
+            <button
+              class="link-categoria"
+              onclick="filtrarPorCategoria('transmissao')"
+            >
+              Ver produtos <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- ===== CTA BANNER ===== -->
     <section class="cta-banner">
-        <div class="container">
-            <div class="conteudo-cta">
-                <i class="fas fa-headset icone-cta"></i>
-                <div class="texto-cta">
-                    <h2>Não Encontrou o Que Procura?</h2>
-                    <p>Nossa equipe está pronta para ajudar você a encontrar a peça ideal</p>
-                </div>
-                <a href="https://api.whatsapp.com/send/?phone=5549984276503&text=Olá! Preciso de ajuda para encontrar uma peça." class="botao botao-grande" target="_blank">
-                    <i class="fab fa-whatsapp"></i> Falar com Especialista
-                </a>
-            </div>
+      <div class="container">
+        <div class="conteudo-cta">
+          <i class="fas fa-headset icone-cta"></i>
+          <div class="texto-cta">
+            <h2>Não Encontrou o Que Procura?</h2>
+            <p>
+              Nossa equipe está pronta para ajudar você a encontrar a peça ideal
+            </p>
+          </div>
+          <a
+            href="https://api.whatsapp.com/send/?phone=5549984276503&text=Olá! Preciso de ajuda para encontrar uma peça."
+            class="botao botao-grande"
+            target="_blank"
+          >
+            <i class="fab fa-whatsapp"></i> Falar com Especialista
+          </a>
         </div>
+      </div>
     </section>
 
     <!-- ===== SOBRE A EMPRESA ===== -->
     <section class="secao-sobre" id="sobre">
-        <div class="container">
-            <div class="conteudo-sobre">
-                <div class="imagem-sobre">
-                    <div class="estatistica-destaque">
-                        <span class="numero-grande">20</span>
-                        <span class="texto-stat">Mil Itens em Estoque</span>
-                    </div>
-                </div>
-
-                <div class="texto-sobre">
-                    <span class="tag-secao">Quem Somos</span>
-                    <h2>Distribuidora de Peças para Máquinas Pesadas</h2>
-                    <p>A <strong>Dispemaq</strong> é especializada na distribuição de peças multimarcas para máquinas pesadas, atendendo todo o território brasileiro com qualidade, agilidade e comprometimento.</p>
-                    <p>Trabalhamos com as principais marcas do mercado: FIATALLIS, CASE, CATERPILLAR, DEERE, HYUNDAI, JCB, KOMATSU, MICHIGAN, NEW HOLLAND, MWM, PERKINS, SDLG, XCMG e VOLVO.</p>
-
-                    <div class="lista-diferenciais">
-                        <div class="item-diferencial">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Atendimento em todo Brasil</span>
-                        </div>
-                        <div class="item-diferencial">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Peças originais e compatíveis</span>
-                        </div>
-                        <div class="item-diferencial">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Entrega rápida e segura</span>
-                        </div>
-                        <div class="item-diferencial">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Compra 100% segura</span>
-                        </div>
-                    </div>
-
-                    <div class="estatisticas-sobre">
-                        <div class="stat-item">
-                            <strong>14</strong>
-                            <span>Marcas</span>
-                        </div>
-                        <div class="stat-item">
-                            <strong>12</strong>
-                            <span>Categorias</span>
-                        </div>
-                        <div class="stat-item">
-                            <strong>100</strong>
-                            <span>% Seguro</span>
-                        </div>
-                    </div>
-                </div>
+      <div class="container">
+        <div class="conteudo-sobre">
+          <div class="imagem-sobre">
+            <div class="estatistica-destaque">
+              <span class="numero-grande">20</span>
+              <span class="texto-stat">Mil Itens em Estoque</span>
             </div>
+          </div>
+
+          <div class="texto-sobre">
+            <span class="tag-secao">Quem Somos</span>
+            <h2>Distribuidora de Peças para Máquinas Pesadas</h2>
+            <p>
+              A <strong>Dispemaq</strong> é especializada na distribuição de
+              peças multimarcas para máquinas pesadas, atendendo todo o
+              território brasileiro com qualidade, agilidade e comprometimento.
+            </p>
+            <p>
+              Trabalhamos com as principais marcas do mercado: FIATALLIS, CASE,
+              CATERPILLAR, DEERE, HYUNDAI, JCB, KOMATSU, MICHIGAN, NEW HOLLAND,
+              MWM, PERKINS, SDLG, XCMG e VOLVO.
+            </p>
+
+            <div class="lista-diferenciais">
+              <div class="item-diferencial">
+                <i class="fas fa-check-circle"></i>
+                <span>Atendimento em todo Brasil</span>
+              </div>
+              <div class="item-diferencial">
+                <i class="fas fa-check-circle"></i>
+                <span>Peças originais e compatíveis</span>
+              </div>
+              <div class="item-diferencial">
+                <i class="fas fa-check-circle"></i>
+                <span>Entrega rápida e segura</span>
+              </div>
+              <div class="item-diferencial">
+                <i class="fas fa-check-circle"></i>
+                <span>Compra 100% segura</span>
+              </div>
+            </div>
+
+            <div class="estatisticas-sobre">
+              <div class="stat-item">
+                <strong>14</strong>
+                <span>Marcas</span>
+              </div>
+              <div class="stat-item">
+                <strong>12</strong>
+                <span>Categorias</span>
+              </div>
+              <div class="stat-item">
+                <strong>100</strong>
+                <span>% Seguro</span>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </section>
 
     <!-- ===== CONTATO ===== -->
     <section class="secao-contato" id="contato">
-        <div class="container">
-            <div class="cabecalho-secao centralizado">
-                <span class="tag-secao">Fale Conosco</span>
-                <h2>Entre em Contato</h2>
-                <p>Estamos prontos para atender você da melhor forma</p>
-            </div>
-
-            <div class="grade-contato">
-                <div class="card-contato">
-                    <div class="icone-contato telefone">
-                        <i class="fas fa-phone"></i>
-                    </div>
-                    <h3>Telefone</h3>
-                    <p><a href="tel:+5549984276503">+55 49 98427-6503</a></p>
-                    <a href="tel:+5549984276503" class="link-contato">Ligar agora <i class="fas fa-arrow-right"></i></a>
-                </div>
-
-                <div class="card-contato destaque">
-                    <div class="icone-contato whatsapp">
-                        <i class="fab fa-whatsapp"></i>
-                    </div>
-                    <h3>WhatsApp</h3>
-                    <p>Atendimento rápido e direto</p>
-                    <a href="https://api.whatsapp.com/send/?phone=5549984276503" class="link-contato" target="_blank">Enviar mensagem <i class="fas fa-arrow-right"></i></a>
-                </div>
-
-                <div class="card-contato">
-                    <div class="icone-contato horario">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <h3>Horário</h3>
-                    <p>Segunda à Sexta<br>7:30 às 18:00 hrs</p>
-                </div>
-            </div>
-
-            <div class="mapa-local">
-                <div class="info-local">
-                    <h3><i class="fas fa-map-marker-alt"></i> Nossa Localização</h3>
-                    <p><strong>Rua Camboriú, 99-D, Sala 01</strong></p>
-                    <p>Cristo Rei, Chapecó - SC</p>
-                    <p>CEP: 89810-152</p>
-                    <a href="https://www.google.com/maps/dir//Dispemaq,+R.+Camboriu,+99+-+Cristo+Rei,+Chapec%C3%B3+-+SC" class="botao botao-outline-pequeno" target="_blank">
-                        <i class="fas fa-directions"></i> Como chegar
-                    </a>
-                    <p class="area-atuacao"><i class="fas fa-truck"></i> Atuamos em todo território brasileiro</p>
-                </div>
-                <div class="container-mapa">
-                    <iframe 
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d224.47707894774815!2d-52.63520791849!3d-27.073324699999997!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94e4b500405283c1%3A0x838ca04117f6c09e!2sDispemaq!5e0!3m2!1spt-BR!2sbr!4v1234567890"
-                        width="100%" 
-                        height="100%" 
-                        style="border:0;" 
-                        allowfullscreen="" 
-                        loading="lazy">
-                    </iframe>
-                </div>
-            </div>
+      <div class="container">
+        <div class="cabecalho-secao centralizado">
+          <span class="tag-secao">Fale Conosco</span>
+          <h2>Entre em Contato</h2>
+          <p>Estamos prontos para atender você da melhor forma</p>
         </div>
+
+        <div class="grade-contato">
+          <div class="card-contato">
+            <div class="icone-contato telefone">
+              <i class="fas fa-phone"></i>
+            </div>
+            <h3>Telefone</h3>
+            <p><a href="tel:+5549984276503">+55 49 98427-6503</a></p>
+            <a href="tel:+5549984276503" class="link-contato"
+              >Ligar agora <i class="fas fa-arrow-right"></i
+            ></a>
+          </div>
+
+          <div class="card-contato destaque">
+            <div class="icone-contato whatsapp">
+              <i class="fab fa-whatsapp"></i>
+            </div>
+            <h3>WhatsApp</h3>
+            <p>Atendimento rápido e direto</p>
+            <a
+              href="https://api.whatsapp.com/send/?phone=5549984276503"
+              class="link-contato"
+              target="_blank"
+              >Enviar mensagem <i class="fas fa-arrow-right"></i
+            ></a>
+          </div>
+
+          <div class="card-contato">
+            <div class="icone-contato horario">
+              <i class="fas fa-clock"></i>
+            </div>
+            <h3>Horário</h3>
+            <p>Segunda à Sexta<br />7:30 às 18:00 hrs</p>
+          </div>
+        </div>
+
+        <div class="mapa-local">
+          <div class="info-local">
+            <h3><i class="fas fa-map-marker-alt"></i> Nossa Localização</h3>
+            <p><strong>Rua Camboriú, 99-D, Sala 01</strong></p>
+            <p>Cristo Rei, Chapecó - SC</p>
+            <p>CEP: 89810-152</p>
+            <a
+              href="https://www.google.com/maps/dir//Dispemaq,+R.+Camboriu,+99+-+Cristo+Rei,+Chapec%C3%B3+-+SC"
+              class="botao botao-outline-pequeno"
+              target="_blank"
+            >
+              <i class="fas fa-directions"></i> Como chegar
+            </a>
+            <p class="area-atuacao">
+              <i class="fas fa-truck"></i> Atuamos em todo território brasileiro
+            </p>
+          </div>
+          <div class="container-mapa">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d224.47707894774815!2d-52.63520791849!3d-27.073324699999997!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94e4b500405283c1%3A0x838ca04117f6c09e!2sDispemaq!5e0!3m2!1spt-BR!2sbr!4v1234567890"
+              width="100%"
+              height="100%"
+              style="border: 0"
+              allowfullscreen=""
+              loading="lazy"
+            >
+            </iframe>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- ===== RODAPÉ ===== -->
     <footer class="rodape-principal">
-        <div class="container">
-            <div class="conteudo-rodape">
-                
-                <div class="coluna-rodape">
-                    <h3>DISPEMAQ</h3>
-                    <p>Loja online de peças multimarcas para máquinas pesadas com mais de 20 mil itens em estoque.</p>
-                    <div class="redes-sociais">
-                        <a href="https://www.instagram.com/dispemaq/" target="_blank"><i class="fab fa-instagram"></i></a>
-                        <a href="https://www.facebook.com/profile.php?id=61558093745831" target="_blank"><i class="fab fa-facebook"></i></a>
-                        <a href="https://api.whatsapp.com/send/?phone=5549984276503" target="_blank"><i class="fab fa-whatsapp"></i></a>
-                    </div>
-                </div>
-
-                <div class="coluna-rodape">
-                    <h4>Links Rápidos</h4>
-                    <ul class="links-rodape">
-                        <li><a href="#inicio">Início</a></li>
-                        <li><a href="#loja">Loja</a></li>
-                        <li><a href="#categorias">Categorias</a></li>
-                        <li><a href="#sobre">Sobre Nós</a></li>
-                        <li><a href="#contato">Contato</a></li>
-                    </ul>
-                </div>
-
-                <div class="coluna-rodape">
-                    <h4>Atendimento</h4>
-                    <ul class="info-rodape">
-                        <li><i class="fas fa-phone"></i> +55 49 98427-6503</li>
-                        <li><i class="fas fa-clock"></i> Seg-Sex: 7:30-18:00</li>
-                        <li><i class="fas fa-map-marker-alt"></i> Cristo Rei, Chapecó-SC</li>
-                        <li><i class="fas fa-truck"></i> Entrega para todo Brasil</li>
-                    </ul>
-                </div>
-
-                <div class="coluna-rodape">
-                    <h4>Pagamento Seguro</h4>
-                    <div class="formas-pagamento">
-                        <i class="fas fa-credit-card"></i>
-                        <i class="fab fa-cc-visa"></i>
-                        <i class="fab fa-cc-mastercard"></i>
-                        <i class="fab fa-pix"></i>
-                        <i class="fas fa-barcode"></i>
-                    </div>
-                    <p style="margin-top: 15px; font-size: 0.9rem;">Compra 100% segura e protegida</p>
-                </div>
-
+      <div class="container">
+        <div class="conteudo-rodape">
+          <div class="coluna-rodape">
+            <h3>DISPEMAQ</h3>
+            <p>
+              Loja online de peças multimarcas para máquinas pesadas com mais de
+              20 mil itens em estoque.
+            </p>
+            <div class="redes-sociais">
+              <a href="https://www.instagram.com/dispemaq/" target="_blank"
+                ><i class="fab fa-instagram"></i
+              ></a>
+              <a
+                href="https://www.facebook.com/profile.php?id=61558093745831"
+                target="_blank"
+                ><i class="fab fa-facebook"></i
+              ></a>
+              <a
+                href="https://api.whatsapp.com/send/?phone=5549984276503"
+                target="_blank"
+                ><i class="fab fa-whatsapp"></i
+              ></a>
             </div>
+          </div>
 
-            <div class="divisor-rodape"></div>
+          <div class="coluna-rodape">
+            <h4>Links Rápidos</h4>
+            <ul class="links-rodape">
+              <li><a href="#inicio">Início</a></li>
+              <li><a href="#loja">Loja</a></li>
+              <li><a href="#categorias">Categorias</a></li>
+              <li><a href="#sobre">Sobre Nós</a></li>
+              <li><a href="#contato">Contato</a></li>
+            </ul>
+          </div>
 
-            <div class="rodape-inferior">
-                <p>&copy; 2025 Dispemaq - CNPJ: 51.169.602/0001-08 - Todos os Direitos Reservados.</p>
-                <div class="links-legais">
-                    <a href="#" onclick="abrirModal('modalTermos'); return false;">Termos de Uso</a>
-                    <span>|</span>
-                    <a href="#" onclick="abrirModal('modalPrivacidade'); return false;">Política de Privacidade</a>
-                </div>
+          <div class="coluna-rodape">
+            <h4>Atendimento</h4>
+            <ul class="info-rodape">
+              <li><i class="fas fa-phone"></i> +55 49 98427-6503</li>
+              <li><i class="fas fa-clock"></i> Seg-Sex: 7:30-18:00</li>
+              <li>
+                <i class="fas fa-map-marker-alt"></i> Cristo Rei, Chapecó-SC
+              </li>
+              <li><i class="fas fa-truck"></i> Entrega para todo Brasil</li>
+            </ul>
+          </div>
+
+          <div class="coluna-rodape">
+            <h4>Pagamento Seguro</h4>
+            <div class="formas-pagamento">
+              <i class="fas fa-credit-card"></i>
+              <i class="fab fa-cc-visa"></i>
+              <i class="fab fa-cc-mastercard"></i>
+              <i class="fab fa-pix"></i>
+              <i class="fas fa-barcode"></i>
             </div>
+            <p style="margin-top: 15px; font-size: 0.9rem">
+              Compra 100% segura e protegida
+            </p>
+          </div>
         </div>
+
+        <div class="divisor-rodape"></div>
+
+        <div class="rodape-inferior">
+          <p>
+            &copy; 2025 Dispemaq - CNPJ: 51.169.602/0001-08 - Todos os Direitos
+            Reservados.
+          </p>
+          <div class="links-legais">
+            <a href="#" onclick="abrirModal('modalTermos'); return false;"
+              >Termos de Uso</a
+            >
+            <span>|</span>
+            <a href="#" onclick="abrirModal('modalPrivacidade'); return false;"
+              >Política de Privacidade</a
+            >
+          </div>
+        </div>
+      </div>
     </footer>
 
     <!-- ===== CARRINHO LATERAL ===== -->
     <div class="carrinho-lateral" id="carrinhoLateral">
-        <div class="carrinho-header">
-            <h3><i class="fas fa-shopping-cart"></i> Meu Carrinho</h3>
-            <button class="fechar-carrinho" id="fecharCarrinho">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
+      <div class="carrinho-header">
+        <h3><i class="fas fa-shopping-cart"></i> Meu Carrinho</h3>
+        <button class="fechar-carrinho" id="fecharCarrinho">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
 
-        <div class="carrinho-conteudo" id="carrinhoConteudo">
-            <div class="carrinho-vazio">
-                <i class="fas fa-shopping-cart"></i>
-                <p>Seu carrinho está vazio</p>
-            </div>
+      <div class="carrinho-conteudo" id="carrinhoConteudo">
+        <div class="carrinho-vazio">
+          <i class="fas fa-shopping-cart"></i>
+          <p>Seu carrinho está vazio</p>
         </div>
+      </div>
 
-        <div class="carrinho-footer">
-            <div class="carrinho-total">
-                <span>Total:</span>
-                <strong id="carrinhoTotal">R$ 0,00</strong>
-            </div>
-            <button class="botao botao-primario botao-block" id="finalizarCompra">
-                <i class="fas fa-check"></i> Finalizar Pedido
-            </button>
+      <div class="carrinho-footer">
+        <div class="carrinho-total">
+          <span>Total:</span>
+          <strong id="carrinhoTotal">R$ 0,00</strong>
         </div>
+        <button class="botao botao-primario botao-block" id="finalizarCompra">
+          <i class="fas fa-check"></i> Finalizar Pedido
+        </button>
+      </div>
     </div>
 
     <!-- Overlay do Carrinho -->
     <div class="carrinho-overlay" id="carrinhoOverlay"></div>
 
     <!-- ===== BOTÃO WHATSAPP FLUTUANTE ===== -->
-    <a href="https://api.whatsapp.com/send/?phone=5549984276503&text=Olá! Vim pela loja e gostaria de mais informações." class="whatsapp-flutuante" target="_blank">
-        <i class="fab fa-whatsapp"></i>
-        <span class="tooltip-whatsapp">Fale conosco!</span>
+    <a
+      href="https://api.whatsapp.com/send/?phone=5549984276503&text=Olá! Vim pela loja e gostaria de mais informações."
+      class="whatsapp-flutuante"
+      target="_blank"
+    >
+      <i class="fab fa-whatsapp"></i>
+      <span class="tooltip-whatsapp">Fale conosco!</span>
     </a>
 
     <!-- ===== BOTÃO VOLTAR AO TOPO ===== -->
     <button class="botao-topo" id="botaoTopo">
-        <i class="fas fa-arrow-up"></i>
+      <i class="fas fa-arrow-up"></i>
     </button>
 
     <!-- Modal Termos de Uso -->
     <div class="modal-overlay" id="modalTermos">
-        <div class="modal-conteudo">
-            <button class="fechar-modal" onclick="fecharModal('modalTermos')">&times;</button>
-            <h2>Termos de Uso</h2>
-            <div class="conteudo-scroll">
-                <h3>1. Aceitação dos Termos</h3>
-                <p>Ao acessar e usar a loja online da Dispemaq, você concorda em cumprir e estar vinculado aos seguintes termos e condições de uso.</p>
+      <div class="modal-conteudo">
+        <button class="fechar-modal" onclick="fecharModal('modalTermos')">
+          &times;
+        </button>
+        <h2>Termos de Uso</h2>
+        <div class="conteudo-scroll">
+          <h3>1. Aceitação dos Termos</h3>
+          <p>
+            Ao acessar e usar a loja online da Dispemaq, você concorda em
+            cumprir e estar vinculado aos seguintes termos e condições de uso.
+          </p>
 
-                <h3>2. Compras e Pagamentos</h3>
-                <p>Todas as compras realizadas através do site estão sujeitas à confirmação de estoque e pagamento. Aceitamos PIX, cartões de crédito e boleto bancário.</p>
+          <h3>2. Compras e Pagamentos</h3>
+          <p>
+            Todas as compras realizadas através do site estão sujeitas à
+            confirmação de estoque e pagamento. Aceitamos PIX, cartões de
+            crédito e boleto bancário.
+          </p>
 
-                <h3>3. Preços e Disponibilidade</h3>
-                <p>Todos os preços estão sujeitos a alterações sem aviso prévio. A disponibilidade dos produtos é limitada ao estoque disponível.</p>
+          <h3>3. Preços e Disponibilidade</h3>
+          <p>
+            Todos os preços estão sujeitos a alterações sem aviso prévio. A
+            disponibilidade dos produtos é limitada ao estoque disponível.
+          </p>
 
-                <h3>4. Entregas</h3>
-                <p>Os prazos de entrega variam conforme a região. Frete grátis para compras acima de R$ 500.</p>
+          <h3>4. Entregas</h3>
+          <p>
+            Os prazos de entrega variam conforme a região. Frete grátis para
+            compras acima de R$ 500.
+          </p>
 
-                <h3>5. Trocas e Devoluções</h3>
-                <p>Aceitamos trocas e devoluções em até 7 dias após o recebimento, desde que o produto esteja em perfeitas condições.</p>
+          <h3>5. Trocas e Devoluções</h3>
+          <p>
+            Aceitamos trocas e devoluções em até 7 dias após o recebimento,
+            desde que o produto esteja em perfeitas condições.
+          </p>
 
-                <h3>6. Garantia</h3>
-                <p>Todas as peças vendidas possuem garantia de 90 dias contra defeitos de fabricação.</p>
+          <h3>6. Garantia</h3>
+          <p>
+            Todas as peças vendidas possuem garantia de 90 dias contra defeitos
+            de fabricação.
+          </p>
 
-                <h3>7. Contato</h3>
-                <p>Para questões sobre estes Termos de Uso, entre em contato através do WhatsApp: +55 49 98427-6503</p>
-            </div>
+          <h3>7. Contato</h3>
+          <p>
+            Para questões sobre estes Termos de Uso, entre em contato através do
+            WhatsApp: +55 49 98427-6503
+          </p>
         </div>
+      </div>
     </div>
 
     <!-- Modal Política de Privacidade -->
     <div class="modal-overlay" id="modalPrivacidade">
-        <div class="modal-conteudo">
-            <button class="fechar-modal" onclick="fecharModal('modalPrivacidade')">&times;</button>
-            <h2>Política de Privacidade</h2>
-            <div class="conteudo-scroll">
-                <h3>1. Informações que Coletamos</h3>
-                <p>Coletamos informações necessárias para processar seu pedido: nome, telefone, endereço de entrega e informações de pagamento.</p>
+      <div class="modal-conteudo">
+        <button class="fechar-modal" onclick="fecharModal('modalPrivacidade')">
+          &times;
+        </button>
+        <h2>Política de Privacidade</h2>
+        <div class="conteudo-scroll">
+          <h3>1. Informações que Coletamos</h3>
+          <p>
+            Coletamos informações necessárias para processar seu pedido: nome,
+            telefone, endereço de entrega e informações de pagamento.
+          </p>
 
-                <h3>2. Uso das Informações</h3>
-                <p>Utilizamos suas informações apenas para processar pedidos, enviar produtos e melhorar nossos serviços.</p>
+          <h3>2. Uso das Informações</h3>
+          <p>
+            Utilizamos suas informações apenas para processar pedidos, enviar
+            produtos e melhorar nossos serviços.
+          </p>
 
-                <h3>3. Proteção de Dados</h3>
-                <p>Implementamos medidas de segurança para proteger suas informações pessoais e de pagamento.</p>
+          <h3>3. Proteção de Dados</h3>
+          <p>
+            Implementamos medidas de segurança para proteger suas informações
+            pessoais e de pagamento.
+          </p>
 
-                <h3>4. Compartilhamento de Informações</h3>
-                <p>Compartilhamos informações apenas com parceiros de entrega e processadores de pagamento necessários para completar seu pedido.</p>
+          <h3>4. Compartilhamento de Informações</h3>
+          <p>
+            Compartilhamos informações apenas com parceiros de entrega e
+            processadores de pagamento necessários para completar seu pedido.
+          </p>
 
-                <h3>5. Cookies</h3>
-                <p>Usamos cookies para melhorar sua experiência de compra e lembrar itens no carrinho.</p>
+          <h3>5. Cookies</h3>
+          <p>
+            Usamos cookies para melhorar sua experiência de compra e lembrar
+            itens no carrinho.
+          </p>
 
-                <h3>6. Seus Direitos</h3>
-                <p>Você pode solicitar acesso, correção ou exclusão de suas informações pessoais a qualquer momento.</p>
+          <h3>6. Seus Direitos</h3>
+          <p>
+            Você pode solicitar acesso, correção ou exclusão de suas informações
+            pessoais a qualquer momento.
+          </p>
 
-                <h3>7. Contato</h3>
-                <p>Para questões sobre Privacidade, entre em contato: +55 49 98427-6503</p>
-            </div>
+          <h3>7. Contato</h3>
+          <p>
+            Para questões sobre Privacidade, entre em contato: +55 49 98427-6503
+          </p>
         </div>
+      </div>
     </div>
 
     <script src="./script.js"></script>
-</body>
+  </body>
 </html>
