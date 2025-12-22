@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dispemaq | Detalhes do Produto</title>
+    <link rel="stylesheet" href="./assets/css/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        .detalhes-produto { padding: 60px 0; background-color: #f4f4f4; }
+        .grid-detalhes { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; background: #fff; padding: 40px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .img-produto-detalhe { width: 100%; border-radius: 10px; border: 1px solid #eee; }
+        .info-produto h1 { font-size: 2rem; color: #333; margin-bottom: 10px; }
+        .preco-destaque { font-size: 2.5rem; color: #1e3a8a; font-weight: bold; margin: 20px 0; }
+        @media (max-width: 768px) { .grid-detalhes { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <header class="cabecalho-principal">
+      <div class="container">
+        <div class="topo-cabecalho">
+          <div class="logo-empresa">
+            <a href="index.html"><img src="./assets/SITE-LOGO-ESTENDIDA.-PNG-2048x819.png" alt="logo" /></a>
+          </div>
+          <div class="acoes-usuario">
+             <a href="carrinho.html" class="item-acao carrinho-botao">
+              <i class="fas fa-shopping-cart"></i> <span>Carrinho</span>
+              <span class="badge-carrinho" id="badgeCarrinho">0</span>
+            </a>
+          </div>
+        </div>
+        <nav class="menu-navegacao">
+           <ul class="lista-menu">
+             <li><a href="index.html">Início</a></li>
+             <li><a href="loja.html">Loja</a></li>
+             <li><a href="index.html#contato">Contato</a></li>
+           </ul>
+        </nav>
+      </div>
+    </header>
+
+    <section class="detalhes-produto">
+      <div class="container">
+        <div style="margin-bottom: 20px; color: #666;">
+            <a href="index.html">Início</a> / <a href="loja.html">Loja</a> / <span id="breadNomeProduto">Detalhes</span>
+        </div>
+
+        <div class="grid-detalhes">
+            <div class="coluna-imagem">
+                <img src="./assets/placeholder.jpg" alt="Produto" class="img-produto-detalhe" id="imgProdutoDetalhe">
+            </div>
+            <div class="coluna-info info-produto">
+                <span class="tag-secao" id="codProduto">CÓD: 00000</span>
+                <h1 id="nomeProdutoDetalhe">Nome do Produto</h1>
+                <div class="avaliacao">
+                    <i class="fas fa-star" style="color: gold;"></i><i class="fas fa-star" style="color: gold;"></i><i class="fas fa-star" style="color: gold;"></i><i class="fas fa-star" style="color: gold;"></i><i class="fas fa-star" style="color: gold;"></i>
+                </div>
+                
+                <div class="preco-destaque" id="precoProdutoDetalhe">R$ 000,00</div>
+
+                <p style="margin: 20px 0; color: #555; line-height: 1.6;" id="descProdutoDetalhe">
+                    Descrição detalhada da peça. Produto de alta qualidade com garantia de procedência.
+                </p>
+
+                <div class="acoes-compra" style="margin-top: 30px;">
+                    <button class="botao botao-primario" onclick="alert('Funcionalidade será ativada no JS')" style="width:100%; justify-content:center; padding: 15px;">
+                        <i class="fas fa-shopping-cart"></i> Adicionar ao Carrinho
+                    </button>
+                    <a href="https://api.whatsapp.com/send/?phone=5549984276503" class="botao botao-outline" target="_blank" style="width:100%; justify-content:center; padding: 15px; margin-top: 10px; color: #1e3a8a; border-color:#1e3a8a;">
+                        <i class="fab fa-whatsapp"></i> Comprar pelo WhatsApp
+                    </a>
+                </div>
+
+                <div style="margin-top: 30px; background: #fafafa; padding: 15px; border-radius: 5px;">
+                    <p><i class="fas fa-truck"></i> Entrega para todo o Brasil</p>
+                    <p><i class="fas fa-shield-alt"></i> Garantia de 90 dias</p>
+                </div>
+            </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="rodape-principal">
+      <div class="container">
+        <div class="rodape-inferior">
+          <p>© 2025 Dispemaq - CNPJ: 51.169.602/0001-08 - Todos os Direitos Reservados.</p>
+          <div class="links-legais">
+            <a href="#" onclick="abrirModal('modalTermos'); return false;">Termos de Uso</a>
+            <span>|</span>
+            <a href="#" onclick="abrirModal('modalPrivacidade'); return false;">Política de Privacidade</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <div class="modal-overlay" id="modalTermos">
+      <div class="modal-conteudo">
+        <button class="fechar-modal" onclick="fecharModal('modalTermos')">×</button>
+        <h2>Termos de Uso</h2>
+        <div class="conteudo-scroll">
+          <h3>1. Aceitação dos Termos</h3>
+          <p>Ao acessar e usar a loja online da Dispemaq, você concorda em cumprir e estar vinculado aos seguintes termos e condições de uso.</p>
+          <h3>2. Compras e Pagamentos</h3>
+          <p>Todas as compras realizadas através do site estão sujeitas à confirmação de estoque e pagamento. Aceitamos PIX, cartões de crédito e boleto bancário.</p>
+          <h3>3. Preços e Disponibilidade</h3>
+          <p>Todos os preços estão sujeitos a alterações sem aviso prévio. A disponibilidade dos produtos é limitada ao estoque disponível.</p>
+          <h3>4. Entregas</h3>
+          <p>Os prazos de entrega variam conforme a região. Frete grátis para compras acima de R$ 500.</p>
+          <h3>5. Trocas e Devoluções</h3>
+          <p>Aceitamos trocas e devoluções em até 7 dias após o recebimento, desde que o produto esteja em perfeitas condições.</p>
+          <h3>6. Garantia</h3>
+          <p>Todas as peças vendidas possuem garantia de 90 dias contra defeitos de fabricação.</p>
+          <h3>7. Contato</h3>
+          <p>Para questões sobre estes Termos de Uso, entre em contato através do WhatsApp: +55 49 98427-6503</p>
+        </div>
+      </div>
+    </div>
+    <div class="modal-overlay" id="modalPrivacidade">
+      <div class="modal-conteudo">
+        <button class="fechar-modal" onclick="fecharModal('modalPrivacidade')">×</button>
+        <h2>Política de Privacidade</h2>
+        <div class="conteudo-scroll">
+          <h3>1. Informações que Coletamos</h3>
+          <p>Coletamos informações necessárias para processar seu pedido: nome, telefone, endereço de entrega e informações de pagamento.</p>
+          <h3>2. Uso das Informações</h3>
+          <p>Utilizamos suas informações apenas para processar pedidos, enviar produtos e melhorar nossos serviços.</p>
+          <h3>3. Proteção de Dados</h3>
+          <p>Implementamos medidas de segurança para proteger suas informações pessoais e de pagamento.</p>
+          <h3>4. Compartilhamento de Informações</h3>
+          <p>Compartilhamos informações apenas com parceiros de entrega e processadores de pagamento necessários para completar seu pedido.</p>
+          <h3>5. Cookies</h3>
+          <p>Usamos cookies para melhorar sua experiência de compra e lembrar itens no carrinho.</p>
+          <h3>6. Seus Direitos</h3>
+          <p>Você pode solicitar acesso, correção ou exclusão de suas informações pessoais a qualquer momento.</p>
+          <h3>7. Contato</h3>
+          <p>Para questões sobre Privacidade, entre em contato: +55 49 98427-6503</p>
+        </div>
+      </div>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+</html>

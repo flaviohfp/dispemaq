@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Peças Pesadas - Trator Peças</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <link rel="stylesheet" href="./assets/css/style.css" />
+  </head>
+  <body>
+    <div class="barra-anuncio">
+      <div class="container">
+        <p>
+          <i class="fas fa-shipping-fast"></i> Enviamos para todo o Brasil |
+          <i class="fab fa-whatsapp"></i> Atendimento Especializado
+        </p>
+      </div>
+    </div>
+
+    <header class="cabecalho-principal">
+      <div class="container">
+        <div class="topo-cabecalho">
+          <a href="#" class="logo-empresa">
+            <img
+              src="./assets/images/SITE-LOGO-ESTENDIDA.-PNG-2048x819.png"
+              alt="Logo Empresa"
+            />
+          </a>
+
+          <div class="barra-busca">
+            <input
+              type="text"
+              id="campoBusca"
+              placeholder="Buscar peça, código ou máquina..."
+            />
+            <button class="botao-buscar" id="botaoBuscar"><i class="fas fa-search"></i></button>
+          </div>
+
+          <div class="acoes-usuario">
+            <a href="#" class="item-acao">
+              <i class="far fa-user"></i>
+              <span>Conta</span>
+            </a>
+            <a href="#" class="item-acao" onclick="toggleCarrinho(event)">
+              <div class="carrinho-botao">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="badge-carrinho">0</span>
+              </div>
+              <span>Carrinho</span>
+            </a>
+            <a href="https://wa.me/" class="item-acao destaque-whatsapp">
+              <i class="fab fa-whatsapp"></i>
+              <span>Vendas</span>
+            </a>
+            <button class="botao-menu-mobile" id="botaoMenuMobile">
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <nav class="menu-navegacao" id="menuNavegacao">
+        </nav>
+
+    <div class="barra-marcas">
+      <button class="item-marca" data-marca="cnh-fiatitallis"><i></i> CNH / FIATALLIS</button>
+      <button class="item-marca" data-marca="caterpillar"><i></i> CATERPILLAR</button>
+      <button class="item-marca" data-marca="jcb"><i></i> JCB</button>
+      <button class="item-marca" data-marca="komatsu"><i></i> KOMATSU</button>
+      <button class="item-marca" data-marca="hyundai"><i></i> HYUNDAI</button>
+      <button class="item-marca" data-marca="volvo-michigan"><i></i> VOLVO / MICHIGAN</button>
+      <button class="item-marca" data-marca="bobcat"><i></i> BOBCAT</button>
+      <button class="item-marca" data-marca="cummins"><i></i> CUMMINS</button>
+      <button class="item-marca" data-marca="doosan"><i></i> DOOSAN – DEVELON</button>
+      <button class="item-marca" data-marca="isuzu"><i></i> ISUZU</button>
+
+      
+    </div>
+    <div class="dropdown-marcas">
+        <button id="btnMarcas" class="botao-marcas">
+            <i class="fas fa-plus-circle"></i> Ver mais marcas
+        </button>
+        
+        <div id="menuMarcas">
+            <button class="marca-item" data-marca="kubota">Kubota</button>
+            <button class="marca-item" data-marca="link-belt">Link-Belt</button>
+            <button class="marca-item" data-marca="massey">Massey Ferguson – Maxion</button>
+            <button class="marca-item" data-marca="muller">Muller – Randon</button>
+            <button class="marca-item" data-marca="perkins">Perkins</button>
+            <button class="marca-item" data-marca="sany">SANY</button>
+            <button class="marca-item" data-marca="sdlg">SDLG</button>
+            <button class="marca-item" data-marca="xcmg">XCMG</button>
+        </div>
+      </div>
+
+    <div id="modalCategorias" class="modal-categorias-overlay">
+        <div class="modal-conteudo-categorias">
+          <div class="modal-header">
+            <h3 id="tituloMarcaModal">Selecione a Categoria</h3>
+            <button class="fechar-modal-cat" onclick="fecharModalCategorias()">
+              &times;
+            </button>
+          </div>
+
+          <div class="grid-botoes-categorias">
+            <button class="btn-cat-escolha" data-cat="motor">
+              <i class="fas fa-cogs"></i> Motor
+            </button>
+            <button class="btn-cat-escolha" data-cat="hidraulica">
+              <i class="fas fa-oil-can"></i> Hidráulica
+            </button>
+            <button class="btn-cat-escolha" data-cat="eletrica">
+              <i class="fas fa-bolt"></i> Elétrica
+            </button>
+            <button class="btn-cat-escolha" data-cat="filtros">
+              <i class="fas fa-filter"></i> Filtros
+            </button>
+            <button class="btn-cat-escolha" data-cat="material-rodante">
+              <i class="fas fa-tractor"></i> Material Rodante
+            </button>
+            <button class="btn-cat-escolha" data-cat="transmissao">
+              <i class="fas fa-cog"></i> Transmissão
+            </button>
+
+            <button class="btn-cat-escolha destaque" data-cat="todas">
+              Ver Tudo dessa Marca
+            </button>
+          </div>
+        </div>
+    </div>
+
+    <section class="hero-principal">
+      <div class="container conteudo-hero">
+        <div class="texto-hero">
+          <span class="tag-destaque">Líder em Peças Pesadas</span>
+          <h1>A Solução Completa para sua Máquina Não Parar</h1>
+          <p class="descricao-hero">
+            Estoque completo de peças para linha amarela e agrícola. Qualidade
+            garantida, envio rápido e o melhor custo-benefício do mercado.
+          </p>
+
+          <div class="marcas-atendidas">
+            <strong>Especialistas em:</strong> Caterpillar, Volvo, Case, Komatsu
+            e muito mais.
+          </div>
+
+          <div class="botoes-cta">
+            <a href="loja.html" class="botao botao-primario botao-grande">Ver Catálogo Completo</a>
+            <a href="#" class="botao botao-outline botao-grande"><i class="fab fa-whatsapp"></i> Orçamento Rápido</a>
+          </div>
+        </div>
+
+        <div class="imagem-hero">
+          <div class="card-flutuante card-1">
+            <i class="fas fa-box-open"></i>
+            <div>
+              <strong>Entrega Rápida</strong>
+              <small>Para todo Brasil</small>
+            </div>
+          </div>
+          <div class="card-flutuante card-2">
+            <i class="fas fa-medal"></i>
+            <div>
+              <strong>Garantia Total</strong>
+              <small>Peças originais e 1ª linha</small>
+            </div>
+          </div>
+          <div class="card-flutuante card-3">
+            <i class="fas fa-headset"></i>
+            <div>
+              <strong>Suporte Técnico</strong>
+              <small>Especialistas prontos</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="secao-loja">
+      <div class="container">
+        <div class="cabecalho-secao">
+          <h2>Destaques da Semana</h2>
+          <div class="filtros-produtos">
+            <button class="filtro-btn ativo">Todos</button>
+            <button class="filtro-btn">Motor</button>
+            <button class="filtro-btn">Filtros</button>
+            <button class="filtro-btn">Ferramentas de Penetração</button>
+          </div>
+        </div>
+
+        <div id="gradeDestaques" class="grade-produtos">
+          
+          <div class="card-produto">
+            <div class="produto-imagem">
+              <span class="badge-desconto">-15%</span>
+              <i class="fas fa-cog"></i>
+            </div>
+            <div class="produto-info">
+              <span class="produto-categoria">Transmissão</span>
+              <h3 class="produto-nome">Kit Conversor de Torque Case 580L</h3>
+              <span class="produto-codigo">Cód: CS-580-99</span>
+              <div class="produto-precos">
+                <span class="preco-antigo">R$ 4.500,00</span>
+                <span class="preco-atual">R$ 3.825,00</span>
+                <span class="preco-pix"><i class="fas fa-barcode"></i> R$ 3.633,00 no PIX</span>
+              </div>
+              <div class="produto-acoes">
+                <button class="botao-adicionar" onclick="adicionarAoCarrinho(1)">
+                  <i class="fas fa-shopping-cart"></i> Comprar
+                </button>
+                <button class="botao-detalhes">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-produto">
+            <div class="produto-imagem">
+              <span class="badge-estoque-baixo">Últimas Unidades</span>
+              <i class="fas fa-filter"></i>
+            </div>
+            <div class="produto-info">
+              <span class="produto-categoria">Filtros</span>
+              <h3 class="produto-nome">Filtro de Ar Externo CAT 416E</h3>
+              <span class="produto-codigo">Cód: CT-416-AR</span>
+              <div class="produto-precos">
+                <span class="preco-antigo">R$ 280,00</span>
+                <span class="preco-atual">R$ 250,00</span>
+                <span class="preco-pix"><i class="fas fa-barcode"></i> R$ 237,50 no PIX</span>
+              </div>
+              <div class="produto-acoes">
+                <button class="botao-adicionar" onclick="adicionarAoCarrinho(7)">
+                  <i class="fas fa-shopping-cart"></i> Comprar
+                </button>
+                <button class="botao-detalhes">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-produto">
+            <div class="produto-imagem">
+              <i class="fas fa-cogs"></i>
+            </div>
+            <div class="produto-info">
+              <span class="produto-categoria">Motor</span>
+              <h3 class="produto-nome">Bomba D'água Motor Cummins Serie B</h3>
+              <span class="produto-codigo">Cód: CM-B-H2O</span>
+              <div class="produto-precos">
+                <span class="preco-antigo"></span>
+                <span class="preco-atual">R$ 890,00</span>
+                <span class="preco-pix"><i class="fas fa-barcode"></i> R$ 845,50 no PIX</span>
+              </div>
+              <div class="produto-acoes">
+                <button class="botao-adicionar" onclick="adicionarAoCarrinho(5)">
+                  <i class="fas fa-shopping-cart"></i> Comprar
+                </button>
+                <button class="botao-detalhes">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-produto">
+            <div class="produto-imagem">
+              <span class="badge-desconto">-10%</span>
+              <i class="fas fa-link"></i>
+            </div>
+            <div class="produto-info">
+              <span class="produto-categoria">Material Rodante</span>
+              <h3 class="produto-nome">Dente Caçamba Escavadeira Hyundai</h3>
+              <span class="produto-codigo">Cód: HY-220-D</span>
+              <div class="produto-precos">
+                <span class="preco-antigo">R$ 180,00</span>
+                <span class="preco-atual">R$ 162,00</span>
+                <span class="preco-pix"><i class="fas fa-barcode"></i> R$ 153,90 no PIX</span>
+              </div>
+              <div class="produto-acoes">
+                <button class="botao-adicionar" onclick="adicionarAoCarrinho(6)">
+                  <i class="fas fa-shopping-cart"></i> Comprar
+                </button>
+                <button class="botao-detalhes">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="centralizado" style="margin-top: 40px">
+          <a href="loja.html" class="botao botao-outline-pequeno">Ver todos os produtos</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="barra-beneficios">
+      <div class="container">
+        <div class="grade-beneficios">
+          <div class="item-beneficio">
+            <i class="fas fa-truck"></i>
+            <div>
+              <strong>Envio Imediato</strong>
+              <small>Despachamos em 24h</small>
+            </div>
+          </div>
+          <div class="item-beneficio">
+            <i class="fas fa-credit-card"></i>
+            <div>
+              <strong>Parcele em até 12x</strong>
+              <small>Cartões de crédito</small>
+            </div>
+          </div>
+          <div class="item-beneficio">
+            <i class="fas fa-shield-alt"></i>
+            <div>
+              <strong>Compra Segura</strong>
+              <small>Dados protegidos</small>
+            </div>
+          </div>
+          <div class="item-beneficio">
+            <i class="fas fa-tags"></i>
+            <div>
+              <strong>5% no PIX</strong>
+              <small>Desconto à vista</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="cta-banner">
+      <div class="container conteudo-cta">
+        <div class="texto-cta">
+          <h2>Não encontrou a peça que precisa?</h2>
+          <p>
+            Temos acesso a mais de 50.000 itens em estoque. Fale com um
+            consultor agora mesmo!
+          </p>
+        </div>
+        <a href="#" class="botao botao-outline botao-grande"><i class="fab fa-whatsapp"></i> Falar no WhatsApp</a>
+      </div>
+    </section>
+
+    <section class="secao-sobre">
+      <div class="container conteudo-sobre">
+        <div class="imagem-sobre">
+          <i
+            class="fas fa-warehouse"
+            style="font-size: 8rem; color: rgba(255, 255, 255, 0.3)"
+          ></i>
+          <div
+            class="card-flutuante card-2"
+            style="bottom: 30px; right: 30px; top: auto"
+          >
+            <i class="fas fa-check-circle"></i>
+            <strong>Qualidade Garantida</strong>
+          </div>
+        </div>
+        <div class="texto-sobre">
+          <span class="tag-secao">Quem Somos</span>
+          <h2>Experiência que move o seu negócio</h2>
+          <p>
+            Há mais de 15 anos no mercado, somos referência na distribuição de
+            peças para tratores e máquinas pesadas. Nossa missão é entregar
+            agilidade e confiança.
+          </p>
+
+          <div class="lista-diferenciais">
+            <div class="item-diferencial">
+              <i class="fas fa-check"></i> Estoque diversificado
+            </div>
+            <div class="item-diferencial">
+              <i class="fas fa-check"></i> Atendimento técnico especializado
+            </div>
+            <div class="item-diferencial">
+              <i class="fas fa-check"></i> Logística eficiente para todo país
+            </div>
+          </div>
+
+          <div class="estatisticas-sobre">
+            <div class="stat-item">
+              <strong>+15</strong>
+              <span>Anos de História</span>
+            </div>
+            <div class="stat-item">
+              <strong>+10k</strong>
+              <span>Clientes Atendidos</span>
+            </div>
+            <div class="stat-item">
+              <strong>+50k</strong>
+              <span>Itens em Estoque</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="secao-contato">
+      <div class="container">
+        <div class="cabecalho-secao centralizado">
+          <h2>Fale Conosco</h2>
+          <p>Estamos prontos para te atender pelos nossos canais</p>
+        </div>
+
+        <div class="grade-contato">
+          <div class="card-contato">
+            <div class="icone-contato telefone">
+              <i class="fas fa-phone-alt"></i>
+            </div>
+            <h3>Televendas</h3>
+            <p>Fale diretamente com um vendedor</p>
+            <a href="tel:+550000000000" class="link-contato">(00) 0000-0000</a>
+          </div>
+
+          <div class="card-contato destaque">
+            <div class="icone-contato whatsapp">
+              <i class="fab fa-whatsapp"></i>
+            </div>
+            <h3>WhatsApp</h3>
+            <p>Atendimento rápido e envio de fotos</p>
+            <a href="#" class="link-contato">Iniciar Conversa</a>
+          </div>
+
+          <div class="card-contato">
+            <div class="icone-contato horario">
+              <i class="far fa-clock"></i>
+            </div>
+            <h3>Horário</h3>
+            <p>Segunda a Sexta: 08h às 18h</p>
+            <p>Sábado: 08h às 12h</p>
+          </div>
+        </div>
+
+        <div class="mapa-local">
+          <div class="info-local">
+            <h3><i class="fas fa-map-marker-alt"></i> Nossa Loja</h3>
+            <p>Av. das Máquinas, 1234 - Distrito Industrial</p>
+            <p>Cidade - Estado, CEP: 00000-000</p>
+            <div class="area-atuacao">
+              Atendemos todo o território nacional via transportadora.
+            </div>
+          </div>
+          <div
+            class="container-mapa"
+            style="
+              background: #eee;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            "
+          >
+            <i
+              class="fas fa-map-marked-alt"
+              style="font-size: 3rem; color: #ccc"
+            ></i>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="rodape-principal">
+      <div class="container">
+        <div class="conteudo-rodape">
+          <div class="coluna-rodape">
+            <h3>Sobre Nós</h3>
+            <p>
+              Especialistas em peças de reposição para máquinas pesadas e
+              tratores agrícolas. Qualidade e confiança para o seu equipamento.
+            </p>
+            <div class="redes-sociais">
+              <a href="#"><i class="fab fa-instagram"></i></a>
+              <a href="#"><i class="fab fa-facebook-f"></i></a>
+              <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+          </div>
+
+          <div class="coluna-rodape">
+            <h4>Links Rápidos</h4>
+            <ul class="links-rodape">
+              <li><a href="#">Início</a></li>
+              <li><a href="#">Minha Conta</a></li>
+              <li><a href="#">Rastrear Pedido</a></li>
+              <li><a href="#">Trocas e Devoluções</a></li>
+            </ul>
+          </div>
+
+          <div class="coluna-rodape">
+            <h4>Categorias</h4>
+            <ul class="links-rodape">
+              <li><a href="#">Motor</a></li>
+              <li><a href="#">Hidráulica</a></li>
+              <li><a href="#">Transmissão</a></li>
+              <li><a href="#">Material Rodante</a></li>
+            </ul>
+          </div>
+
+          <div class="coluna-rodape">
+            <h4>Contato</h4>
+            <ul class="info-rodape">
+              <li><i class="fas fa-phone-alt"></i> (00) 0000-0000</li>
+              <li><i class="fab fa-whatsapp"></i> (00) 90000-0000</li>
+              <li><i class="far fa-envelope"></i> contato@loja.com.br</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="divisor-rodape"></div>
+
+        <div class="rodape-inferior">
+          <p>&copy; 2023 Nome da Empresa. Todos os direitos reservados.</p>
+          <div class="formas-pagamento">
+            <i class="fab fa-cc-visa"></i>
+            <i class="fab fa-cc-mastercard"></i>
+            <i class="fas fa-barcode"></i>
+            <i class="fas fa-pix"></i>
+          </div>
+          <div class="links-legais">
+            <a href="#">Termos de Uso</a>
+            <a href="#">Política de Privacidade</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <div class="overlay-categorias" id="overlay"></div>
+    
+    <div class="carrinho-lateral" id="carrinhoLateral">
+      <div class="carrinho-header">
+        <h3><i class="fas fa-shopping-bag"></i> Seu Carrinho</h3>
+        <button class="fechar-carrinho" onclick="toggleCarrinho(event)">
+          &times;
+        </button>
+      </div>
+      <div class="carrinho-conteudo">
+        </div>
+      <div class="carrinho-footer">
+        <div class="carrinho-total">
+          <span>Total:</span>
+          <strong>R$ 0,00</strong>
+        </div>
+        <button class="botao botao-primario botao-block">
+          Finalizar Compra
+        </button>
+      </div>
+    </div>
+
+    <a href="#" class="whatsapp-flutuante">
+      <i class="fab fa-whatsapp"></i>
+      <span class="tooltip-whatsapp">Fale Conosco</span>
+    </a>
+
+    <button class="botao-topo" id="btnTopo" onclick="subirTopo()">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+      // Toggle Carrinho
+      function toggleCarrinho(e) {
+        if (e) e.preventDefault();
+        const carrinho = document.getElementById("carrinhoLateral");
+        const overlay = document.getElementById("overlay");
+        carrinho.classList.toggle("aberto");
+        overlay.classList.toggle("ativo");
+      }
+
+      // Fechar carrinho ao clicar no overlay
+      document.getElementById("overlay").addEventListener("click", function () {
+        document.getElementById("carrinhoLateral").classList.remove("aberto");
+        this.classList.remove("ativo");
+      });
+
+      // Toggle Menu Mobile
+      function toggleMenuMobile() {
+        const menu = document.getElementById("menuNavegacao");
+        menu.classList.toggle("ativo"); 
+      }
+
+      // Botão voltar ao topo
+      window.onscroll = function () {
+        const btn = document.getElementById("btnTopo");
+        if (
+          document.body.scrollTop > 300 ||
+          document.documentElement.scrollTop > 300
+        ) {
+          btn.classList.add("visivel");
+        } else {
+          btn.classList.remove("visivel");
+        }
+      };
+
+      function subirTopo() {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    </script>
+
+    <script src="./assets/js/main.js"></script>
+  </body>
+</html>

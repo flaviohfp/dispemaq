@@ -63,26 +63,14 @@ body {
     padding: 15px 0;
 }
 
-/* Logo */
-.logo-empresa img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100px;
-    object-fit: contain;
-    padding-left: 20px; /* opcional */
-}
-
-
-
-/* Barra de Busca */
 .barra-busca {
     display: flex;
+    width: 100%;
     max-width: 500px;
     background: var(--cinza-claro);
     border-radius: 8px;
     overflow: hidden;
-    
+    margin: 0 auto;
 }
 
 .barra-busca input {
@@ -109,6 +97,21 @@ body {
 .botao-buscar:hover {
     background: var(--laranja);
 }
+
+.logo-empresa img {
+    position: relative;
+    height: 70px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+    transition: transform 0.3s ease;
+    z-index: 10;
+}
+
+.logo-empresa img:hover {
+    transform: scale(1.05);
+}
+
 
 /* Ações do Usuário */
 .acoes-usuario {
@@ -168,7 +171,7 @@ body {
 .barra-marcas {
     position: relative;
     width: 100vw;
-    height: 80px;
+    height: 50px;
     left: 50%;
     transform: translateX(-50%);
     background: linear-gradient(135deg, var(--laranja) 0%, #ea580c 100%);
@@ -269,164 +272,240 @@ body {
     background: #f2f2f2;
 }
 
+/* ============================================================
+   BARRA DE MARCAS (Container Pai)
+   ============================================================ */
+.barra-marcas {
+    display: flex;              /* Alinha os itens lado a lado */
+    align-items: center;        /* Centraliza verticalmente */
+    overflow-x: auto;           /* Permite rolagem horizontal */
+    background-color: #ff6600;  /* Sua cor laranja */
+    padding: 10px 0;
+    position: relative;         /* Necessário para o filho sticky funcionar */
+    
+    /* Esconde a barra de rolagem para ficar mais bonito */
+    scrollbar-width: none;      /* Firefox */
+    -ms-overflow-style: none;   /* IE e Edge */
+}
 
-/* ===== MENU DROPDOWN DE CATEGORIAS POR MARCA ===== */
-.menu-categorias-marca {
+/* Esconde barra de rolagem no Chrome/Safari */
+.barra-marcas::-webkit-scrollbar {
+    display: none;
+}
+
+/* Itens normais (as marcas que rolam) */
+.item-marca {
+    flex: 0 0 auto;             /* Impede que os botões encolham */
+    margin: 0 10px;             /* Espaçamento entre as marcas */
+    white-space: nowrap;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    /* ... seus outros estilos de botão ... */
+}
+
+/* ============================================================
+   DROPDOWN "VER MAIS MARCAS" (O que fica fixo)
+   ============================================================ */
+.dropdown-marcas {
+    position: sticky;           /* O SEGREDO: Fixa o elemento dentro da barra */
+    right: 0;                   /* Cola na direita total */
+    z-index: 100;               /* Garante que fique por cima das outras marcas */
+    
+    background-color: #ffffff;  /* CRUCIAL: Fundo laranja para tapar o que passa por baixo */
+    box-shadow: -5px 0 15px rgba(0,0,0,0.2); /* Sombra na esquerda para dar destaque */
+    
+    padding: 0 15px;            /* Espaço interno */
+    display: flex;              /* Garante visibilidade */
+    align-items: center;
+    height: 100%;               /* Altura total da barra */
+}
+
+/* Estilo do Botão */
+.botao-marcas {
+    background-color: white;
+    color: #ff6600;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;        /* Arredondado para destacar */
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.botao-marcas:hover {
+    background-color: #ffe5cc; /* Um laranja bem clarinho no hover */
+}
+
+/* ============================================================
+   MENU FLUTUANTE (A lista que abre)
+   ============================================================ */
+#menuMarcas {
+    display: none;              /* Começa escondido */
+    position: fixed;
+    top: 100%;                  /* Logo abaixo do botão */
+    right: 10px;                /* Alinhado à direita (com margem de segurança) */
+    width: 220px;
+    background-color: white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    border-radius: 8px;
+    padding: 10px 0;
+    z-index: 101;               /* Acima do botão */
+    margin-top: 10px;
+}
+
+#menuMarcas.mostrar {
+    display: block;             /* JS ativa isso */
+    animation: aparecerSuave 0.2s ease-out;
+}
+
+@keyframes aparecerSuave {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Itens da lista do menu */
+.marca-item {
+    display: block;
+    width: 100%;
+    padding: 10px 20px;
+    text-align: left;
+    background: none;
+    border: none;
+    border-bottom: 1px solid #eee;
+    color: #333;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.marca-item:hover {
+    background-color: #f9f9f9;
+    color: #ff6600;
+    padding-left: 25px;         /* Efeito de deslizar */
+    transition: all 0.2s;
+}
+
+
+/* =================================================================
+   CSS DO MODAL DE CATEGORIAS (INTERMEDIÁRIO)
+   ================================================================= */
+
+/* Fundo escuro atrás da janela */
+.modal-categorias-overlay {
+    display: none; /* Começa invisível */
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    background: var(--branco);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    z-index: 1999;
-    transform: translateY(-100%);
-    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    max-height: 80vh;
-    overflow-y: auto;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); /* Escurece o fundo */
+    z-index: 100000; /* Fica na frente de TUDO */
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(3px); /* Efeito borrado no fundo */
 }
 
-.menu-categorias-marca.aberto {
-    transform: translateY(0);
+/* A caixa branca */
+.modal-conteudo-categorias {
+    background: #fff;
+    width: 90%;
+    max-width: 500px; /* Largura máxima */
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    border-top: 6px solid #f59e0b; /* Laranja da marca */
+    animation: descerSuave 0.3s ease;
 }
 
-.titulo-marca-selecionada {
+@keyframes descerSuave {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Cabeçalho do modal */
+.modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 25px 0;
-    border-bottom: 2px solid var(--cinza-claro);
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
 }
 
-.titulo-marca-selecionada h3 {
-    color: var(--azul-escuro);
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
+.modal-header h3 {
+    color: #1e3a8a; /* Azul Escuro */
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.fechar-modal-cat {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #999;
+    line-height: 1;
+}
+
+/* Grade de Botões */
+.grid-botoes-categorias {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 colunas */
     gap: 10px;
 }
 
-.fechar-menu-categorias {
-    background: var(--cinza-claro);
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+/* Os botões de categoria */
+.btn-cat-escolha {
+    background: #f9fafb;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: 0.3s;
-    font-size: 1.2rem;
-    color: var(--cinza-escuro);
-}
-
-.fechar-menu-categorias:hover {
-    background: var(--azul-escuro);
-    color: var(--branco);
-    transform: rotate(90deg);
-}
-
-.grade-categorias-marca {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 15px;
-    padding: 30px 0;
-}
-
-.categoria-marca-item {
-    background: var(--cinza-claro);
-    padding: 20px;
-    border: 2px solid transparent;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: 0.3s;
+    font-size: 0.95rem;
+    color: #333;
     display: flex;
-    align-items: center;
-    gap: 15px;
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--cinza-escuro);
-    text-align: left;
-}
-
-.categoria-marca-item:hover {
-    background: var(--branco);
-    border-color: var(--laranja);
-    transform: translateX(10px);
-    box-shadow: var(--sombra-media);
-}
-
-.categoria-marca-item i {
-    font-size: 1.8rem;
-    color: var(--laranja);
-    width: 40px;
-    height: 40px;
-    background: var(--branco);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.overlay-categorias {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.6);
-    z-index: 1998;
-    opacity: 0;
-    visibility: hidden;
-    transition: 0.3s;
-    backdrop-filter: blur(3px);
-}
-
-.overlay-categorias.ativo {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Menu de Navegação */
-.menu-navegacao {
-    border-top: 1px solid var(--cinza-claro);
-}
-
-.lista-menu {
-    display: flex;
-    justify-content: center;
-    list-style: none;
-    gap: 5px;
-}
-
-.lista-menu a {
-    display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 8px;
-    padding: 15px 20px;
-    color: var(--cinza-escuro);
-    text-decoration: none;
-    font-weight: 500;
-    transition: 0.3s;
-    position: relative;
+    transition: all 0.2s;
 }
 
-.lista-menu a::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 3px;
-    background: var(--laranja);
-    transition: 0.3s;
+.btn-cat-escolha i {
+    font-size: 1.5rem;
+    color: #1e3a8a;
 }
 
-.lista-menu a:hover {
-    color: var(--azul-escuro);
+.btn-cat-escolha:hover {
+    background: #1e3a8a;
+    color: #fff;
+    border-color: #1e3a8a;
 }
 
-.lista-menu a:hover::after {
-    width: 100%;
+.btn-cat-escolha:hover i {
+    color: #f59e0b; /* Ícone fica laranja no hover */
 }
+
+/* Botão "Ver Tudo" (Destaque) */
+.btn-cat-escolha.destaque {
+    grid-column: span 2; /* Ocupa as 2 colunas */
+    background-color: #f59e0b;
+    color: #fff;
+    border: none;
+    font-weight: bold;
+}
+
+.btn-cat-escolha.destaque:hover {
+    background-color: #d97706;
+}
+
+
 
 /* ===== HERO PRINCIPAL ===== */
 .hero-principal {
@@ -694,7 +773,7 @@ body {
 
 .card-produto {
     background: var(--branco);
-    border-radius: 12px;
+    border-radius: 3px;
     overflow: hidden;
     box-shadow: var(--sombra-leve);
     transition: 0.3s;
