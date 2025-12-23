@@ -393,119 +393,176 @@ body {
 }
 
 
-/* =================================================================
-   CSS DO MODAL DE CATEGORIAS (INTERMEDIÁRIO)
-   ================================================================= */
-
-/* Fundo escuro atrás da janela */
-.modal-categorias-overlay {
-    display: none; /* Começa invisível */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6); /* Escurece o fundo */
-    z-index: 100000; /* Fica na frente de TUDO */
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(3px); /* Efeito borrado no fundo */
+/* ============================================================
+   MENU FLUTUANTE DE CATEGORIAS (Estilo Dropdown)
+   ============================================================ */
+.menu-cat-dropdown {
+    display: none; /* JS vai mudar para 'block' */
+    position: absolute; /* Permite mover ele pela tela */
+    z-index: 9999; /* Fica acima de tudo */
+    background-color: white;
+    width: 280px; /* Largura confortável */
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2); /* Sombra forte para destacar */
+    border: 1px solid #eee;
+    overflow: hidden;
+    animation: fadeInFast 0.2s ease-out;
 }
 
-/* A caixa branca */
-.modal-conteudo-categorias {
-    background: #fff;
-    width: 90%;
-    max-width: 500px; /* Largura máxima */
-    border-radius: 10px;
-    padding: 25px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    border-top: 6px solid #f59e0b; /* Laranja da marca */
-    animation: descerSuave 0.3s ease;
-}
-
-@keyframes descerSuave {
-    from { transform: translateY(-20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
-
-/* Cabeçalho do modal */
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-}
-
-.modal-header h3 {
-    color: #1e3a8a; /* Azul Escuro */
-    font-size: 1.2rem;
-    margin: 0;
-}
-
-.fechar-modal-cat {
-    background: none;
-    border: none;
-    font-size: 2rem;
-    cursor: pointer;
-    color: #999;
-    line-height: 1;
-}
-
-/* Grade de Botões */
-.grid-botoes-categorias {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* 2 colunas */
-    gap: 10px;
-}
-
-/* Os botões de categoria */
-.btn-cat-escolha {
-    background: #f9fafb;
-    border: 1px solid #ddd;
-    padding: 15px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.95rem;
+/* Cabeçalho do menu (Nome da marca) */
+.menu-cat-header {
+    background-color: #f4f4f4;
+    padding: 10px 15px;
+    font-weight: bold;
     color: #333;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+/* Área de rolagem para os itens */
+.lista-cat-scroll {
+    max-height: 400px; /* Se passar disso, cria rolagem */
+    overflow-y: auto;
+}
+
+/* Estilo de cada botão da lista */
+.item-cat-dropdown {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 8px;
-    transition: all 0.2s;
-}
-
-.btn-cat-escolha i {
-    font-size: 1.5rem;
-    color: #1e3a8a;
-}
-
-.btn-cat-escolha:hover {
-    background: #1e3a8a;
-    color: #fff;
-    border-color: #1e3a8a;
-}
-
-.btn-cat-escolha:hover i {
-    color: #f59e0b; /* Ícone fica laranja no hover */
-}
-
-/* Botão "Ver Tudo" (Destaque) */
-.btn-cat-escolha.destaque {
-    grid-column: span 2; /* Ocupa as 2 colunas */
-    background-color: #f59e0b;
-    color: #fff;
+    width: 100%;
+    padding: 12px 15px;
     border: none;
+    background: none;
+    text-align: left;
+    font-size: 14px;
+    color: #444;
+    border-bottom: 1px solid #f9f9f9;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.item-cat-dropdown i {
+    width: 25px; /* Alinha os ícones */
+    color: #ff6600; /* Laranja */
+    margin-right: 5px;
+}
+
+.item-cat-dropdown:hover {
+    background-color: #fff5eb; /* Laranja bem clarinho */
+    color: #ff6600;
+    font-weight: 500;
+}
+
+/* Botão destaque no final */
+.item-cat-dropdown.destaque {
+    background-color: #333;
+    color: white;
+    justify-content: center;
+    text-align: center;
+}
+.item-cat-dropdown.destaque:hover {
+    background-color: black;
+}
+
+@keyframes fadeInFast {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Personaliza a barra de rolagem para ficar fina e cinza */
+.lista-cat-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+.lista-cat-scroll::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 3px;
+}
+/* ============================================================
+   ESTILOS EXCLUSIVOS DA LOJA.HTML
+   ============================================================ */
+
+/* Layout Grid: Sidebar (esquerda) + Produtos (direita) */
+.container-loja-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr; /* Sidebar fixa 260px, resto fluido */
+    gap: 30px;
+    align-items: start;
+}
+
+/* Estilo da Sidebar */
+.sidebar-filtros .box-sidebar {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.sidebar-filtros h3 {
+    font-size: 1.1rem;
+    color: #333;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ff6600; /* Laranja da marca */
+}
+
+.grupo-filtro {
+    margin-bottom: 25px;
+}
+
+.grupo-filtro h4 {
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    color: #555;
+    text-transform: uppercase;
     font-weight: bold;
 }
 
-.btn-cat-escolha.destaque:hover {
-    background-color: #d97706;
+.grupo-filtro ul {
+    list-style: none;
+    padding: 0;
 }
 
+.filtro-item {
+    padding: 8px 10px;
+    cursor: pointer;
+    color: #666;
+    border-radius: 4px;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #f0f0f0;
+}
 
+.filtro-item:hover {
+    background-color: #ff6600;
+    color: white;
+    padding-left: 15px; /* Efeito de deslizar */
+}
+
+/* Cabeçalho dos Resultados */
+.header-resultados {
+    background-color: #fff;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 20px;
+}
+
+.header-resultados h2 {
+    color: #1e3a8a; /* Azul escuro da home */
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+/* Responsividade para celular */
+@media (max-width: 900px) {
+    .container-loja-layout {
+        grid-template-columns: 1fr; /* Vira uma coluna só */
+    }
+    
+    .sidebar-filtros {
+        margin-bottom: 30px;
+    }
+}
 
 /* ===== HERO PRINCIPAL ===== */
 .hero-principal {
@@ -1667,6 +1724,48 @@ body {
 .fechar-modal:hover {
     background: rgba(255,255,255,0.2);
 }
+
+
+/* --- COLE ISSO NO FINAL DO SEU STYLE.CSS --- */
+
+/* Layout que divide a Sidebar (filtros) e os Produtos */
+.dyn-layout-loja {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 30px;
+    align-items: start;
+}
+@media (max-width: 900px) {
+    .dyn-layout-loja { grid-template-columns: 1fr; }
+}
+
+/* Grade onde ficam os cards dos produtos */
+.dyn-grade-produtos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 25px;
+}
+
+/* O Card do Produto (Visual Novo) */
+.dyn-card {
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+    overflow: hidden; transition: transform 0.3s; display: flex; flex-direction: column;
+}
+.dyn-card:hover { transform: translateY(-5px); border-color: #1e3a8a; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+
+.dyn-img-wrapper {
+    height: 200px; padding: 10px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #f0f0f0;
+}
+.dyn-img-wrapper img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+.dyn-info { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
+.dyn-titulo { font-size: 1rem; font-weight: 700; margin: 5px 0 10px 0; height: 2.5em; overflow: hidden; color: #333; }
+.dyn-preco { font-size: 1.3rem; color: #ff6600; font-weight: 800; margin-top: auto; margin-bottom: 15px; }
+
+.dyn-btn-comprar {
+    width: 100%; padding: 10px; background: #1e3a8a; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;
+}
+.dyn-btn-comprar:hover { background: #0f256e; }
 
 /* ===== ANIMAÇÕES ===== */
 @keyframes slideInLeft {

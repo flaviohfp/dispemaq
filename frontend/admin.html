@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Dispemaq</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="./assets/css/admin.css">
+</head>
+<body>
+
+    <header class="admin-header">
+        <h1><i class="fas fa-tools"></i> Painel Admin</h1>
+        <a href="./loja.html" target="_blank"><i class="fas fa-external-link-alt"></i> Ver Loja</a>
+    </header>
+
+    <div class="container">
+        
+        <div class="card-admin">
+            <h2>Cadastrar Novo Produto</h2>
+            <form id="formProduto">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nome da Peça</label>
+                        <input type="text" id="nome" placeholder="Ex: Filtro de Óleo" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Código (Ref)</label>
+                        <input type="text" id="cod" placeholder="Ex: AX-9900" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Marca</label>
+                        <select id="marca" required>
+                            <option value="">Selecione...</option>
+                            <option value="caterpillar">Caterpillar</option>
+                            <option value="komatsu">Komatsu</option>
+                            <option value="volvo-michigan">Volvo / Michigan</option>
+                            <option value="case">Case</option>
+                            <option value="jcb">JCB</option>
+                            <option value="cummins">Cummins</option>
+                            <option value="massey">Massey Ferguson</option>
+                            <option value="outras">Outras</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Categoria</label>
+                        <select id="categoria" required>
+                            <option value="">Selecione...</option>
+                            <option value="motor">Motor</option>
+                            <option value="transmissao">Transmissão</option>
+                            <option value="hidraulica">Hidráulica</option>
+                            <option value="eletrica">Elétrica</option>
+                            <option value="filtros">Filtros</option>
+                            <option value="rodante">Material Rodante</option>
+                            <option value="fps">FPS / Implementos</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Preço (R$)</label>
+                        <input type="number" id="preco" step="0.01" placeholder="0.00" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Foto do Produto</label>
+                        <input type="file" id="arquivoImagem" accept="image/*" required>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button type="submit" class="btn-add">
+                        <i class="fas fa-plus-circle"></i> Cadastrar Produto
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card-admin">
+            <h2>Produtos em Estoque</h2>
+            <p id="statusCarregamento">Carregando lista...</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th width="80">Foto</th>
+                        <th>Nome / Código</th>
+                        <th>Marca / Categ.</th>
+                        <th>Preço</th>
+                        <th width="50">Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaProdutos">
+                    </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script type="module" src="./assets/js/admin.js"></script>
+
+</body>
+</html>

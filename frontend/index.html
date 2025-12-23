@@ -101,40 +101,49 @@
         </div>
       </div>
 
-    <div id="modalCategorias" class="modal-categorias-overlay">
-        <div class="modal-conteudo-categorias">
-          <div class="modal-header">
-            <h3 id="tituloMarcaModal">Selecione a Categoria</h3>
-            <button class="fechar-modal-cat" onclick="fecharModalCategorias()">
-              &times;
-            </button>
-          </div>
-
-          <div class="grid-botoes-categorias">
-            <button class="btn-cat-escolha" data-cat="motor">
-              <i class="fas fa-cogs"></i> Motor
-            </button>
-            <button class="btn-cat-escolha" data-cat="hidraulica">
-              <i class="fas fa-oil-can"></i> Hidráulica
-            </button>
-            <button class="btn-cat-escolha" data-cat="eletrica">
-              <i class="fas fa-bolt"></i> Elétrica
-            </button>
-            <button class="btn-cat-escolha" data-cat="filtros">
-              <i class="fas fa-filter"></i> Filtros
-            </button>
-            <button class="btn-cat-escolha" data-cat="material-rodante">
-              <i class="fas fa-tractor"></i> Material Rodante
-            </button>
-            <button class="btn-cat-escolha" data-cat="transmissao">
-              <i class="fas fa-cog"></i> Transmissão
-            </button>
-
-            <button class="btn-cat-escolha destaque" data-cat="todas">
-              Ver Tudo dessa Marca
-            </button>
-          </div>
-        </div>
+   <div id="menuCategoriasFlutuante" class="menu-cat-dropdown">
+    <div class="menu-cat-header" id="tituloMarcaDropdown">Categorias</div>
+    
+    <div class="lista-cat-scroll">
+        <button class="item-cat-dropdown" data-cat="motor">
+            <i class="fas fa-cogs"></i> Motor
+        </button>
+        <button class="item-cat-dropdown" data-cat="combustivel">
+            <i class="fas fa-gas-pump"></i> Sistema de Combustível
+        </button>
+        <button class="item-cat-dropdown" data-cat="transmissao">
+            <i class="fas fa-columns"></i> Transmissão / Comando Final
+        </button>
+        <button class="item-cat-dropdown" data-cat="freios-eixos">
+            <i class="fas fa-life-ring"></i> Direção / Freios / Eixos
+        </button>
+        <button class="item-cat-dropdown" data-cat="eletrica">
+            <i class="fas fa-bolt"></i> Sistema Elétrico
+        </button>
+        <button class="item-cat-dropdown" data-cat="hidraulica">
+            <i class="fas fa-oil-can"></i> Sistema Hidráulico
+        </button>
+        <button class="item-cat-dropdown" data-cat="chassi">
+            <i class="fas fa-th-large"></i> Chassi / Estruturas
+        </button>
+        <button class="item-cat-dropdown" data-cat="cabine">
+            <i class="fas fa-chair"></i> Posto Operação / Cabine
+        </button>
+        <button class="item-cat-dropdown" data-cat="ar-condicionado">
+            <i class="fas fa-snowflake"></i> Sistema Ar Condicionado
+        </button>
+        <button class="item-cat-dropdown" data-cat="implementos">
+            <i class="fas fa-tools"></i> F.P.S. / Implementos
+        </button>
+        <button class="item-cat-dropdown" data-cat="rodante">
+            <i class="fas fa-tractor"></i> Material Rodante
+        </button>
+        
+        <button class="item-cat-dropdown destaque" data-cat="todas">
+            <strong>Ver Tudo dessa Marca</strong>
+        </button>
+    </div>
+</div>
     </div>
 
     <section class="hero-principal">

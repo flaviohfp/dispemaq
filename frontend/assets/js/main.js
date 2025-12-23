@@ -1,5 +1,5 @@
 /* =========================================
-   MAIN.JS - DADOS E FUNÇÕES GLOBAIS (CORRIGIDO)
+   MAIN.JS - COMPLETO E ATUALIZADO
    ========================================= */
 
 // 1. BANCO DE DADOS DE PRODUTOS
@@ -18,14 +18,14 @@ const produtos = [
     { id: 12, nome: "Sensor de Pressão Óleo", cod: "SEN-01", categoria: "eletrica", preco: 120.00, img: "./assets/placeholder.jpg", marca: "caterpillar", desc: "Sensor interruptor de pressão 3 pinos." },
 ];
 
-// Variável Global para controlar o fluxo Marca -> Categoria
-let marcaAtualSelecionada = "";
+// Variável para saber qual marca o usuário clicou por último
+let marcaSelecionadaAtual = "";
 
-// 2. LÓGICA DO CARRINHO (Compartilhada)
+// 2. LÓGICA DO CARRINHO
 let carrinho = JSON.parse(localStorage.getItem('dispemaq_carrinho')) || [];
 
 function atualizarBadge() {
-    const badges = document.querySelectorAll('.badge-carrinho, #badgeCarrinho'); // Suporta classe ou ID
+    const badges = document.querySelectorAll('.badge-carrinho, #badgeCarrinho'); 
     const totalItens = carrinho.reduce((acc, item) => acc + item.qtd, 0);
     
     badges.forEach(b => {
@@ -50,31 +50,15 @@ function adicionarAoCarrinho(idProduto) {
     alert(`"${produto.nome}" adicionado ao carrinho!`);
 }
 
-// 3. FUNÇÕES GLOBAIS DE INTERFACE (Acessíveis pelo HTML)
-function fecharModalCategorias() {
-    const modal = document.getElementById('modalCategorias');
-    if(modal) modal.style.display = 'none';
-}
-
-function abrirModal(id) {
-    const modal = document.getElementById(id);
-    if(modal) modal.classList.add('ativo');
-}
-
-function fecharModal(id) {
-    const modal = document.getElementById(id);
-    if(modal) modal.classList.remove('ativo');
-}
-
 /* =========================================
-   INICIALIZAÇÃO DO SITE (DOMContentLoaded)
+   INICIALIZAÇÃO (QUANDO A PÁGINA CARREGA)
    ========================================= */
 document.addEventListener('DOMContentLoaded', () => {
     
     // A. Inicializa Carrinho
     atualizarBadge();
 
-    // B. Menu Mobile
+    // B. Menu Mobile (Hambúrguer)
     const btnMenu = document.getElementById('botaoMenuMobile');
     const navMenu = document.getElementById('menuNavegacao');
     if (btnMenu && navMenu) {
@@ -102,10 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // D. Renderizar DESTAQUES na Home (Se existir a div)
+    // D. Renderizar Destaques (Se houver a div na Home)
     const containerDestaques = document.getElementById('gradeDestaques');
     if (containerDestaques) {
-        // Pega os 4 primeiros
         const destaques = produtos.slice(0, 4);
         containerDestaques.innerHTML = destaques.map(p => `
             <div class="card-produto" style="border: 1px solid #eee; padding: 15px; border-radius: 8px; text-align: center;">
@@ -122,104 +105,108 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* -----------------------------------------------------------
-       E. LÓGICA DO MENU DROPDOWN "VER MAIS MARCAS" (Posicionamento)
+       E. DROPDOWN "VER MAIS MARCAS" (Botão Fixo à Direita)
        ----------------------------------------------------------- */
-    const btnMarcas = document.getElementById("btnMarcas");
-    const menuMarcas = document.getElementById("menuMarcas");
+    const btnMaisMarcas = document.getElementById('btnMarcas');
+    const menuMaisMarcas = document.getElementById('menuMarcas');
 
-    if (btnMarcas && menuMarcas) {
-        // Função para calcular posição
-        const posicionarMenu = () => {
-            const rect = btnMarcas.getBoundingClientRect();
-            menuMarcas.style.top = (rect.bottom + 5) + "px";
-            
-            // Ajuste para não sair da tela
-            if (rect.left + 220 > window.innerWidth) {
-                menuMarcas.style.left = "auto";
-                menuMarcas.style.right = "10px";
-            } else {
-                menuMarcas.style.left = rect.left + "px";
-                menuMarcas.style.right = "auto";
-            }
-        };
-
-        btnMarcas.addEventListener("click", (e) => {
-            e.stopPropagation();
-            const estaVisivel = menuMarcas.style.display === "block";
-            if (!estaVisivel) {
-                posicionarMenu(); // Calcula antes de mostrar
-                menuMarcas.style.display = "block";
-            } else {
-                menuMarcas.style.display = "none";
-            }
-        });
-
-        // Fechar dropdown ao rolar a página
-        window.addEventListener('scroll', () => {
-            if(menuMarcas.style.display === 'block') menuMarcas.style.display = "none";
+    if (btnMaisMarcas && menuMaisMarcas) {
+        btnMaisMarcas.addEventListener('click', (e) => {
+            e.stopPropagation(); // Impede fechar ao clicar
+            menuMaisMarcas.classList.toggle('mostrar');
+            btnMaisMarcas.classList.toggle('ativo');
         });
     }
 
     /* -----------------------------------------------------------
-       F. LÓGICA: CLIQUE NA MARCA -> ABRIR MODAL CATEGORIAS
+       F. NOVO: MENU FLUTUANTE DE CATEGORIAS (Abre ao clicar na Marca)
        ----------------------------------------------------------- */
+    const menuCategorias = document.getElementById('menuCategoriasFlutuante');
+    const tituloMenuCat = document.getElementById('tituloMarcaDropdown');
+    
+    // Seleciona botões da barra e também os de dentro do "Ver mais marcas"
     const botoesMarca = document.querySelectorAll('.item-marca, .marca-item');
-    const modalCat = document.getElementById('modalCategorias');
-    const tituloModal = document.getElementById('tituloMarcaModal');
 
-    // 1. Clique nas marcas (da barra ou do menu)
-    botoesMarca.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault(); 
-            e.stopPropagation();
+    // Função para abrir o menu na posição correta
+    function abrirMenuCategorias(e, nomeMarca) {
+        e.preventDefault();
+        e.stopPropagation();
 
-            // Identifica a marca
-            let marca = btn.getAttribute('data-marca');
-            if (!marca) {
-                marca = btn.innerText.trim().toLowerCase().replace(/\s+/g, '-');
-            }
-            
-            marcaAtualSelecionada = marca;
+        // 1. Salva a marca atual e atualiza o título
+        marcaSelecionadaAtual = nomeMarca; 
+        if(tituloMenuCat) tituloMenuCat.textContent = nomeMarca.toUpperCase();
 
-            // Abre o modal
-            if(tituloModal) tituloModal.innerText = `Peças para ${marca.toUpperCase()}`;
-            if(modalCat) modalCat.style.display = 'flex';
-            
-            // Fecha o menu dropdown se estiver aberto
-            if(menuMarcas) menuMarcas.style.display = 'none';
-        });
-    });
+        // 2. Cálculos de Posição
+        const botao = e.currentTarget;
+        const rect = botao.getBoundingClientRect(); // Pega X e Y do botão clicado
+        
+        let top = rect.bottom + window.scrollY; // Logo abaixo do botão
+        let left = rect.left + window.scrollX;  // Alinhado à esquerda do botão
 
-    // 2. Clique nas categorias (dentro do modal)
-    const botoesCategoria = document.querySelectorAll('.btn-cat-escolha');
-    botoesCategoria.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const categoria = btn.getAttribute('data-cat');
-            
-            let urlDestino = `loja.html?marca=${marcaAtualSelecionada}`;
-            if (categoria !== 'todas') {
-                urlDestino += `&cat=${categoria}`;
-            }
-            window.location.href = urlDestino;
-        });
-    });
-});
-
-// Fechar modal de categorias ao clicar fora (Global)
-window.addEventListener('click', (e) => {
-    const modal = document.getElementById('modalCategorias');
-    const btnMarcas = document.getElementById("btnMarcas");
-    const menuMarcas = document.getElementById("menuMarcas");
-
-    // Fecha modal de categoria
-    if (e.target === modal) {
-        fecharModalCategorias();
-    }
-
-    // Fecha dropdown de marcas se clicar fora
-    if (btnMarcas && menuMarcas) {
-        if (!btnMarcas.contains(e.target) && !menuMarcas.contains(e.target)) {
-            menuMarcas.style.display = "none";
+        // Ajuste: Se o menu for sair da tela na direita, alinha pela direita
+        if (left + 280 > window.innerWidth) {
+            left = (rect.right + window.scrollX) - 280;
         }
+
+        // 3. Aplica posição e mostra
+        if(menuCategorias) {
+            menuCategorias.style.top = `${top + 5}px`;
+            menuCategorias.style.left = `${left}px`;
+            menuCategorias.style.display = 'block';
+        }
+
+        // Esconde o menu de "Ver mais marcas" se estiver aberto
+        if(menuMaisMarcas) menuMaisMarcas.classList.remove('mostrar');
     }
+
+    // Adiciona o evento de clique em CADA marca
+    botoesMarca.forEach(btn => {
+        btn.addEventListener('click', (evento) => {
+            // Tenta pegar o nome do atributo data-marca, senão pega do texto
+            const marca = btn.getAttribute('data-marca') || btn.innerText.trim();
+            abrirMenuCategorias(evento, marca);
+        });
+    });
+
+    // Evento de clique nos itens DO menu de categorias (Motor, Hidráulica, etc)
+    const itensCategoria = document.querySelectorAll('.item-cat-dropdown');
+    itensCategoria.forEach(item => {
+        item.addEventListener('click', () => {
+            const cat = item.getAttribute('data-cat');
+            
+            // Redireciona para a loja com Marca + Categoria
+            let url = `loja.html?marca=${marcaSelecionadaAtual}`;
+            if (cat !== 'todas') {
+                url += `&cat=${cat}`;
+            }
+            window.location.href = url;
+        });
+    });
+
+    /* -----------------------------------------------------------
+       G. FECHAR MENUS AO CLICAR FORA
+       ----------------------------------------------------------- */
+    document.addEventListener('click', (e) => {
+        // Fechar Menu de Categorias Flutuante
+        if (menuCategorias && menuCategorias.style.display === 'block') {
+            if (!menuCategorias.contains(e.target)) {
+                menuCategorias.style.display = 'none';
+            }
+        }
+
+        // Fechar Menu "Ver Mais Marcas"
+        if (menuMaisMarcas && menuMaisMarcas.classList.contains('mostrar')) {
+            if (!btnMaisMarcas.contains(e.target) && !menuMaisMarcas.contains(e.target)) {
+                menuMaisMarcas.classList.remove('mostrar');
+                btnMaisMarcas.classList.remove('ativo');
+            }
+        }
+    });
+
+    // Fechar ao rolar a página (opcional, mas recomendado para menus flutuantes)
+    window.addEventListener('scroll', () => {
+        if (menuCategorias) menuCategorias.style.display = 'none';
+        if (menuMaisMarcas) menuMaisMarcas.classList.remove('mostrar');
+    });
+
 });

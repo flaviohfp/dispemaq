@@ -1,175 +1,198 @@
 /* =========================================
-   LOJA.JS - LÓGICA DO CATÁLOGO (CORRIGIDO)
+   LOJA.JS (Versão Final Organizada)
    ========================================= */
+// O "./" busca o arquivo na mesma pasta (assets/js)
+import { db, collection, getDocs } from './firebase-config.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-    const gradeProdutos = document.getElementById('gradeProdutos');
+let produtosLoja = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
     
-    // Só executa se estiver na página da loja
-    if (!gradeProdutos) return;
+    // Atualiza o carrinho (número) ao abrir a página
+    atualizarBadgeLoja();
 
-    // 1. LEITURA DOS PARÂMETROS DA URL (A mágica acontece aqui)
-    const urlParams = new URLSearchParams(window.location.search);
-    const buscaUrl = urlParams.get('busca');
-    const marcaUrl = urlParams.get('marca'); // NOVO: Pega a marca
-    const catUrl = urlParams.get('cat');     // Pega a categoria
+    const container = document.getElementById('gradeProdutosLoja');
+    if(container) container.innerHTML = '<p style="grid-column:1/-1; text-align:center;">Carregando produtos...</p>';
 
-    // 2. DECIDE O QUE EXIBIR BASEADO NA URL
-    if (marcaUrl && catUrl) {
-        // CASO 1: Cliente escolheu Marca E Categoria no modal (ex: Volvo + Motor)
-        filtrarMarcaECategoria(marcaUrl, catUrl);
-
-    } else if (marcaUrl) {
-        // CASO 2: Cliente clicou apenas na Marca (ex: Ver tudo da Caterpillar)
-        filtrarPorMarca(marcaUrl);
-
-    } else if (buscaUrl) {
-        // CASO 3: Cliente usou a barra de busca
-        document.getElementById('campoBusca').value = buscaUrl;
-        filtrarPorBusca(buscaUrl);
-
-    } else {
-        // CASO 4: Acesso normal ou filtro só por categoria lateral
-        renderizarProdutos(catUrl || 'todos');
+    try {
+        // Busca produtos do Firebase
+        const querySnapshot = await getDocs(collection(db, "produtos"));
+        produtosLoja = [];
         
-        // Marca o botão da categoria como ativo na lateral
-        if(catUrl) {
-            atualizarBotoesAtivos(catUrl);
+        querySnapshot.forEach((doc) => {
+            let dados = doc.data();
+            dados.id = doc.id; 
+            produtosLoja.push(dados);
+        });
+
+        if (produtosLoja.length === 0 && container) {
+            container.innerHTML = `<p style="grid-column:1/-1; text-align:center;">Nenhum produto cadastrado ainda.</p>`;
         }
+
+    } catch (error) {
+        console.error("Erro Firebase:", error);
+        if(container) container.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:red;">Erro ao conectar com o banco de dados.</p>`;
     }
 
-    // 3. EVENTOS DOS BOTÕES LATERAIS DE CATEGORIA
-    document.querySelectorAll('.filtro-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const categoria = btn.dataset.categoria;
-            atualizarBotoesAtivos(categoria);
-            
-            // Renderiza
-            renderizarProdutos(categoria);
-            
-            // Atualiza a URL sem recarregar a página (UX Profissional)
-            const novaUrl = categoria === 'todos' ? 'loja.html' : `loja.html?cat=${categoria}`;
-            window.history.pushState({}, '', novaUrl);
-            
-            // Limpa título personalizado se houver
-            atualizarTituloLoja('Todos os Produtos'); 
-        });
-    });
+    // Configura filtros vindos da URL
+    const params = new URLSearchParams(window.location.search);
+    filtrarLoja(params.get('marca'), params.get('cat'), params.get('busca'));
+
+    configurarSidebar();
+    configurarBuscaHeader();
 });
 
-/* ===== FUNÇÕES DE FILTRAGEM ===== */
+function filtrarLoja(marcaUrl, catUrl, buscaUrl) {
+    const container = document.getElementById('gradeProdutosLoja');
+    if (!container || (produtosLoja.length === 0 && container.innerText.includes("Erro"))) return;
 
-// Filtro Duplo: Marca + Categoria
-function filtrarMarcaECategoria(marca, categoria) {
-    const grade = document.getElementById('gradeProdutos');
+    container.innerHTML = ""; 
+
+    const m = marcaUrl ? marcaUrl.toLowerCase() : null;
+    const c = catUrl ? catUrl.toLowerCase() : null;
+    const b = buscaUrl ? buscaUrl.toLowerCase() : null;
+
+    const resultados = produtosLoja.filter(p => {
+        let okMarca = (m && m !== 'todas') ? (p.marca && p.marca.toLowerCase().includes(m)) : true;
+        let okCat = (c && c !== 'todas') ? (p.categoria && p.categoria.toLowerCase() === c) : true;
+        let okBusca = true;
+        if (b) {
+            const nome = p.nome ? p.nome.toLowerCase() : "";
+            const cod = p.cod ? p.cod.toLowerCase() : "";
+            okBusca = nome.includes(b) || cod.includes(b);
+        }
+        return okMarca && okCat && okBusca;
+    });
+
+    // Atualiza Título da Página
+    const titulo = document.getElementById('tituloResultadoLoja');
+    const qtd = document.getElementById('qtdResultados');
     
-    // Filtra comparando os dois dados
-    const filtrados = produtos.filter(p => 
-        p.marca.toLowerCase().includes(marca.toLowerCase()) && 
-        p.categoria.toLowerCase() === categoria.toLowerCase()
-    );
+    if(titulo) {
+        if(b) titulo.innerText = `Busca: "${buscaUrl}"`;
+        else if(m && m !== 'todas') titulo.innerText = `Marca: ${m.toUpperCase()}`;
+        else if(c && c !== 'todas') titulo.innerText = `Categoria: ${c.toUpperCase()}`;
+        else titulo.innerText = "Todos os Produtos";
+    }
 
-    atualizarTituloLoja(`${categoria.toUpperCase()} para ${marca.toUpperCase()}`);
-    exibirResultado(filtrados, grade);
+    if(qtd) qtd.innerText = `${resultados.length} produtos encontrados`;
+
+    // Desenha os cards
+    if (resultados.length === 0) {
+        container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px;">Nenhum produto encontrado.</div>`;
+    } else {
+        resultados.forEach(p => {
+            const card = document.createElement('div');
+            card.className = "dyn-card"; 
+            
+            // Nota: O caminho da imagem placeholder é relativo ao HTML, então continua ./assets/...
+            const img = p.img || './assets/images/placeholder.jpg'; 
+
+            card.innerHTML = `
+                <div class="dyn-img-wrapper">
+                    <img src="${img}" alt="${p.nome}">
+                </div>
+                <div class="dyn-info">
+                    <span class="dyn-cat">${p.categoria || 'PEÇA'}</span>
+                    <h3 class="dyn-titulo">${p.nome}</h3>
+                    <div class="dyn-preco">
+                        R$ ${parseFloat(p.preco).toFixed(2).replace('.', ',')}
+                    </div>
+                    <button class="dyn-btn-comprar btn-comprar-js" data-id="${p.id}">
+                        <i class="fas fa-shopping-cart"></i> Adicionar
+                    </button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+        document.querySelectorAll('.btn-comprar-js').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.currentTarget.getAttribute('data-id');
+                addCarrinhoLoja(id);
+            });
+        });
+    }
 }
 
-// Filtro Simples: Só Marca
-function filtrarPorMarca(marca) {
-    const grade = document.getElementById('gradeProdutos');
-    
-    const filtrados = produtos.filter(p => 
-        p.marca.toLowerCase().includes(marca.toLowerCase())
-    );
-
-    atualizarTituloLoja(`Peças para ${marca.toUpperCase()}`);
-    exibirResultado(filtrados, grade);
+function configurarSidebar() {
+    const itens = document.querySelectorAll('.filtro-item');
+    itens.forEach(item => {
+        item.addEventListener('click', () => {
+            const params = new URLSearchParams(window.location.search);
+            if(item.dataset.marca) params.set('marca', item.dataset.marca);
+            if(item.dataset.cat) params.set('cat', item.dataset.cat);
+            if(item.dataset.marca === 'todas') params.delete('marca');
+            if(item.dataset.cat === 'todas') params.delete('cat');
+            if(item.dataset.marca || item.dataset.cat) params.delete('busca');
+            window.location.href = `loja.html?${params.toString()}`;
+        });
+    });
 }
 
-// Filtro de Busca
-function filtrarPorBusca(termo) {
-    const grade = document.getElementById('gradeProdutos');
-    const termoLower = termo.toLowerCase();
-    
-    const produtosFiltrados = produtos.filter(p => 
-        p.nome.toLowerCase().includes(termoLower) || 
-        p.cod.toLowerCase().includes(termoLower) ||
-        p.marca.toLowerCase().includes(termoLower)
-    );
-
-    atualizarTituloLoja(`Resultados para: "${termo}"`);
-    exibirResultado(produtosFiltrados, grade);
+function configurarBuscaHeader() {
+    const btn = document.getElementById('btnBuscaLoja');
+    const input = document.getElementById('campoBuscaLoja');
+    if(btn && input) {
+        const busca = () => { if(input.value) window.location.href = `loja.html?busca=${encodeURIComponent(input.value)}`; };
+        btn.addEventListener('click', busca);
+        input.addEventListener('keypress', (e) => { if(e.key === 'Enter') busca(); });
+    }
 }
 
-// Renderização Padrão (Categoria ou Todos)
-function renderizarProdutos(filtro) {
-    const grade = document.getElementById('gradeProdutos');
+// Funções do Carrinho
+function addCarrinhoLoja(id) {
+    let carrinho = JSON.parse(localStorage.getItem('dispemaq_carrinho')) || [];
+    const prod = produtosLoja.find(p => p.id === id);
     
-    const produtosFiltrados = filtro === 'todos' 
-        ? produtos 
-        : produtos.filter(p => p.categoria === filtro);
-
-    exibirResultado(produtosFiltrados, grade);
+    if(prod) {
+        const existe = carrinho.find(x => x.id === id);
+        if(existe) existe.qtd++;
+        else carrinho.push({...prod, qtd:1});
+        
+        localStorage.setItem('dispemaq_carrinho', JSON.stringify(carrinho));
+        atualizarBadgeLoja();
+        
+        const sidebar = document.getElementById('carrinhoLateral');
+        const overlay = document.getElementById('overlay');
+        if(sidebar) sidebar.classList.add('aberto');
+        if(overlay) overlay.classList.add('ativo');
+    }
 }
 
-/* ===== FUNÇÕES VISUAIS E AUXILIARES ===== */
-
-function exibirResultado(lista, container) {
-    container.innerHTML = "";
+function atualizarBadgeLoja() {
+    const carrinho = JSON.parse(localStorage.getItem('dispemaq_carrinho')) || [];
+    const total = carrinho.reduce((acc, i) => acc + i.qtd, 0);
+    const badge = document.getElementById('badgeCarrinhoLoja');
     
-    if (lista.length === 0) {
-        container.innerHTML = `
-            <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
-                <i class="fas fa-search" style="font-size: 3rem; color: #ddd; margin-bottom: 20px;"></i>
-                <h3 style="color: #666;">Nenhum produto encontrado.</h3>
-                <p style="color: #999;">Tente usar termos diferentes ou limpar os filtros.</p>
-                <a href="loja.html" style="display:inline-block; margin-top:20px; color:var(--azul-escuro); text-decoration:underline;">Ver todos os produtos</a>
-            </div>
-        `;
+    if(badge) {
+        badge.innerText = total;
+        badge.style.display = total > 0 ? 'flex' : 'none';
+    }
+    renderizarItensCarrinhoLateral(carrinho);
+}
+
+function renderizarItensCarrinhoLateral(carrinho) {
+    const div = document.getElementById('itensCarrinhoHtml'); 
+    if(!div) return;
+    
+    if(carrinho.length === 0) {
+        div.innerHTML = "<p style='padding:20px; text-align:center'>Seu carrinho está vazio.</p>";
         return;
     }
 
-    lista.forEach(p => {
-        container.innerHTML += criarCardProduto(p);
+    div.innerHTML = "";
+    carrinho.forEach(item => {
+        div.innerHTML += `
+            <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;">
+                <div>
+                    <strong>${item.nome}</strong><br>
+                    <small>${item.qtd}x R$ ${parseFloat(item.preco).toFixed(2)}</small>
+                </div>
+                <div>R$ ${(item.qtd * item.preco).toFixed(2)}</div>
+            </div>
+        `;
     });
 }
 
-function criarCardProduto(p) {
-    // Formata preço para Real Brasileiro
-    const precoFormatado = p.preco.toFixed(2).replace('.', ',');
-    
-    return `
-    <div class="produto-card">
-        <a href="produto.html?id=${p.id}" style="text-decoration:none; color:inherit;">
-            <div class="produto-imagem">
-                <img src="${p.img}" alt="${p.nome}" loading="lazy">
-            </div>
-            <div class="produto-info">
-                <span class="produto-cod">Cód: ${p.cod}</span>
-                <h3>${p.nome}</h3>
-                <div class="produto-marca-tag">${p.marca.toUpperCase()}</div>
-                <div class="produto-preco">R$ ${precoFormatado}</div>
-            </div>
-        </a>
-        <button class="btn-comprar-card" onclick="adicionarAoCarrinho(${p.id})">
-            <i class="fas fa-shopping-cart"></i> Comprar
-        </button>
-    </div>
-    `;
-}
-
-// Atualiza o título H2 da página (se existir o ID 'tituloLoja' no HTML)
-function atualizarTituloLoja(texto) {
-    const titulo = document.getElementById('tituloLoja');
-    if (titulo) titulo.innerText = texto;
-}
-
-// Gerencia a classe 'ativo' nos botões laterais
-function atualizarBotoesAtivos(categoriaAlvo) {
-    document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('ativo'));
-    
-    // Tenta achar o botão correspondente (pode ser data-cat ou data-categoria)
-    const btnAtivo = document.querySelector(`.filtro-btn[data-categoria="${categoriaAlvo}"]`) || 
-                     document.querySelector(`.filtro-btn[data-cat="${categoriaAlvo}"]`);
-                     
-    if(btnAtivo) btnAtivo.classList.add('ativo');
-}
+window.atualizarBadgeLoja = atualizarBadgeLoja;
