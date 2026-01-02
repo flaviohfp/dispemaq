@@ -24,10 +24,12 @@
     <header class="cabecalho-principal">
       <div class="container">
         <div class="topo-cabecalho">
+          
           <a href="index.html" class="logo-empresa">
             <img
               src="./assets/images/SITE-LOGO-ESTENDIDA.-PNG-2048x819.png"
               alt="Logo Empresa"
+              onerror="this.src='https://via.placeholder.com/200x80?text=Dispemaq'"
             />
           </a>
 
@@ -45,6 +47,12 @@
               <i class="fas fa-home"></i>
               <span>Início</span>
             </a>
+
+            <a href="login.html" class="item-acao" id="btnAuth">
+              <i class="fas fa-user-circle" id="iconAuth"></i>
+              <span id="txtAuth">Entrar</span>
+            </a>
+
             <a href="#" class="item-acao" onclick="toggleCarrinho(event)">
               <div class="carrinho-botao">
                 <i class="fas fa-shopping-cart"></i>
@@ -52,6 +60,7 @@
               </div>
               <span>Carrinho</span>
             </a>
+
             <a href="https://wa.me/" class="item-acao destaque-whatsapp">
               <i class="fab fa-whatsapp"></i>
               <span>Vendas</span>
@@ -176,11 +185,10 @@
     </div>
 
     <style>
-        /* CSS DO POPUP */
         .overlay-popup {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); z-index: 9999;
-            display: none; /* Começa invisível, o JS vai mostrar */
+            display: none; /* JS controla isso */
             align-items: center; justify-content: center;
         }
         .box-popup {
@@ -201,6 +209,7 @@
     <script type="module" src="./assets/js/loja.js"></script>
     
     <script>
+        // Função visual do Carrinho
         function toggleCarrinho(e) {
             if(e) e.preventDefault();
             const sidebar = document.getElementById('carrinhoLateral');
@@ -215,7 +224,7 @@
             overlay.addEventListener('click', () => toggleCarrinho());
         }
 
-        // Função para fechar o popup visualmente e salvar na sessão
+        // Função para fechar o popup e lembrar
         window.fecharPopupLogin = function() {
             document.getElementById('popupAvisoLogin').style.display = 'none';
             sessionStorage.setItem('popupFechado', 'true');
@@ -223,13 +232,50 @@
     </script>
 
     <script type="module">
-        import { auth, onAuthStateChanged } from './assets/js/firebase-config.js';
+        import { auth, onAuthStateChanged, signOut } from './assets/js/firebase-config.js';
 
-        // Verifica se já está logado. Se NÃO estiver, mostra o popup.
+        const btnAuth = document.getElementById('btnAuth');
+        const txtAuth = document.getElementById('txtAuth');
+        const iconAuth = document.getElementById('iconAuth');
+        const popup = document.getElementById('popupAvisoLogin');
+
         onAuthStateChanged(auth, (user) => {
-            // Se não tem usuário logado E o usuário ainda não fechou o popup nessa sessão
-            if (!user && !sessionStorage.getItem('popupFechado')) {
-                document.getElementById('popupAvisoLogin').style.display = 'flex';
+            if (user) {
+                // --- USUÁRIO ESTÁ LOGADO ---
+                console.log("Usuário logado:", user.email);
+                
+                // Muda botão para "SAIR"
+                txtAuth.innerText = "Sair";
+                iconAuth.className = "fas fa-sign-out-alt"; // Ícone de saída
+                btnAuth.href = "#"; // Não vai pra login.html
+                
+                // Quando clicar em Sair, desloga do Firebase
+                btnAuth.onclick = (e) => {
+                    e.preventDefault();
+                    if(confirm("Deseja realmente sair da conta?")) {
+                        signOut(auth).then(() => {
+                            window.location.reload(); // Recarrega a página
+                        });
+                    }
+                };
+
+                // Garante que o popup não apareça
+                popup.style.display = 'none';
+
+            } else {
+                // --- USUÁRIO NÃO ESTÁ LOGADO ---
+                console.log("Ninguém logado.");
+
+                // Muda botão para "ENTRAR"
+                txtAuth.innerText = "Entrar";
+                iconAuth.className = "fas fa-user-circle";
+                btnAuth.href = "login.html";
+                btnAuth.onclick = null; // Remove a função de sair
+
+                // Mostra popup se a pessoa ainda não fechou
+                if (!sessionStorage.getItem('popupFechado')) {
+                    popup.style.display = 'flex';
+                }
             }
         });
     </script>

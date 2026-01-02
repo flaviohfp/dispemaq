@@ -4,104 +4,110 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Dispemaq</title>
-    <link rel="stylesheet" href="./assets/css/style.css"> <style>
-        body {
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* Estilo Exclusivo para centralizar o Login */
+        body.login-page {
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            background-color: #f4f4f4;
-            font-family: sans-serif;
+            background-color: #f4f6f8;
             margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
-        .login-container {
+        .login-box {
             background: white;
             padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             width: 100%;
-            max-width: 400px;
+            max-width: 380px;
             text-align: center;
         }
-
-        .login-container h2 { margin-bottom: 10px; color: #333; }
-        .login-container p { color: #666; margin-bottom: 20px; font-size: 14px; }
-
-        .input-group { margin-bottom: 15px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
-        .input-group input {
+        .login-box h2 { color: #333; margin-bottom: 10px; }
+        .login-box p { color: #777; font-size: 14px; margin-bottom: 25px; }
+        
+        .campo-login { margin-bottom: 15px; text-align: left; }
+        .campo-login label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; color: #555; }
+        .campo-login input {
             width: 100%;
             padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-sizing: border-box; /* Garante que o padding não estoure a largura */
+            border: 2px solid #eee;
+            border-radius: 8px;
+            box-sizing: border-box;
+            outline: none;
+            transition: 0.3s;
         }
+        .campo-login input:focus { border-color: #007bff; }
 
         .btn-entrar {
             width: 100%;
-            padding: 12px;
-            background-color: #007bff; /* Azul padrão, ou mude para a cor da sua marca */
+            padding: 14px;
+            background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 16px;
-            cursor: pointer;
             font-weight: bold;
-            transition: background 0.3s;
+            cursor: pointer;
+            transition: 0.3s;
         }
-        .btn-entrar:hover { background-color: #0056b3; }
-
-        .link-cadastro { margin-top: 20px; font-size: 14px; }
-        .link-cadastro a { color: #007bff; text-decoration: none; font-weight: bold; }
-
+        .btn-entrar:hover { background-color: #0056b3; transform: translateY(-2px); }
+        
         .msg-erro {
-            color: red;
-            background: #ffe6e6;
+            background-color: #fee;
+            color: #d00;
             padding: 10px;
             border-radius: 5px;
-            margin-bottom: 15px;
-            display: none; /* Começa oculto */
             font-size: 13px;
+            margin-bottom: 15px;
+            display: none;
         }
     </style>
 </head>
-<body>
+<body class="login-page">
 
-    <div class="login-container">
-        <h2>Acesse sua Conta</h2>
-        <p>Bem-vindo de volta à Dispemaq</p>
+    <div class="login-box">
+        <div style="font-size: 40px; color: #007bff; margin-bottom: 15px;">
+            <i class="fas fa-user-circle"></i>
+        </div>
+        <h2>Entrar na Conta</h2>
+        <p>Acesse para comprar ou gerenciar a loja</p>
 
         <div id="mensagemErro" class="msg-erro"></div>
 
         <form id="formLogin">
-            <div class="input-group">
+            <div class="campo-login">
                 <label>E-mail</label>
-                <input type="email" id="emailLogin" placeholder="seu@email.com" required>
+                <input type="email" id="emailLogin" placeholder="ex: admin@dispemaq.com" required>
+            </div>
+            <div class="campo-login">
+                <label>Senha</label>
+                <input type="password" id="senhaLogin" placeholder="Digite sua senha" required>
             </div>
             
-            <div class="input-group">
-                <label>Senha</label>
-                <input type="password" id="senhaLogin" placeholder="********" required>
-            </div>
-
             <button type="submit" class="btn-entrar" id="btnSubmit">ENTRAR</button>
         </form>
 
-        <div class="link-cadastro">
+        <div style="margin-top: 25px; font-size: 14px; border-top: 1px solid #eee; padding-top: 20px;">
             Ainda não tem conta? <br>
-            <a href="cadastro.html">Criar conta agora</a>
+            <a href="cadastro.html" style="color: #007bff; font-weight: bold; text-decoration: none;">Criar conta grátis</a>
         </div>
+        
         <div style="margin-top: 15px;">
-            <a href="index.html" style="color: #999; text-decoration: none; font-size: 12px;">&larr; Voltar ao site</a>
+            <a href="loja.html" style="color: #999; text-decoration: none; font-size: 13px;">
+                <i class="fas fa-arrow-left"></i> Voltar para a Loja
+            </a>
         </div>
     </div>
 
     <script type="module">
         import { auth, signInWithEmailAndPassword } from './assets/js/firebase-config.js';
 
-        // O E-mail do ADMIN (Tem que ser IGUAL ao que está no admin.js)
-        const EMAIL_ADMIN = "admin@dispemaq.com"; 
+        const EMAIL_ADMIN = "admin@dispemaq.com"; // O E-mail do Dono
 
         document.getElementById('formLogin').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -109,49 +115,37 @@
             const email = document.getElementById('emailLogin').value;
             const senha = document.getElementById('senhaLogin').value;
             const btn = document.getElementById('btnSubmit');
-            const msgErro = document.getElementById('mensagemErro');
+            const msg = document.getElementById('mensagemErro');
 
-            // Limpa erro anterior e muda botão
-            msgErro.style.display = 'none';
-            const textoOriginal = btn.innerText;
-            btn.innerText = "Verificando...";
+            // Feedback visual
+            msg.style.display = 'none';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
             btn.disabled = true;
 
             try {
-                // 1. Tenta fazer login no Firebase
-                const userCredential = await signInWithEmailAndPassword(auth, email, senha);
-                const user = userCredential.user;
+                const credencial = await signInWithEmailAndPassword(auth, email, senha);
+                const user = credencial.user;
 
-                // 2. SUCESSO! Agora verifica quem é:
-                console.log("Logado como:", user.email);
+                console.log("Login OK:", user.email);
 
+                // Redirecionamento inteligente
                 if (user.email === EMAIL_ADMIN) {
-                    // É O DONO -> Vai pro Painel
-                    window.location.href = "admin.html";
+                    window.location.href = "admin.html"; // Vai pro Painel se for Dono
                 } else {
-                    // É CLIENTE -> Vai pra Loja comprar
-                    window.location.href = "loja.html";
+                    window.location.href = "loja.html"; // Vai pra Loja se for Cliente
                 }
 
             } catch (error) {
-                // 3. ERRO (Senha errada ou usuário não existe)
                 console.error(error);
-                msgErro.style.display = 'block';
-                btn.innerText = textoOriginal;
+                btn.innerHTML = 'ENTRAR';
                 btn.disabled = false;
+                msg.style.display = 'block';
 
-                if(error.code === 'auth/wrong-password') {
-                    msgErro.innerText = "Senha incorreta.";
-                } else if(error.code === 'auth/user-not-found') {
-                    msgErro.innerText = "Usuário não encontrado. Crie uma conta.";
-                } else if(error.code === 'auth/invalid-credential') {
-                     msgErro.innerText = "E-mail ou senha inválidos.";
-                } else {
-                    msgErro.innerText = "Erro ao entrar: " + error.message;
-                }
+                if(error.code === 'auth/wrong-password') msg.innerText = "Senha incorreta.";
+                else if(error.code === 'auth/user-not-found') msg.innerText = "E-mail não cadastrado.";
+                else msg.innerText = "Erro ao entrar. Verifique seus dados.";
             }
         });
     </script>
-
 </body>
 </html>
