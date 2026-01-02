@@ -1,21 +1,24 @@
 /* =========================================
-   LOJA.JS (Versão Final Organizada)
+   LOJA.JS (Versão Final com Proteção de Login)
    ========================================= */
-// O "./" busca o arquivo na mesma pasta (assets/js)
-import { db, collection, getDocs } from './firebase-config.js';
+// [ATENÇÃO] Adicionei 'auth' na importação abaixo:
+import { db, collection, getDocs, doc, getDoc, auth } from './firebase-config.js';
 
 let produtosLoja = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
     
-    // Atualiza o carrinho (número) ao abrir a página
+    // 1. Carrega o Banner do topo
+    carregarBannerLoja();
+
+    // 2. Atualiza número do carrinho
     atualizarBadgeLoja();
 
     const container = document.getElementById('gradeProdutosLoja');
     if(container) container.innerHTML = '<p style="grid-column:1/-1; text-align:center;">Carregando produtos...</p>';
 
     try {
-        // Busca produtos do Firebase
+        // 3. Busca produtos do Firebase
         const querySnapshot = await getDocs(collection(db, "produtos"));
         produtosLoja = [];
         
@@ -34,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if(container) container.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:red;">Erro ao conectar com o banco de dados.</p>`;
     }
 
-    // Configura filtros vindos da URL
+    // 4. Configura filtros vindos da URL
     const params = new URLSearchParams(window.location.search);
     filtrarLoja(params.get('marca'), params.get('cat'), params.get('busca'));
 
@@ -42,6 +45,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     configurarBuscaHeader();
 });
 
+/* --- FUNÇÃO: CARREGAR BANNER --- */
+async function carregarBannerLoja() {
+    try {
+        const docRef = doc(db, "configuracoes", "banner_site");
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const dados = docSnap.data();
+            const imgBanner = document.getElementById("bannerPrincipal");
+            
+            if(imgBanner && dados.url) {
+                imgBanner.src = dados.url;
+            }
+        }
+    } catch (error) {
+        console.log("Banner: usando padrão ou erro de conexão.");
+    }
+}
+
+/* --- FUNÇÕES DE FILTRO E EXIBIÇÃO --- */
 function filtrarLoja(marcaUrl, catUrl, buscaUrl) {
     const container = document.getElementById('gradeProdutosLoja');
     if (!container || (produtosLoja.length === 0 && container.innerText.includes("Erro"))) return;
@@ -85,7 +108,6 @@ function filtrarLoja(marcaUrl, catUrl, buscaUrl) {
             const card = document.createElement('div');
             card.className = "dyn-card"; 
             
-            // Nota: O caminho da imagem placeholder é relativo ao HTML, então continua ./assets/...
             const img = p.img || './assets/images/placeholder.jpg'; 
 
             card.innerHTML = `
@@ -140,8 +162,19 @@ function configurarBuscaHeader() {
     }
 }
 
-// Funções do Carrinho
+/* --- FUNÇÕES DO CARRINHO (AGORA COM PROTEÇÃO DE LOGIN) --- */
 function addCarrinhoLoja(id) {
+    // 1. BLOQUEIO DE SEGURANÇA
+    const user = auth.currentUser;
+    
+    if (!user) {
+        // Se NÃO estiver logado, avisa e manda para o login
+        alert("🔒 Atenção: Para adicionar itens ao carrinho, você precisa fazer login ou criar uma conta.");
+        window.location.href = "login.html";
+        return; // Para a execução aqui. Nada é adicionado.
+    }
+
+    // 2. SE ESTIVER LOGADO, SEGUE A VIDA:
     let carrinho = JSON.parse(localStorage.getItem('dispemaq_carrinho')) || [];
     const prod = produtosLoja.find(p => p.id === id);
     
@@ -195,4 +228,5 @@ function renderizarItensCarrinhoLateral(carrinho) {
     });
 }
 
+// Torna global caso precise chamar via console
 window.atualizarBadgeLoja = atualizarBadgeLoja;

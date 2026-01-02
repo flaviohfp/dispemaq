@@ -61,6 +61,16 @@
       </div>
     </header>
 
+    <section class="banner-loja-container" style="max-width: 1400px; margin: 0 auto; padding: 10px;">
+        <img 
+            id="bannerPrincipal" 
+            src="./assets/images/banner-padrao.jpg" 
+            alt="Ofertas Especiais" 
+            style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: block;"
+            onerror="this.style.display='none'"
+        >
+    </section>
+
     <div class="container dyn-layout-loja" style="margin-top: 30px; margin-bottom: 50px;">
         
         <aside class="sidebar-filtros">
@@ -152,6 +162,42 @@
 
     <a href="#" class="whatsapp-flutuante"><i class="fab fa-whatsapp"></i></a>
 
+    <div id="popupAvisoLogin" class="overlay-popup">
+        <div class="box-popup">
+            <button class="fechar-popup" onclick="fecharPopupLogin()">&times;</button>
+            <h3>Bem-vindo à Dispemaq!</h3>
+            <p>Faça login para salvar seus favoritos e finalizar compras com agilidade.</p>
+            <div class="botoes-popup">
+                <a href="login.html" class="botao botao-primario">Fazer Login</a>
+                <a href="cadastro.html" class="botao botao-secundario">Criar Conta</a>
+            </div>
+            <p class="texto-pequeno">Ou feche para apenas navegar &rarr;</p>
+        </div>
+    </div>
+
+    <style>
+        /* CSS DO POPUP */
+        .overlay-popup {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 9999;
+            display: none; /* Começa invisível, o JS vai mostrar */
+            align-items: center; justify-content: center;
+        }
+        .box-popup {
+            background: white; padding: 30px; border-radius: 10px;
+            text-align: center; max-width: 400px; width: 90%; position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .fechar-popup {
+            position: absolute; top: 10px; right: 15px; font-size: 28px;
+            background: none; border: none; cursor: pointer; color: #666;
+        }
+        .botoes-popup { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+        .texto-pequeno { font-size: 12px; color: #999; margin-top: 15px; }
+        .botao-secundario { background-color: #666; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;}
+        .botao-primario { background-color: #ff6600; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;}
+    </style>
+
     <script type="module" src="./assets/js/loja.js"></script>
     
     <script>
@@ -168,6 +214,24 @@
         if(overlay) {
             overlay.addEventListener('click', () => toggleCarrinho());
         }
+
+        // Função para fechar o popup visualmente e salvar na sessão
+        window.fecharPopupLogin = function() {
+            document.getElementById('popupAvisoLogin').style.display = 'none';
+            sessionStorage.setItem('popupFechado', 'true');
+        }
+    </script>
+
+    <script type="module">
+        import { auth, onAuthStateChanged } from './assets/js/firebase-config.js';
+
+        // Verifica se já está logado. Se NÃO estiver, mostra o popup.
+        onAuthStateChanged(auth, (user) => {
+            // Se não tem usuário logado E o usuário ainda não fechou o popup nessa sessão
+            if (!user && !sessionStorage.getItem('popupFechado')) {
+                document.getElementById('popupAvisoLogin').style.display = 'flex';
+            }
+        });
     </script>
   </body>
 </html>

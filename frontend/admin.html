@@ -80,6 +80,21 @@
             </form>
         </div>
 
+        <div class="card-admin" style="border-left: 5px solid #007bff;">
+            <h2>Gerenciar Banner do Site</h2>
+            <p>Troque a imagem principal da loja (Promoções, Black Friday, Avisos).</p>
+            
+            <div class="form-grid" style="grid-template-columns: 1fr; gap: 10px;">
+                <div class="form-group">
+                    <label>Nova Imagem do Banner</label>
+                    <input type="file" id="arquivoBanner" accept="image/*">
+                </div>
+                <button id="btnSalvarBanner" class="btn-add" style="background-color: #007bff; margin-top:0;">
+                    <i class="fas fa-camera"></i> Atualizar Banner Agora
+                </button>
+            </div>
+        </div>
+
         <div class="card-admin">
             <h2>Produtos em Estoque</h2>
             <p id="statusCarregamento">Carregando lista...</p>
