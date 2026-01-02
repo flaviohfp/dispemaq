@@ -392,6 +392,37 @@ body {
     transition: all 0.2s;
 }
 
+/* --- CSS DO MENU VER MAIS --- */
+.painel-marcas-oculto {
+    display: none; /* Escondido por padrão */
+    background: #f4f4f4;
+    padding: 15px;
+    border-bottom: 4px solid #ea580c;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+    text-align: center;
+}
+
+/* Quando tiver a classe 'aberto', ele aparece */
+.painel-marcas-oculto.aberto {
+    display: grid;
+}
+
+.marca-extra {
+    background: white;
+    padding: 10px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    font-weight: bold;
+    color: #333;
+    text-transform: uppercase;
+}
+
+.marca-extra:hover {
+    background: #ea580c;
+    color: white;
+    border-color: #ea580c;
+}
 
 /* ============================================================
    MENU FLUTUANTE DE CATEGORIAS (Estilo Dropdown)

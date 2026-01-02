@@ -1,28 +1,94 @@
-/* =========================================
-   MAIN.JS - COMPLETO E ATUALIZADO
-   ========================================= */
+import { db, collection, getDocs, auth, onAuthStateChanged, signOut } from './firebase-config.js';
 
-// 1. BANCO DE DADOS DE PRODUTOS
-const produtos = [
-    { id: 1, nome: "Filtro de Óleo Motor Caterpillar", cod: "CAT-1R0716", categoria: "filtros", preco: 145.90, img: "./assets/placeholder.jpg", marca: "caterpillar", desc: "Filtro de alta eficiência para motores CAT séries 300 e 900." },
-    { id: 2, nome: "Bomba Hidráulica Principal", cod: "HYD-9920", categoria: "hidraulica", preco: 2350.00, img: "./assets/placeholder.jpg", marca: "komatsu", desc: "Bomba de pistão axial para escavadeiras Komatsu PC200." },
-    { id: 3, nome: "Alternador 24V 60A", cod: "EL-2460", categoria: "eletrica", preco: 890.00, img: "./assets/placeholder.jpg", marca: "volvo-michigan", desc: "Alternador blindado resistente a poeira e vibração." },
-    { id: 4, nome: "Kit Vedação Cilindro Lança", cod: "VED-5500", categoria: "hidraulica", preco: 320.50, img: "./assets/placeholder.jpg", marca: "case", desc: "Kit completo de reparo para cilindro hidráulico." },
-    { id: 5, nome: "Motor de Partida 12 Dentes", cod: "MOT-12D", categoria: "motor", preco: 1200.00, img: "./assets/placeholder.jpg", marca: "cummins", desc: "Arranque reforçado para motores Cummins série B." },
-    { id: 6, nome: "Dente de Caçamba Escavadeira", cod: "FPS-220", categoria: "fps", preco: 180.00, img: "./assets/placeholder.jpg", marca: "jcb", desc: "Dente forjado de alta resistência a abrasão." },
-    { id: 7, nome: "Filtro de Ar Externo", cod: "FIL-AR-01", categoria: "filtros", preco: 210.00, img: "./assets/placeholder.jpg", marca: "caterpillar", desc: "Elemento filtrante primário radial seal." },
-    { id: 8, nome: "Correia Ventilador", cod: "COR-8890", categoria: "motor", preco: 85.00, img: "./assets/placeholder.jpg", marca: "new-holland", desc: "Correia em V dentada industrial." },
-    { id: 9, nome: "Disco de Freio Sinterizado", cod: "FRE-500", categoria: "freios", preco: 450.00, img: "./assets/placeholder.jpg", marca: "cnh-fiatitallis", desc: "Disco de fricção para transmissão e freio úmido." },
-    { id: 10, nome: "Farol de Led Trabalho", cod: "LUZ-LED", categoria: "eletrica", preco: 150.00, img: "./assets/placeholder.jpg", marca: "universal", desc: "Farol de milha LED quadrado 48W bivolt." },
-    { id: 11, nome: "Cruzeta Cardan Transmissão", cod: "TRA-900", categoria: "transmissao", preco: 290.00, img: "./assets/placeholder.jpg", marca: "massey", desc: "Cruzeta blindada série 1000." },
-    { id: 12, nome: "Sensor de Pressão Óleo", cod: "SEN-01", categoria: "eletrica", preco: 120.00, img: "./assets/placeholder.jpg", marca: "caterpillar", desc: "Sensor interruptor de pressão 3 pinos." },
-];
-
-// Variável para saber qual marca o usuário clicou por último
-let marcaSelecionadaAtual = "";
-
-// 2. LÓGICA DO CARRINHO
+/* ============================================================
+   1. CONFIGURAÇÃO E VARIÁVEIS GLOBAIS
+   ============================================================ */
+// O carrinho começa lendo o que está salvo no navegador (LocalStorage)
 let carrinho = JSON.parse(localStorage.getItem('dispemaq_carrinho')) || [];
+
+/* ============================================================
+   2. CARREGAR PRODUTOS DO FIREBASE (REAL)
+   Essa função vai no banco de dados, pega o que o cliente cadastrou
+   e desenha na tela inicial.
+   ============================================================ */
+async function carregarProdutosDestaque() {
+    const container = document.getElementById('gradeDestaques');
+    
+    // Se não tiver essa div na página (ex: login.html), para por aqui
+    if (!container) return; 
+
+    // Mostra um "Carregando..." enquanto busca
+    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Carregando produtos...</p>';
+
+    try {
+        // Busca a coleção 'produtos' no Firebase
+        const querySnapshot = await getDocs(collection(db, "produtos"));
+        
+        container.innerHTML = ''; // Limpa o carregando
+
+        if (querySnapshot.empty) {
+            container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Nenhum produto cadastrado ainda.</p>';
+            return;
+        }
+
+        // Para cada produto encontrado no banco...
+        querySnapshot.forEach((doc) => {
+            const produto = doc.data();
+            const id = doc.id; // ID único do Firebase
+            
+            // Define imagem padrão se o cliente esqueceu de colocar
+            const imagem = produto.urlImagem || './assets/images/placeholder.jpg';
+            const precoFormatado = parseFloat(produto.preco).toFixed(2).replace('.', ',');
+            const precoPix = (parseFloat(produto.preco) * 0.95).toFixed(2).replace('.', ',');
+
+            // Cria o HTML do Card
+            const htmlProduto = `
+                <div class="card-produto">
+                    <div class="produto-imagem">
+                        ${produto.promocao ? '<span class="badge-desconto">Oferta</span>' : ''}
+                        <img src="${imagem}" alt="${produto.nome}" style="max-width:80%; max-height:80%;">
+                    </div>
+                    <div class="produto-info">
+                        <span class="produto-categoria">${produto.categoria || 'Peças'}</span>
+                        <h3 class="produto-nome">${produto.nome}</h3>
+                        <span class="produto-codigo">Cód: ${produto.codigo || '---'}</span>
+                        
+                        <div class="produto-precos">
+                            <span class="preco-atual">R$ ${precoFormatado}</span>
+                            <span class="preco-pix"><i class="fas fa-barcode"></i> R$ ${precoPix} no PIX</span>
+                        </div>
+                        
+                        <div class="produto-acoes">
+                            <button class="botao-adicionar" 
+                                onclick="adicionarAoCarrinho(this)"
+                                data-id="${id}"
+                                data-nome="${produto.nome}"
+                                data-preco="${produto.preco}"
+                                data-img="${imagem}">
+                                <i class="fas fa-shopping-cart"></i> Comprar
+                            </button>
+                            <button class="botao-detalhes">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Adiciona na tela
+            container.innerHTML += htmlProduto;
+        });
+
+    } catch (error) {
+        console.error("Erro ao buscar produtos:", error);
+        container.innerHTML = '<p>Erro ao carregar produtos.</p>';
+    }
+}
+
+
+/* ============================================================
+   3. FUNÇÕES DO CARRINHO (Lógica Atualizada)
+   ============================================================ */
 
 function atualizarBadge() {
     const badges = document.querySelectorAll('.badge-carrinho, #badgeCarrinho'); 
@@ -35,178 +101,194 @@ function atualizarBadge() {
     localStorage.setItem('dispemaq_carrinho', JSON.stringify(carrinho));
 }
 
-function adicionarAoCarrinho(idProduto) {
-    const produto = produtos.find(p => p.id === idProduto);
-    if (!produto) return;
+// Essa função agora recebe o PRÓPRIO BOTÃO clicado (el)
+window.adicionarAoCarrinho = function(el) {
+    // Pega os dados direto do HTML do botão
+    const id = el.getAttribute('data-id');
+    const nome = el.getAttribute('data-nome');
+    const preco = parseFloat(el.getAttribute('data-preco'));
+    const img = el.getAttribute('data-img');
 
-    const itemExistente = carrinho.find(item => item.id === idProduto);
+    // Verifica se já tem no carrinho
+    const itemExistente = carrinho.find(item => item.id === id);
     if (itemExistente) {
         itemExistente.qtd++;
     } else {
-        carrinho.push({ ...produto, qtd: 1 });
+        carrinho.push({
+            id: id,
+            nome: nome,
+            preco: preco,
+            img: img,
+            qtd: 1
+        });
     }
-    
+
     atualizarBadge();
-    alert(`"${produto.nome}" adicionado ao carrinho!`);
+    renderizarCarrinho();
+    abrirCarrinhoLateral();
 }
 
-/* =========================================
-   INICIALIZAÇÃO (QUANDO A PÁGINA CARREGA)
-   ========================================= */
-document.addEventListener('DOMContentLoaded', () => {
-    
-    // A. Inicializa Carrinho
-    atualizarBadge();
+// Alterar quantidade (+ ou -)
+window.alterarQuantidade = function(id, acao) {
+    // Como o ID do Firebase é string, a comparação é normal
+    const item = carrinho.find(item => item.id == id);
+    if (!item) return;
 
-    // B. Menu Mobile (Hambúrguer)
+    if (acao === 'aumentar') {
+        item.qtd++;
+    } else if (acao === 'diminuir') {
+        item.qtd--;
+        if (item.qtd <= 0) {
+            window.removerItem(id);
+            return;
+        }
+    }
+    atualizarBadge();
+    renderizarCarrinho();
+};
+
+window.removerItem = function(id) {
+    carrinho = carrinho.filter(item => item.id != id);
+    atualizarBadge();
+    renderizarCarrinho();
+};
+
+// Renderiza (desenha) o carrinho lateral
+function renderizarCarrinho() {
+    const container = document.querySelector('.carrinho-conteudo');
+    const totalEl = document.querySelector('.carrinho-total strong');
+    
+    if (!container) return;
+    
+    container.innerHTML = '';
+    let totalPreco = 0;
+
+    if (carrinho.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:30px; color:#666;"><i class="fas fa-shopping-basket" style="font-size:2rem; margin-bottom:10px;"></i><br>Seu carrinho está vazio.</div>';
+    } else {
+        carrinho.forEach(item => {
+            totalPreco += item.preco * item.qtd;
+            container.innerHTML += `
+                <div class="item-carrinho" style="display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                    <div style="width: 50px; height: 50px; border: 1px solid #eee; display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                         <img src="${item.img}" style="max-width:100%; max-height:100%;"> 
+                    </div>
+                    <div style="flex: 1;">
+                        <h4 style="font-size: 0.85rem; margin-bottom: 5px; color: #333; line-height:1.2;">${item.nome}</h4>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: #1e3a8a; font-weight: bold;">R$ ${(item.preco * item.qtd).toFixed(2).replace('.',',')}</span>
+                            
+                            <div style="display: flex; align-items: center; gap: 5px; border: 1px solid #ddd; border-radius: 4px; padding: 0 5px;">
+                                <button onclick="alterarQuantidade('${item.id}', 'diminuir')" style="background:none; border:none; cursor:pointer; color: #f59e0b;">-</button>
+                                <span style="font-size: 0.8rem;">${item.qtd}</span>
+                                <button onclick="alterarQuantidade('${item.id}', 'aumentar')" style="background:none; border:none; cursor:pointer; color: #f59e0b;">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="removerItem('${item.id}')" style="background:none; border:none; color: #ff0000; cursor:pointer; align-self: flex-start;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+        });
+    }
+
+    if (totalEl) totalEl.innerText = 'R$ ' + totalPreco.toFixed(2).replace('.', ',');
+}
+
+// Funções de Abrir/Fechar Carrinho
+window.toggleCarrinho = function(e) {
+    if (e) e.preventDefault();
+    const carrinhoEl = document.getElementById("carrinhoLateral");
+    const overlay = document.getElementById("overlay");
+    
+    if (carrinhoEl.classList.contains('aberto')) {
+        carrinhoEl.classList.remove('aberto');
+        overlay.classList.remove('ativo');
+    } else {
+        renderizarCarrinho(); 
+        carrinhoEl.classList.add('aberto');
+        overlay.classList.add('ativo');
+    }
+};
+
+function abrirCarrinhoLateral() {
+    const carrinhoEl = document.getElementById("carrinhoLateral");
+    const overlay = document.getElementById("overlay");
+    if(carrinhoEl && overlay) {
+        carrinhoEl.classList.add('aberto');
+        overlay.classList.add('ativo');
+    }
+}
+
+
+/* ============================================================
+   4. INICIALIZAÇÃO GERAL (AO ABRIR O SITE)
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // 1. Busca os produtos reais no Firebase
+    carregarProdutosDestaque();
+
+    // 2. Atualiza badge do carrinho
+    atualizarBadge();
+    
+    // 3. Verifica Login (Para botão entrar/sair)
+    const btnAuth = document.getElementById('btnAuth');
+    const txtAuth = document.getElementById('txtAuth');
+    
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            if(txtAuth) txtAuth.innerText = "Sair";
+            if(btnAuth) {
+                btnAuth.href = "#";
+                btnAuth.onclick = (e) => {
+                    e.preventDefault();
+                    if(confirm("Sair da conta?")) signOut(auth).then(() => window.location.reload());
+                };
+            }
+        } else {
+            if(txtAuth) txtAuth.innerText = "Entrar";
+            if(btnAuth) {
+                btnAuth.href = "login.html";
+                btnAuth.onclick = null;
+            }
+        }
+    });
+
+    // 4. Lógica do Menu "Ver Mais Marcas"
+    const btnMarcas = document.getElementById("btnMarcas");
+    const menuMarcas = document.getElementById("menuMarcas");
+    if (btnMarcas && menuMarcas) {
+        btnMarcas.addEventListener("click", function() {
+            menuMarcas.classList.toggle("ativo");
+            if (menuMarcas.classList.contains("ativo")) {
+                btnMarcas.innerHTML = '<i class="fas fa-minus-circle"></i> Ver menos';
+            } else {
+                btnMarcas.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
+            }
+        });
+    }
+
+    // 5. Menu Mobile e Botão Topo
     const btnMenu = document.getElementById('botaoMenuMobile');
     const navMenu = document.getElementById('menuNavegacao');
-    if (btnMenu && navMenu) {
-        btnMenu.addEventListener('click', () => {
-            navMenu.classList.toggle('ativo');
-            btnMenu.classList.toggle('ativo');
-        });
-    }
-
-    // C. Busca Global
-    const btnBuscar = document.getElementById('botaoBuscar');
-    const inputBusca = document.getElementById('campoBusca');
+    if (btnMenu) btnMenu.addEventListener('click', () => navMenu.classList.toggle('ativo'));
     
-    function realizarBusca() {
-        const termo = inputBusca.value.trim().toLowerCase();
-        if (termo) {
-            window.location.href = `loja.html?busca=${encodeURIComponent(termo)}`;
-        }
-    }
-
-    if (btnBuscar && inputBusca) {
-        btnBuscar.addEventListener('click', realizarBusca);
-        inputBusca.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') realizarBusca();
+    const btnTopo = document.getElementById("btnTopo");
+    if(btnTopo) {
+        window.addEventListener("scroll", function() {
+            if (window.scrollY > 300) btnTopo.classList.add("visivel");
+            else btnTopo.classList.remove("visivel");
         });
     }
 
-    // D. Renderizar Destaques (Se houver a div na Home)
-    const containerDestaques = document.getElementById('gradeDestaques');
-    if (containerDestaques) {
-        const destaques = produtos.slice(0, 4);
-        containerDestaques.innerHTML = destaques.map(p => `
-            <div class="card-produto" style="border: 1px solid #eee; padding: 15px; border-radius: 8px; text-align: center;">
-                <img src="${p.img}" alt="${p.nome}" style="width: 100%; height: 160px; object-fit: contain; margin-bottom: 10px;">
-                <h3 style="font-size: 0.95rem; color: #333; margin-bottom: 5px; height: 40px; overflow: hidden;">${p.nome}</h3>
-                <div style="color: #1e3a8a; font-weight: bold; font-size: 1.1rem; margin-bottom: 10px;">
-                    R$ ${p.preco.toFixed(2).replace('.', ',')}
-                </div>
-                <button onclick="adicionarAoCarrinho(${p.id})" style="background: #1e3a8a; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; width: 100%;">
-                    Comprar
-                </button>
-            </div>
-        `).join('');
-    }
-
-    /* -----------------------------------------------------------
-       E. DROPDOWN "VER MAIS MARCAS" (Botão Fixo à Direita)
-       ----------------------------------------------------------- */
-    const btnMaisMarcas = document.getElementById('btnMarcas');
-    const menuMaisMarcas = document.getElementById('menuMarcas');
-
-    if (btnMaisMarcas && menuMaisMarcas) {
-        btnMaisMarcas.addEventListener('click', (e) => {
-            e.stopPropagation(); // Impede fechar ao clicar
-            menuMaisMarcas.classList.toggle('mostrar');
-            btnMaisMarcas.classList.toggle('ativo');
+    // Fechar ao clicar fora (Overlay)
+    const overlay = document.getElementById("overlay");
+    if(overlay) {
+        overlay.addEventListener("click", function() {
+            document.getElementById("carrinhoLateral").classList.remove("aberto");
+            this.classList.remove("ativo");
         });
     }
-
-    /* -----------------------------------------------------------
-       F. NOVO: MENU FLUTUANTE DE CATEGORIAS (Abre ao clicar na Marca)
-       ----------------------------------------------------------- */
-    const menuCategorias = document.getElementById('menuCategoriasFlutuante');
-    const tituloMenuCat = document.getElementById('tituloMarcaDropdown');
-    
-    // Seleciona botões da barra e também os de dentro do "Ver mais marcas"
-    const botoesMarca = document.querySelectorAll('.item-marca, .marca-item');
-
-    // Função para abrir o menu na posição correta
-    function abrirMenuCategorias(e, nomeMarca) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        // 1. Salva a marca atual e atualiza o título
-        marcaSelecionadaAtual = nomeMarca; 
-        if(tituloMenuCat) tituloMenuCat.textContent = nomeMarca.toUpperCase();
-
-        // 2. Cálculos de Posição
-        const botao = e.currentTarget;
-        const rect = botao.getBoundingClientRect(); // Pega X e Y do botão clicado
-        
-        let top = rect.bottom + window.scrollY; // Logo abaixo do botão
-        let left = rect.left + window.scrollX;  // Alinhado à esquerda do botão
-
-        // Ajuste: Se o menu for sair da tela na direita, alinha pela direita
-        if (left + 280 > window.innerWidth) {
-            left = (rect.right + window.scrollX) - 280;
-        }
-
-        // 3. Aplica posição e mostra
-        if(menuCategorias) {
-            menuCategorias.style.top = `${top + 5}px`;
-            menuCategorias.style.left = `${left}px`;
-            menuCategorias.style.display = 'block';
-        }
-
-        // Esconde o menu de "Ver mais marcas" se estiver aberto
-        if(menuMaisMarcas) menuMaisMarcas.classList.remove('mostrar');
-    }
-
-    // Adiciona o evento de clique em CADA marca
-    botoesMarca.forEach(btn => {
-        btn.addEventListener('click', (evento) => {
-            // Tenta pegar o nome do atributo data-marca, senão pega do texto
-            const marca = btn.getAttribute('data-marca') || btn.innerText.trim();
-            abrirMenuCategorias(evento, marca);
-        });
-    });
-
-    // Evento de clique nos itens DO menu de categorias (Motor, Hidráulica, etc)
-    const itensCategoria = document.querySelectorAll('.item-cat-dropdown');
-    itensCategoria.forEach(item => {
-        item.addEventListener('click', () => {
-            const cat = item.getAttribute('data-cat');
-            
-            // Redireciona para a loja com Marca + Categoria
-            let url = `loja.html?marca=${marcaSelecionadaAtual}`;
-            if (cat !== 'todas') {
-                url += `&cat=${cat}`;
-            }
-            window.location.href = url;
-        });
-    });
-
-    /* -----------------------------------------------------------
-       G. FECHAR MENUS AO CLICAR FORA
-       ----------------------------------------------------------- */
-    document.addEventListener('click', (e) => {
-        // Fechar Menu de Categorias Flutuante
-        if (menuCategorias && menuCategorias.style.display === 'block') {
-            if (!menuCategorias.contains(e.target)) {
-                menuCategorias.style.display = 'none';
-            }
-        }
-
-        // Fechar Menu "Ver Mais Marcas"
-        if (menuMaisMarcas && menuMaisMarcas.classList.contains('mostrar')) {
-            if (!btnMaisMarcas.contains(e.target) && !menuMaisMarcas.contains(e.target)) {
-                menuMaisMarcas.classList.remove('mostrar');
-                btnMaisMarcas.classList.remove('ativo');
-            }
-        }
-    });
-
-    // Fechar ao rolar a página (opcional, mas recomendado para menus flutuantes)
-    window.addEventListener('scroll', () => {
-        if (menuCategorias) menuCategorias.style.display = 'none';
-        if (menuMaisMarcas) menuMaisMarcas.classList.remove('mostrar');
-    });
-
 });

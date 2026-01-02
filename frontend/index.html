@@ -11,6 +11,52 @@
     />
 
     <link rel="stylesheet" href="./assets/css/style.css" />
+
+    <style>
+        /* CSS DO MENU DE MARCAS (DROPDOWN) */
+        #menuMarcas {
+            display: none; /* Escondido por padrão */
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 100%;
+            max-width: 1280px;
+            background: #fff;
+            border-top: 4px solid #ff6600;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            padding: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            z-index: 9999;
+        }
+        
+        /* Aceita .ativo ou .mostrar para garantir que abra */
+        #menuMarcas.ativo, #menuMarcas.mostrar {
+            display: grid;
+        }
+
+        .dropdown-marcas {
+            position: relative; 
+            z-index: 900;
+        }
+
+        /* Estilo para quando a marca é clicada */
+        .marca-item.selecionada, .item-marca.selecionada {
+            background-color: #ff6600 !important;
+            color: white !important;
+            border-color: #ff6600 !important;
+        }
+
+        /* CSS DO MENU DE CATEGORIAS FLUTUANTE */
+        #menuCategoriasFlutuante {
+            display: none; /* OBRIGATÓRIO: Começa oculto */
+            background: white;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+    </style>
   </head>
   <body>
     <div class="barra-anuncio">
@@ -69,7 +115,7 @@
     </header>
 
     <nav class="menu-navegacao" id="menuNavegacao">
-        </nav>
+    </nav>
 
     <div class="barra-marcas">
       <button class="item-marca" data-marca="cnh-fiatitallis"><i></i> CNH / FIATALLIS</button>
@@ -205,106 +251,7 @@
         </div>
 
         <div id="gradeDestaques" class="grade-produtos">
-          
-          <div class="card-produto">
-            <div class="produto-imagem">
-              <span class="badge-desconto">-15%</span>
-              <i class="fas fa-cog"></i>
-            </div>
-            <div class="produto-info">
-              <span class="produto-categoria">Transmissão</span>
-              <h3 class="produto-nome">Kit Conversor de Torque Case 580L</h3>
-              <span class="produto-codigo">Cód: CS-580-99</span>
-              <div class="produto-precos">
-                <span class="preco-antigo">R$ 4.500,00</span>
-                <span class="preco-atual">R$ 3.825,00</span>
-                <span class="preco-pix"><i class="fas fa-barcode"></i> R$ 3.633,00 no PIX</span>
-              </div>
-              <div class="produto-acoes">
-                <button class="botao-adicionar" onclick="adicionarAoCarrinho(1)">
-                  <i class="fas fa-shopping-cart"></i> Comprar
-                </button>
-                <button class="botao-detalhes">
-                  <i class="fas fa-eye"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div class="card-produto">
-            <div class="produto-imagem">
-              <span class="badge-estoque-baixo">Últimas Unidades</span>
-              <i class="fas fa-filter"></i>
-            </div>
-            <div class="produto-info">
-              <span class="produto-categoria">Filtros</span>
-              <h3 class="produto-nome">Filtro de Ar Externo CAT 416E</h3>
-              <span class="produto-codigo">Cód: CT-416-AR</span>
-              <div class="produto-precos">
-                <span class="preco-antigo">R$ 280,00</span>
-                <span class="preco-atual">R$ 250,00</span>
-                <span class="preco-pix"><i class="fas fa-barcode"></i> R$ 237,50 no PIX</span>
-              </div>
-              <div class="produto-acoes">
-                <button class="botao-adicionar" onclick="adicionarAoCarrinho(7)">
-                  <i class="fas fa-shopping-cart"></i> Comprar
-                </button>
-                <button class="botao-detalhes">
-                  <i class="fas fa-eye"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div class="card-produto">
-            <div class="produto-imagem">
-              <i class="fas fa-cogs"></i>
-            </div>
-            <div class="produto-info">
-              <span class="produto-categoria">Motor</span>
-              <h3 class="produto-nome">Bomba D'água Motor Cummins Serie B</h3>
-              <span class="produto-codigo">Cód: CM-B-H2O</span>
-              <div class="produto-precos">
-                <span class="preco-antigo"></span>
-                <span class="preco-atual">R$ 890,00</span>
-                <span class="preco-pix"><i class="fas fa-barcode"></i> R$ 845,50 no PIX</span>
-              </div>
-              <div class="produto-acoes">
-                <button class="botao-adicionar" onclick="adicionarAoCarrinho(5)">
-                  <i class="fas fa-shopping-cart"></i> Comprar
-                </button>
-                <button class="botao-detalhes">
-                  <i class="fas fa-eye"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div class="card-produto">
-            <div class="produto-imagem">
-              <span class="badge-desconto">-10%</span>
-              <i class="fas fa-link"></i>
-            </div>
-            <div class="produto-info">
-              <span class="produto-categoria">Material Rodante</span>
-              <h3 class="produto-nome">Dente Caçamba Escavadeira Hyundai</h3>
-              <span class="produto-codigo">Cód: HY-220-D</span>
-              <div class="produto-precos">
-                <span class="preco-antigo">R$ 180,00</span>
-                <span class="preco-atual">R$ 162,00</span>
-                <span class="preco-pix"><i class="fas fa-barcode"></i> R$ 153,90 no PIX</span>
-              </div>
-              <div class="produto-acoes">
-                <button class="botao-adicionar" onclick="adicionarAoCarrinho(6)">
-                  <i class="fas fa-shopping-cart"></i> Comprar
-                </button>
-                <button class="botao-detalhes">
-                  <i class="fas fa-eye"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+             </div>
 
         <div class="centralizado" style="margin-top: 40px">
           <a href="loja.html" class="botao botao-outline-pequeno">Ver todos os produtos</a>
@@ -526,7 +473,7 @@
         <div class="divisor-rodape"></div>
 
         <div class="rodape-inferior">
-          <p>&copy; 2023 Nome da Empresa. Todos os direitos reservados.</p>
+          <p>&copy; 2026 Dispemaq. Todos os direitos reservados.</p>
           <div class="formas-pagamento">
             <i class="fab fa-cc-visa"></i>
             <i class="fab fa-cc-mastercard"></i>
@@ -622,25 +569,56 @@
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
 
-      // 4. FUNCIONALIDADE "VER MAIS MARCAS" (ESSA QUE ESTAVA FALTANDO)
+      // 4. LÓGICA COMPLETA DE MARCAS (MENU E SELEÇÃO)
       const btnMarcas = document.getElementById("btnMarcas");
       const menuMarcas = document.getElementById("menuMarcas");
+      const tituloDropdown = document.getElementById("tituloMarcaDropdown");
+      const menuCategorias = document.getElementById("menuCategoriasFlutuante"); 
+
+      // REMOVI O BOTÃO "VER MAIS MARCAS" DAQUI POIS ESTAVA DANDO CONFLITO COM O MAIN.JS
+      // O main.js vai cuidar de abrir o menu.
+
+      // Selecionar Marca (Funciona tanto para a barra principal quanto para o menu)
+      const todasMarcas = document.querySelectorAll('.item-marca, .marca-item');
       
-      if(btnMarcas && menuMarcas) {
-          btnMarcas.addEventListener("click", function() {
-              menuMarcas.classList.toggle("ativo");
+      todasMarcas.forEach(botao => {
+          botao.addEventListener('click', function() {
+              // 1. Remove a cor de todos
+              todasMarcas.forEach(b => {
+                  b.classList.remove('selecionada');
+                  b.style.backgroundColor = ''; 
+                  b.style.color = '';
+              });
+
+              // 2. Coloca cor no que foi clicado
+              this.classList.add('selecionada');
+              this.style.backgroundColor = '#ff6600';
+              this.style.color = 'white';
+              this.style.borderColor = '#ff6600';
+
+              // 3. Muda o texto de Categorias e MOSTRA O MENU
+              const nomeMarca = this.innerText;
+              if(tituloDropdown) {
+                  tituloDropdown.innerText = "Categorias: " + nomeMarca;
+              }
               
-              // Muda o texto do botão
-              if(menuMarcas.classList.contains("ativo")) {
-                  btnMarcas.innerHTML = '<i class="fas fa-minus-circle"></i> Ver menos';
-              } else {
+              if(menuCategorias) {
+                  menuCategorias.style.display = 'block'; // Mostra o menu de categorias
+                  menuCategorias.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); // Rola até ele
+              }
+
+              // 4. Se foi clicado dentro do menu, fecha o menu de marcas extras
+              if(menuMarcas && menuMarcas.classList.contains('ativo')) {
+                  menuMarcas.classList.remove('ativo');
                   btnMarcas.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
               }
+
+              console.log("Marca selecionada:", nomeMarca);
           });
-      }
+      });
     </script>
 
-    <script src="./assets/js/main.js"></script>
+    <script type="module" src="./assets/js/main.js"></script>
 
     <script type="module">
         import { auth, onAuthStateChanged, signOut } from './assets/js/firebase-config.js';
