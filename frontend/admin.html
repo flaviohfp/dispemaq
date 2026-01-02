@@ -13,7 +13,7 @@
 
     <header class="admin-header">
         <h1><i class="fas fa-tools"></i> Painel Admin</h1>
-        <a href="./loja.html" target="_blank"><i class="fas fa-external-link-alt"></i> Ver Loja</a>
+        <a href="./index.html" target="_blank"><i class="fas fa-external-link-alt"></i> Ver Loja</a>
     </header>
 
     <div class="container">
@@ -29,46 +29,63 @@
                     
                     <div class="form-group">
                         <label>Código (Ref)</label>
-                        <input type="text" id="cod" placeholder="Ex: AX-9900" required>
+                        <input type="text" id="cod" placeholder="Ex: AX-9900">
                     </div>
 
                     <div class="form-group">
                         <label>Marca</label>
                         <select id="marca" required>
-                            <option value="">Selecione...</option>
+                            <option value="" disabled selected>Selecione...</option>
+                            <option value="cnh-fiatitallis">CNH / FIATALLIS</option>
                             <option value="caterpillar">Caterpillar</option>
-                            <option value="komatsu">Komatsu</option>
-                            <option value="volvo-michigan">Volvo / Michigan</option>
-                            <option value="case">Case</option>
                             <option value="jcb">JCB</option>
+                            <option value="komatsu">Komatsu</option>
+                            <option value="hyundai">Hyundai</option>
+                            <option value="volvo-michigan">Volvo / Michigan</option>
+                            <option value="bobcat">Bobcat</option>
                             <option value="cummins">Cummins</option>
+                            <option value="doosan">Doosan – Develon</option>
+                            <option value="isuzu">Isuzu</option>
+                            <option value="kubota">Kubota</option>
+                            <option value="link-belt">Link-Belt</option>
                             <option value="massey">Massey Ferguson</option>
-                            <option value="outras">Outras</option>
+                            <option value="muller">Muller – Randon</option>
+                            <option value="perkins">Perkins</option>
+                            <option value="sany">SANY</option>
+                            <option value="sdlg">SDLG</option>
+                            <option value="xcmg">XCMG</option>
+                            <option value="outras">Outras / Diversas</option>
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label>Categoria</label>
                         <select id="categoria" required>
-                            <option value="">Selecione...</option>
+                            <option value="" disabled selected>Selecione...</option>
                             <option value="motor">Motor</option>
+                            <option value="combustivel">Sistema de Combustível</option>
                             <option value="transmissao">Transmissão</option>
-                            <option value="hidraulica">Hidráulica</option>
-                            <option value="eletrica">Elétrica</option>
+                            <option value="freios-eixos">Direção / Freios / Eixos</option>
+                            <option value="eletrica">Sistema Elétrico</option>
+                            <option value="hidraulica">Sistema Hidráulico</option>
+                            <option value="chassi">Chassi / Estruturas</option>
+                            <option value="cabine">Cabine / Operação</option>
+                            <option value="ar-condicionado">Ar Condicionado</option>
                             <option value="filtros">Filtros</option>
                             <option value="rodante">Material Rodante</option>
-                            <option value="fps">FPS / Implementos</option>
+                            <option value="implementos">FPS / Implementos</option>
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label>Preço (R$)</label>
-                        <input type="number" id="preco" step="0.01" placeholder="0.00" required>
+                        <input type="number" id="preco" step="0.01" placeholder="0.00">
                     </div>
 
                     <div class="form-group">
                         <label>Foto do Produto</label>
                         <input type="file" id="arquivoImagem" accept="image/*" required>
+                        <img id="previewImagem" src="" style="max-width:100%; display:none; margin-top:10px;">
                     </div>
                 </div>
 
@@ -76,37 +93,46 @@
                     <button type="submit" class="btn-add">
                         <i class="fas fa-plus-circle"></i> Cadastrar Produto
                     </button>
+                    <p id="msgSucesso" style="color: green; display: none; margin-top: 10px;">Produto cadastrado!</p>
                 </div>
             </form>
         </div>
 
         <div class="card-admin" style="border-left: 5px solid #007bff;">
-            <h2>Gerenciar Banner do Site</h2>
-            <p>Troque a imagem principal da loja (Promoções, Black Friday, Avisos).</p>
+            <h2>Gerenciar Banners do Site</h2>
+            <p>Adicione imagens para o carrossel do topo da loja.</p>
             
-            <div class="form-grid" style="grid-template-columns: 1fr; gap: 10px;">
-                <div class="form-group">
-                    <label>Nova Imagem do Banner</label>
-                    <input type="file" id="arquivoBanner" accept="image/*">
+            <form id="formBanner">
+                <div class="form-grid" style="grid-template-columns: 1fr; gap: 10px;">
+                    <div class="form-group">
+                        <label>Nova Imagem do Banner (1920x500 recomendado)</label>
+                        <input type="file" id="arquivoBanner" accept="image/*" required>
+                    </div>
+                    <button type="submit" id="btnSalvarBanner" class="btn-add" style="background-color: #007bff; margin-top:0;">
+                        <i class="fas fa-upload"></i> Enviar Banner
+                    </button>
                 </div>
-                <button id="btnSalvarBanner" class="btn-add" style="background-color: #007bff; margin-top:0;">
-                    <i class="fas fa-camera"></i> Atualizar Banner Agora
-                </button>
+            </form>
+
+            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ddd;">
+            <h3>Banners Ativos:</h3>
+            <div id="listaBanners" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+                <p style="color: #666; font-size: 0.9em;">Carregando banners...</p>
             </div>
         </div>
 
         <div class="card-admin">
-            <h2>Produtos em Estoque</h2>
+            <h2>Produtos Cadastrados</h2>
             <p id="statusCarregamento">Carregando lista...</p>
             
-            <table>
+            <table style="width: 100%; border-collapse: collapse;">
                 <thead>
-                    <tr>
-                        <th width="80">Foto</th>
-                        <th>Nome / Código</th>
-                        <th>Marca / Categ.</th>
-                        <th>Preço</th>
-                        <th width="50">Ação</th>
+                    <tr style="background: #f4f4f4; text-align: left;">
+                        <th style="padding: 10px;">Foto</th>
+                        <th style="padding: 10px;">Nome / Código</th>
+                        <th style="padding: 10px;">Marca / Categ.</th>
+                        <th style="padding: 10px;">Preço</th>
+                        <th style="padding: 10px;">Ação</th>
                     </tr>
                 </thead>
                 <tbody id="tabelaProdutos">
