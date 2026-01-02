@@ -11,7 +11,7 @@
     />
 
     <link rel="stylesheet" href="./assets/css/style.css" />
-  </head
+  </head>
   <body>
     <div class="barra-anuncio">
       <div class="container">
@@ -42,10 +42,11 @@
           </div>
 
           <div class="acoes-usuario">
-            <a href="#" class="item-acao">
-              <i class="far fa-user"></i>
-              <span>Conta</span>
+            <a href="login.html" class="item-acao" id="btnAuth">
+              <i class="fas fa-user-circle" id="iconAuth"></i>
+              <span id="txtAuth">Entrar</span>
             </a>
+            
             <a href="#" class="item-acao" onclick="toggleCarrinho(event)">
               <div class="carrinho-botao">
                 <i class="fas fa-shopping-cart"></i>
@@ -81,9 +82,8 @@
       <button class="item-marca" data-marca="cummins"><i></i> CUMMINS</button>
       <button class="item-marca" data-marca="doosan"><i></i> DOOSAN – DEVELON</button>
       <button class="item-marca" data-marca="isuzu"><i></i> ISUZU</button>
-
-      
     </div>
+    
     <div class="dropdown-marcas">
         <button id="btnMarcas" class="botao-marcas">
             <i class="fas fa-plus-circle"></i> Ver mais marcas
@@ -144,7 +144,6 @@
         </button>
     </div>
 </div>
-    </div>
 
     <section class="hero-principal">
       <div class="container conteudo-hero">
@@ -573,8 +572,19 @@
       <i class="fas fa-arrow-up"></i>
     </button>
 
+    <div id="popupAvisoLogin" class="overlay-popup" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center;">
+        <div class="box-popup" style="background: white; padding: 30px; border-radius: 10px; text-align: center; max-width: 400px; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+            <button onclick="document.getElementById('popupAvisoLogin').style.display='none'; sessionStorage.setItem('popupFechado', 'true');" style="position: absolute; top: 10px; right: 15px; border: none; background: none; font-size: 20px; cursor: pointer;">&times;</button>
+            <h3 style="color: #333; margin-bottom: 10px;">Bem-vindo à Dispemaq!</h3>
+            <p style="color: #666; margin-bottom: 20px;">Faça login para salvar seus favoritos e ver seus pedidos.</p>
+            <div>
+                <a href="login.html" style="background: #ff6600; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Entrar ou Cadastrar</a>
+            </div>
+        </div>
+    </div>
+
     <script>
-      // Toggle Carrinho
+      // 1. Toggle Carrinho
       function toggleCarrinho(e) {
         if (e) e.preventDefault();
         const carrinho = document.getElementById("carrinhoLateral");
@@ -589,13 +599,13 @@
         this.classList.remove("ativo");
       });
 
-      // Toggle Menu Mobile
+      // 2. Toggle Menu Mobile
       function toggleMenuMobile() {
         const menu = document.getElementById("menuNavegacao");
         menu.classList.toggle("ativo"); 
       }
 
-      // Botão voltar ao topo
+      // 3. Botão voltar ao topo
       window.onscroll = function () {
         const btn = document.getElementById("btnTopo");
         if (
@@ -611,8 +621,67 @@
       function subirTopo() {
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
+
+      // 4. FUNCIONALIDADE "VER MAIS MARCAS" (ESSA QUE ESTAVA FALTANDO)
+      const btnMarcas = document.getElementById("btnMarcas");
+      const menuMarcas = document.getElementById("menuMarcas");
+      
+      if(btnMarcas && menuMarcas) {
+          btnMarcas.addEventListener("click", function() {
+              menuMarcas.classList.toggle("ativo");
+              
+              // Muda o texto do botão
+              if(menuMarcas.classList.contains("ativo")) {
+                  btnMarcas.innerHTML = '<i class="fas fa-minus-circle"></i> Ver menos';
+              } else {
+                  btnMarcas.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
+              }
+          });
+      }
     </script>
 
     <script src="./assets/js/main.js"></script>
+
+    <script type="module">
+        import { auth, onAuthStateChanged, signOut } from './assets/js/firebase-config.js';
+
+        const btnAuth = document.getElementById('btnAuth');
+        const txtAuth = document.getElementById('txtAuth');
+        const iconAuth = document.getElementById('iconAuth');
+        const popup = document.getElementById('popupAvisoLogin');
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // --- USUÁRIO LOGADO ---
+                if(txtAuth) txtAuth.innerText = "Sair";
+                if(iconAuth) iconAuth.className = "fas fa-sign-out-alt";
+                if(btnAuth) {
+                    btnAuth.href = "#"; 
+                    btnAuth.onclick = (e) => {
+                        e.preventDefault();
+                        if(confirm("Deseja realmente sair?")) {
+                            signOut(auth).then(() => {
+                                window.location.reload();
+                            });
+                        }
+                    };
+                }
+                if(popup) popup.style.display = 'none';
+
+            } else {
+                // --- NINGUÉM LOGADO ---
+                if(txtAuth) txtAuth.innerText = "Entrar";
+                if(iconAuth) iconAuth.className = "fas fa-user-circle";
+                if(btnAuth) {
+                    btnAuth.href = "login.html";
+                    btnAuth.onclick = null;
+                }
+                
+                if (popup && !sessionStorage.getItem('popupFechado')) {
+                    popup.style.display = 'flex';
+                }
+            }
+        });
+    </script>
   </body>
 </html>
