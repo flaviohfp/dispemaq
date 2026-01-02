@@ -306,91 +306,7 @@ body {
     /* ... seus outros estilos de botão ... */
 }
 
-/* ============================================================
-   DROPDOWN "VER MAIS MARCAS" (O que fica fixo)
-   ============================================================ */
-.dropdown-marcas {
-    position: sticky;           /* O SEGREDO: Fixa o elemento dentro da barra */
-    right: 0;                   /* Cola na direita total */
-    z-index: 100;               /* Garante que fique por cima das outras marcas */
-    
-    background-color: #ffffff;  /* CRUCIAL: Fundo laranja para tapar o que passa por baixo */
-    box-shadow: -5px 0 15px rgba(0,0,0,0.2); /* Sombra na esquerda para dar destaque */
-    
-    padding: 0 15px;            /* Espaço interno */
-    display: flex;              /* Garante visibilidade */
-    align-items: center;
-    height: 100%;               /* Altura total da barra */
-}
 
-/* Estilo do Botão */
-.botao-marcas {
-    background-color: white;
-    color: #ff6600;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 20px;        /* Arredondado para destacar */
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-
-.botao-marcas:hover {
-    background-color: #ffe5cc; /* Um laranja bem clarinho no hover */
-}
-
-/* ============================================================
-   MENU FLUTUANTE (A lista que abre)
-   ============================================================ */
-#menuMarcas {
-    display: none;              /* Começa escondido */
-    position: fixed;
-    top: 100%;                  /* Logo abaixo do botão */
-    right: 10px;                /* Alinhado à direita (com margem de segurança) */
-    width: 220px;
-    background-color: white;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    border-radius: 8px;
-    padding: 10px 0;
-    z-index: 101;               /* Acima do botão */
-    margin-top: 10px;
-}
-
-#menuMarcas.mostrar {
-    display: block;             /* JS ativa isso */
-    animation: aparecerSuave 0.2s ease-out;
-}
-
-@keyframes aparecerSuave {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Itens da lista do menu */
-.marca-item {
-    display: block;
-    width: 100%;
-    padding: 10px 20px;
-    text-align: left;
-    background: none;
-    border: none;
-    border-bottom: 1px solid #eee;
-    color: #333;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.marca-item:hover {
-    background-color: #f9f9f9;
-    color: #ff6600;
-    padding-left: 25px;         /* Efeito de deslizar */
-    transition: all 0.2s;
-}
 
 /* --- CSS DO MENU VER MAIS --- */
 .painel-marcas-oculto {
@@ -424,90 +340,77 @@ body {
     border-color: #ea580c;
 }
 
-/* ============================================================
-   MENU FLUTUANTE DE CATEGORIAS (Estilo Dropdown)
-   ============================================================ */
-.menu-cat-dropdown {
-    display: none; /* JS vai mudar para 'block' */
-    position: absolute; /* Permite mover ele pela tela */
-    z-index: 9999; /* Fica acima de tudo */
-    background-color: white;
-    width: 280px; /* Largura confortável */
+/* --- CSS DO MENU DE CATEGORIAS (FLUTUANTE) --- */
+#menuCategoriasFlutuante {
+    display: none; /* Começa oculto */
+    position: absolute; /* Permite mover ele para qualquer lugar da tela */
+    background: white;
+    width: 280px; /* Largura fixa para ficar bonito */
     border-radius: 8px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2); /* Sombra forte para destacar */
-    border: 1px solid #eee;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3); /* Sombra forte para destacar */
+    border: 1px solid #ddd;
+    z-index: 10000; /* Bem alto para ficar acima de tudo */
     overflow: hidden;
-    animation: fadeInFast 0.2s ease-out;
 }
 
-/* Cabeçalho do menu (Nome da marca) */
+/* Cabeçalho do menu com o botão fechar */
 .menu-cat-header {
     background-color: #f4f4f4;
     padding: 10px 15px;
     font-weight: bold;
     color: #333;
     border-bottom: 1px solid #ddd;
-    font-size: 14px;
     text-transform: uppercase;
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: space-between; /* Separa o texto do X */
+    align-items: center;
 }
 
-/* Área de rolagem para os itens */
+/* Botão X para fechar */
+.btn-fechar-menu {
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #999;
+    padding: 0 5px;
+    line-height: 1;
+}
+.btn-fechar-menu:hover {
+    color: red;
+}
+
+/* Itens da lista */
 .lista-cat-scroll {
-    max-height: 400px; /* Se passar disso, cria rolagem */
+    max-height: 400px;
     overflow-y: auto;
 }
 
-/* Estilo de cada botão da lista */
 .item-cat-dropdown {
-    display: flex;
-    align-items: center;
     width: 100%;
-    padding: 12px 15px;
-    border: none;
-    background: none;
     text-align: left;
-    font-size: 14px;
-    color: #444;
+    padding: 12px 15px;
+    background: none;
+    border: none;
     border-bottom: 1px solid #f9f9f9;
     cursor: pointer;
-    transition: background 0.2s;
-}
-
-.item-cat-dropdown i {
-    width: 25px; /* Alinha os ícones */
-    color: #ff6600; /* Laranja */
-    margin-right: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: 0.2s;
+    color: #555;
+    font-size: 0.95rem;
 }
 
 .item-cat-dropdown:hover {
-    background-color: #fff5eb; /* Laranja bem clarinho */
+    background-color: #fff3e0; /* Laranja bem clarinho */
     color: #ff6600;
-    font-weight: 500;
+    padding-left: 20px; /* Efeito de deslizar */
 }
 
-/* Botão destaque no final */
-.item-cat-dropdown.destaque {
-    background-color: #333;
-    color: white;
-    justify-content: center;
+.item-cat-dropdown i {
+    color: #ff6600;
+    width: 20px;
     text-align: center;
-}
-.item-cat-dropdown.destaque:hover {
-    background-color: black;
-}
-
-@keyframes fadeInFast {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Personaliza a barra de rolagem para ficar fina e cinza */
-.lista-cat-scroll::-webkit-scrollbar {
-    width: 6px;
-}
-.lista-cat-scroll::-webkit-scrollbar-thumb {
-    background-color: #ccc;
-    border-radius: 3px;
 }
 /* ============================================================
    ESTILOS EXCLUSIVOS DA LOJA.HTML
