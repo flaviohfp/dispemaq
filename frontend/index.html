@@ -13,9 +13,9 @@
     <link rel="stylesheet" href="./assets/css/style.css" />
 
     <style>
-        /* CSS DO MENU DE MARCAS (DROPDOWN) */
+        /* --- CSS DO MENU DE MARCAS (DROPDOWN) --- */
         #menuMarcas {
-            display: none; /* Escondido por padrão */
+            display: none; 
             position: absolute;
             top: 100%;
             right: 0;
@@ -30,7 +30,6 @@
             z-index: 9999;
         }
         
-        /* Aceita .ativo ou .mostrar para garantir que abra */
         #menuMarcas.ativo, #menuMarcas.mostrar {
             display: grid;
         }
@@ -40,21 +39,109 @@
             z-index: 900;
         }
 
-        /* Estilo para quando a marca é clicada */
         .marca-item.selecionada, .item-marca.selecionada {
             background-color: #ff6600 !important;
             color: white !important;
             border-color: #ff6600 !important;
         }
 
-        /* CSS DO MENU DE CATEGORIAS FLUTUANTE */
+        /* --- CSS DO MENU DE CATEGORIAS FLUTUANTE --- */
         #menuCategoriasFlutuante {
-            display: none; /* OBRIGATÓRIO: Começa oculto */
+            display: none; 
             background: white;
             margin-top: 10px;
             border: 1px solid #ddd;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* --- NOVO CSS DO CARROSSEL (BANNER) --- */
+        .secao-banner {
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            background-color: #f4f4f4; /* Fundo enquanto carrega */
+        }
+
+        .banner-container {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            width: 100%;
+            height: auto;
+        }
+
+        .banner-item {
+            min-width: 100%;
+            position: relative;
+        }
+
+        /* Ajuste da imagem para ser responsiva */
+        .banner-item img {
+            width: 100%;
+            height: auto;
+            max-height: 500px; /* Altura máxima para desktop */
+            object-fit: cover; /* Cobre a área sem distorcer */
+            display: block;
+        }
+
+        /* Botões de Navegação (Setas) */
+        .btn-prev, .btn-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 15px;
+            cursor: pointer;
+            z-index: 10;
+            border-radius: 50%;
+            font-size: 18px;
+            transition: background 0.3s;
+        }
+
+        .btn-prev:hover, .btn-next:hover {
+            background-color: rgba(255, 102, 0, 0.8);
+        }
+
+        .btn-prev { left: 20px; }
+        .btn-next { right: 20px; }
+
+        /* Indicadores (Bolinhas) */
+        .indicadores {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .indicador {
+            width: 12px;
+            height: 12px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .indicador.ativo {
+            background-color: #ff6600;
+            transform: scale(1.2);
+        }
+
+        /* Mobile: Ajuste de altura se necessário */
+        @media (max-width: 768px) {
+            .banner-item img {
+                min-height: 200px; /* Garante altura mínima no celular */
+                object-fit: cover;
+            }
+            .btn-prev, .btn-next {
+                padding: 10px;
+                font-size: 14px;
+            }
         }
     </style>
   </head>
@@ -147,7 +234,7 @@
         </div>
       </div>
 
-   <div id="menuCategoriasFlutuante" class="menu-cat-dropdown">
+    <div id="menuCategoriasFlutuante" class="menu-cat-dropdown">
     <div class="menu-cat-header" id="tituloMarcaDropdown">Categorias</div>
     
     <div class="lista-cat-scroll">
@@ -191,53 +278,15 @@
     </div>
 </div>
 
-    <section class="hero-principal">
-      <div class="container conteudo-hero">
-        <div class="texto-hero">
-          <span class="tag-destaque">Líder em Peças Pesadas</span>
-          <h1>A Solução Completa para sua Máquina Não Parar</h1>
-          <p class="descricao-hero">
-            Estoque completo de peças para linha amarela e agrícola. Qualidade
-            garantida, envio rápido e o melhor custo-benefício do mercado.
-          </p>
-
-          <div class="marcas-atendidas">
-            <strong>Especialistas em:</strong> Caterpillar, Volvo, Case, Komatsu
-            e muito mais.
-          </div>
-
-          <div class="botoes-cta">
-            <a href="loja.html" class="botao botao-primario botao-grande">Ver Catálogo Completo</a>
-            <a href="#" class="botao botao-outline botao-grande"><i class="fab fa-whatsapp"></i> Orçamento Rápido</a>
-          </div>
-        </div>
-
-        <div class="imagem-hero">
-          <div class="card-flutuante card-1">
-            <i class="fas fa-box-open"></i>
-            <div>
-              <strong>Entrega Rápida</strong>
-              <small>Para todo Brasil</small>
+    <section class="secao-banner">
+        <div class="banner-container" id="bannerSlider">
             </div>
-          </div>
-          <div class="card-flutuante card-2">
-            <i class="fas fa-medal"></i>
-            <div>
-              <strong>Garantia Total</strong>
-              <small>Peças originais e 1ª linha</small>
-            </div>
-          </div>
-          <div class="card-flutuante card-3">
-            <i class="fas fa-headset"></i>
-            <div>
-              <strong>Suporte Técnico</strong>
-              <small>Especialistas prontos</small>
-            </div>
-          </div>
-        </div>
-      </div>
+
+        <button class="btn-prev" onclick="mudarSlide(-1)">&#10094;</button>
+        <button class="btn-next" onclick="mudarSlide(1)">&#10095;</button>
+
+        <div class="indicadores" id="bannerIndicadores"></div>
     </section>
-
     <section class="secao-loja">
       <div class="container">
         <div class="cabecalho-secao">
@@ -456,7 +505,7 @@
             </ul>
           </div>
 
-         
+          
           <div class="coluna-rodape">
             <h4>Contato</h4>
             <ul class="info-rodape">
@@ -575,10 +624,7 @@
       const tituloDropdown = document.getElementById("tituloMarcaDropdown");
       const menuCategorias = document.getElementById("menuCategoriasFlutuante"); 
 
-      // REMOVI O BOTÃO "VER MAIS MARCAS" DAQUI POIS ESTAVA DANDO CONFLITO COM O MAIN.JS
-      // O main.js vai cuidar de abrir o menu.
-
-      // Selecionar Marca (Funciona tanto para a barra principal quanto para o menu)
+      // Selecionar Marca
       const todasMarcas = document.querySelectorAll('.item-marca, .marca-item');
       
       todasMarcas.forEach(botao => {
@@ -603,8 +649,8 @@
               }
               
               if(menuCategorias) {
-                  menuCategorias.style.display = 'block'; // Mostra o menu de categorias
-                  menuCategorias.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); // Rola até ele
+                  menuCategorias.style.display = 'block'; 
+                  menuCategorias.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); 
               }
 
               // 4. Se foi clicado dentro do menu, fecha o menu de marcas extras
@@ -616,6 +662,74 @@
               console.log("Marca selecionada:", nomeMarca);
           });
       });
+    </script>
+
+    <script>
+        // --- CONFIGURAÇÃO DO CARROSSEL PARA O PAINEL ADMIN ---
+        // Quando criar o painel, apenas substitua este array por dados vindos do Firebase
+        const banners = [
+            // Use imagens de tamanho 1920x500 ou proporção similar
+            { src: 'https://placehold.co/1920x500?text=Banner+Promocional+1', alt: 'Promoção Peças' },
+            { src: 'https://placehold.co/1920x500?text=Frete+Gratis+Brasil', alt: 'Frete Grátis' },
+            { src: 'https://placehold.co/1920x500?text=Novas+Pecas+Caterpillar', alt: 'Novidades CAT' }
+        ];
+
+        let slideAtual = 0;
+        const bannerSlider = document.getElementById('bannerSlider');
+        const indicadoresContainer = document.getElementById('bannerIndicadores');
+
+        function carregarBanners() {
+            if(!bannerSlider) return;
+
+            // Limpa container
+            bannerSlider.innerHTML = '';
+            indicadoresContainer.innerHTML = '';
+
+            banners.forEach((banner, index) => {
+                // Cria a imagem do banner
+                const div = document.createElement('div');
+                div.className = 'banner-item';
+                div.innerHTML = `<img src="${banner.src}" alt="${banner.alt}">`;
+                bannerSlider.appendChild(div);
+
+                // Cria o indicador (bolinha)
+                const bola = document.createElement('div');
+                bola.className = `indicador ${index === 0 ? 'ativo' : ''}`;
+                bola.onclick = () => irParaSlide(index);
+                indicadoresContainer.appendChild(bola);
+            });
+        }
+
+        function mostrarSlide(index) {
+            if (index >= banners.length) slideAtual = 0;
+            else if (index < 0) slideAtual = banners.length - 1;
+            else slideAtual = index;
+
+            // Move o container
+            bannerSlider.style.transform = `translateX(-${slideAtual * 100}%)`;
+
+            // Atualiza bolinhas
+            const bolinhas = document.querySelectorAll('.indicador');
+            bolinhas.forEach((b, i) => {
+                b.classList.toggle('ativo', i === slideAtual);
+            });
+        }
+
+        function mudarSlide(direcao) {
+            mostrarSlide(slideAtual + direcao);
+        }
+
+        function irParaSlide(index) {
+            mostrarSlide(index);
+        }
+
+        // Auto-play (opcional - a cada 5 segundos)
+        setInterval(() => {
+            mudarSlide(1);
+        }, 5000);
+
+        // Inicia
+        document.addEventListener('DOMContentLoaded', carregarBanners);
     </script>
 
     <script type="module" src="./assets/js/main.js"></script>
