@@ -1,111 +1,86 @@
+// IMPORTANTE: Verifique se esse caminho está certo no seu computador
 import { db, doc, getDoc } from './assets/js/firebase-config.js';
 
-// 1. Pegar o ID da URL
+// Função para pegar o ID da URL
 function getProdutoId() {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
-    console.log("ID recuperado da URL:", id); // LOG DE DEBUG
     return id;
 }
 
-// 2. Buscar e Exibir
+// Função Principal
 async function carregarDetalhes() {
-    const id = getProdutoId();
     const loading = document.getElementById('loading');
     const container = document.getElementById('container-produto');
 
-    // Se não tiver ID na URL, para tudo
-    if (!id) {
-        console.error("Nenhum ID fornecido na URL.");
-        loading.innerHTML = "<p>Produto não especificado. Volte para a loja.</p>";
-        return;
-    }
-
     try {
-        console.log("Buscando no Firebase..."); // LOG DE DEBUG
+        // 1. Verificar ID
+        const id = getProdutoId();
+        if (!id) {
+            throw new Error("ID do produto não encontrado na URL. (Ex: produto.html?id=XYZ)");
+        }
+
+        // 2. Buscar no Firebase
+        console.log("Buscando ID:", id);
         const docRef = doc(db, "produtos", id);
         const docSnap = await getDoc(docRef);
 
-        if (docSnap.exists()) {
-            console.log("Produto encontrado:", docSnap.data()); // LOG DE DEBUG
-            const produto = docSnap.data();
-            const preco = parseFloat(produto.preco || 0);
-
-            // Preencher HTML (Verifique se esses IDs existem no seu produto.html)
-            const imgEl = document.getElementById('img-produto');
-            if(imgEl) imgEl.src = produto.urlImagem || 'assets/images/placeholder.jpg';
-
-            const catEl = document.getElementById('cat-produto');
-            if(catEl) catEl.innerText = produto.categoria || 'Geral';
-
-            const nomeEl = document.getElementById('nome-produto');
-            if(nomeEl) nomeEl.innerText = produto.nome || 'Produto sem nome';
-
-            const codEl = document.getElementById('cod-produto');
-            if(codEl) codEl.innerText = produto.codigo || '---';
-
-            const descEl = document.getElementById('desc-produto');
-            if(descEl) descEl.innerText = produto.descricao || "Sem descrição disponível.";
-            
-            // Preço
-            const precoEl = document.getElementById('preco-produto');
-            if(precoEl) precoEl.innerText = `R$ ${preco.toFixed(2).replace('.', ',')}`;
-
-            // Configurar Botão WhatsApp
-            const btnZap = document.getElementById('btn-whatsapp');
-            if(btnZap) {
-                const msg = `Olá, vi o produto *${produto.nome}* (Cód: ${produto.codigo}) no site e gostaria de saber mais.`;
-                btnZap.href = `https://wa.me/554984276503?text=${encodeURIComponent(msg)}`;
-            }
-
-            // Configurar Botão Comprar (Função global que está no main.js não funciona aqui pois é module, precisamos recriar ou exportar)
-            const btnComprar = document.getElementById('btn-comprar');
-            if(btnComprar) {
-                btnComprar.onclick = () => adicionarCarrinhoLocal({
-                    id: id,
-                    nome: produto.nome,
-                    preco: preco,
-                    img: produto.urlImagem || 'assets/images/placeholder.jpg'
-                });
-            }
-
-            // Esconde loading e mostra produto
-            if(loading) loading.style.display = 'none';
-            if(container) container.style.display = 'grid'; // ou flex, dependendo do seu CSS
-
-        } else {
-            console.error("Documento não existe no Firebase");
-            loading.innerHTML = "<p>Produto não encontrado ou removido.</p>";
+        // 3. Verificar se produto existe
+        if (!docSnap.exists()) {
+            throw new Error("Produto não encontrado no banco de dados (ID inválido ou apagado).");
         }
-    } catch (error) {
-        console.error("ERRO FATAL ao carregar detalhes:", error);
-        loading.innerHTML = `<p>Erro ao carregar: ${error.message}</p>`;
-    }
-}
 
-// Função auxiliar de carrinho apenas para esta página
-function adicionarCarrinhoLocal(novoItem) {
-    let carrinho = JSON.parse(localStorage.getItem('dispemaq_carrinho')) || [];
-    const existente = carrinho.find(item => item.id === novoItem.id);
-    if (existente) {
-        existente.qtd++;
-    } else {
-        novoItem.qtd = 1;
-        carrinho.push(novoItem);
+        const produto = docSnap.data();
+        console.log("Dados do produto:", produto); // Veja isso no Console (F12)
+
+        // 4. Preencher a tela (com proteções contra falhas)
+        const imagem = produto.urlImagem || produto.imagem || produto.foto || './assets/images/placeholder.jpg';
+        const nome = produto.nome || "Sem nome";
+        const codigo = produto.codigo || "---";
+        const categoria = produto.categoria || "Geral";
+        const descricao = produto.descricao || "Sem descrição.";
+        const preco = parseFloat(produto.preco || 0);
+
+        // Injetar no HTML
+        document.getElementById('img-produto').src = imagem;
+        document.getElementById('cat-produto').innerText = categoria;
+        document.getElementById('nome-produto').innerText = nome;
+        document.getElementById('cod-produto').innerText = codigo;
+        document.getElementById('desc-produto').innerText = descricao;
+        document.getElementById('preco-produto').innerText = `R$ ${preco.toFixed(2).replace('.', ',')}`;
+
+        // Configurar Botão Zap
+        const btnZap = document.getElementById('btn-whatsapp');
+        if(btnZap) {
+            const msg = `Olá, tenho interesse em: ${nome} (Cód: ${codigo})`;
+            btnZap.href = `https://wa.me/554984276503?text=${encodeURIComponent(msg)}`;
+        }
+
+        // Configurar Botão Comprar
+        const btnComprar = document.getElementById('btn-comprar');
+        if(btnComprar) {
+            btnComprar.onclick = () => {
+                alert("Produto adicionado ao carrinho!"); // Feedback simples para teste
+                // Aqui entraria a lógica de salvar no localStorage
+            };
+        }
+
+        // SUCESSO: Mostrar a tela
+        loading.style.display = 'none';
+        container.style.display = 'grid'; // ou 'flex'
+
+    } catch (error) {
+        // MOSTRAR ERRO NA TELA
+        console.error("Erro fatal:", error);
+        loading.innerHTML = `
+            <div style="color: red; text-align: center; padding: 20px; border: 1px solid red; background: #fff0f0;">
+                <h3>Ocorreu um erro!</h3>
+                <p><strong>Mensagem:</strong> ${error.message}</p>
+                <p><small>Verifique o Console (F12) para mais detalhes técnicos.</small></p>
+            </div>
+        `;
     }
-    localStorage.setItem('dispemaq_carrinho', JSON.stringify(carrinho));
-    
-    // Efeito visual no botão
-    const btn = document.getElementById('btn-comprar');
-    btn.innerHTML = '<i class="fas fa-check"></i> Adicionado!';
-    btn.style.backgroundColor = '#1e3a8a';
-    setTimeout(() => {
-        btn.innerHTML = '<i class="fas fa-shopping-cart"></i> Adicionar ao Carrinho';
-        btn.style.backgroundColor = '';
-        // Opcional: Atualizar o badge do carrinho se recarregar ou se comunicar com main.js
-        window.location.reload(); // Recarrega para atualizar o número no header
-    }, 1000);
 }
 
 // Inicializar
-document.addEventListener('DOMContentLoaded', carregarDetalhes);
+window.addEventListener('DOMContentLoaded', carregarDetalhes);
