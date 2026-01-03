@@ -16,8 +16,7 @@ window.intervaloBanner = null;
    2. CARREGAR PRODUTOS E BANNERS DO FIREBASE
    ============================================================ */
 
-// A) Carregar Produtos (ATUALIZADO COM LINKS PARA DETALHES)
-// A) Carregar Produtos (Versão corrigida: Clique na Imagem)
+// A) Carregar Produtos (Versão corrigida: Clique na Imagem leva aos detalhes)
 async function carregarProdutosDestaque() {
     const container = document.getElementById('gradeDestaques');
     if (!container) return; 
@@ -89,7 +88,7 @@ async function carregarProdutosDestaque() {
 }
 
  
-// B) Carregar Banners (Mantida original)
+// B) Carregar Banners
 async function carregarBanners() {
     const slider = document.getElementById('bannerSlider');
     const indicadores = document.getElementById('bannerIndicadores');
@@ -201,7 +200,10 @@ function renderizarCarrinho() {
             `;
         });
     }
-    if(totalEl) totalEl.innerText = 'R$ ' + totalPreco.toFixed(2).replace('.', ',');
+    // Verificação de segurança caso o elemento totalEl não exista na página
+    if(totalEl) {
+        totalEl.innerText = 'R$ ' + totalPreco.toFixed(2).replace('.', ',');
+    }
 }
 
 window.adicionarAoCarrinho = function(el) {

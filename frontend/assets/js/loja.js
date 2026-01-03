@@ -1,7 +1,7 @@
 /* =========================================
-   LOJA.JS (Versão Final com Proteção de Login)
+   LOJA.JS (Versão Final com Clique no Card e Proteção)
    ========================================= */
-// [ATENÇÃO] Adicionei 'auth' na importação abaixo:
+
 import { db, collection, getDocs, doc, getDoc, auth } from './firebase-config.js';
 
 let produtosLoja = [];
@@ -79,6 +79,7 @@ function filtrarLoja(marcaUrl, catUrl, buscaUrl) {
         let okMarca = (m && m !== 'todas') ? (p.marca && p.marca.toLowerCase().includes(m)) : true;
         let okCat = (c && c !== 'todas') ? (p.categoria && p.categoria.toLowerCase() === c) : true;
         let okBusca = true;
+        
         if (b) {
             const nome = p.nome ? p.nome.toLowerCase() : "";
             const cod = p.cod ? p.cod.toLowerCase() : "";
@@ -102,34 +103,62 @@ function filtrarLoja(marcaUrl, catUrl, buscaUrl) {
 
     // Desenha os cards
     if (resultados.length === 0) {
-        container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px;">Nenhum produto encontrado.</div>`;
+        container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px;">Nenhum produto encontrado com estes filtros.</div>`;
     } else {
         resultados.forEach(p => {
             const card = document.createElement('div');
             card.className = "dyn-card"; 
             
+            // [NOVO] Adiciona cursor de clique ao card
+            card.style.cursor = "pointer";
+
             const img = p.img || './assets/images/placeholder.jpg'; 
+
+            // Tratamento de preço
+            let precoNumerico = 0;
+            if (typeof p.preco === 'string') {
+                precoNumerico = parseFloat(p.preco.replace(',', '.'));
+            } else {
+                precoNumerico = parseFloat(p.preco);
+            }
+            if(isNaN(precoNumerico)) precoNumerico = 0;
 
             card.innerHTML = `
                 <div class="dyn-img-wrapper">
-                    <img src="${img}" alt="${p.nome}">
+                    <img src="${img}" alt="${p.nome}" onerror="this.src='./assets/images/placeholder.jpg'">
                 </div>
                 <div class="dyn-info">
                     <span class="dyn-cat">${p.categoria || 'PEÇA'}</span>
                     <h3 class="dyn-titulo">${p.nome}</h3>
                     <div class="dyn-preco">
-                        R$ ${parseFloat(p.preco).toFixed(2).replace('.', ',')}
+                        R$ ${precoNumerico.toFixed(2).replace('.', ',')}
                     </div>
                     <button class="dyn-btn-comprar btn-comprar-js" data-id="${p.id}">
                         <i class="fas fa-shopping-cart"></i> Adicionar
                     </button>
                 </div>
             `;
+
+            // [NOVO] Lógica de redirecionamento ao clicar no CARD
+            card.addEventListener('click', (e) => {
+                // Verifica se o elemento clicado (ou seus pais) NÃO É o botão de comprar
+                const clicouNoBotao = e.target.closest('.btn-comprar-js');
+                
+                if (!clicouNoBotao) {
+                    // Se não clicou no botão, vai para a página do produto
+                    // Supondo que sua página de detalhes se chame 'produto.html'
+                    window.location.href = `produto.html?id=${p.id}`;
+                }
+            });
+
             container.appendChild(card);
         });
 
+        // Evento exclusivo do botão de comprar (mantido)
         document.querySelectorAll('.btn-comprar-js').forEach(btn => {
             btn.addEventListener('click', (e) => {
+                // O stopPropagation garante que o clique no botão não ative o clique do card (redundância de segurança)
+                e.stopPropagation(); 
                 const id = e.currentTarget.getAttribute('data-id');
                 addCarrinhoLoja(id);
             });
@@ -142,11 +171,15 @@ function configurarSidebar() {
     itens.forEach(item => {
         item.addEventListener('click', () => {
             const params = new URLSearchParams(window.location.search);
+            
             if(item.dataset.marca) params.set('marca', item.dataset.marca);
             if(item.dataset.cat) params.set('cat', item.dataset.cat);
+            
             if(item.dataset.marca === 'todas') params.delete('marca');
             if(item.dataset.cat === 'todas') params.delete('cat');
+            
             if(item.dataset.marca || item.dataset.cat) params.delete('busca');
+            
             window.location.href = `loja.html?${params.toString()}`;
         });
     });
@@ -156,32 +189,44 @@ function configurarBuscaHeader() {
     const btn = document.getElementById('btnBuscaLoja');
     const input = document.getElementById('campoBuscaLoja');
     if(btn && input) {
-        const busca = () => { if(input.value) window.location.href = `loja.html?busca=${encodeURIComponent(input.value)}`; };
+        const busca = () => { 
+            if(input.value.trim()) {
+                window.location.href = `loja.html?busca=${encodeURIComponent(input.value.trim())}`;
+            }
+        };
         btn.addEventListener('click', busca);
         input.addEventListener('keypress', (e) => { if(e.key === 'Enter') busca(); });
     }
 }
 
-/* --- FUNÇÕES DO CARRINHO (AGORA COM PROTEÇÃO DE LOGIN) --- */
+/* --- FUNÇÕES DO CARRINHO (COM PROTEÇÃO DE LOGIN) --- */
 function addCarrinhoLoja(id) {
-    // 1. BLOQUEIO DE SEGURANÇA
     const user = auth.currentUser;
     
     if (!user) {
-        // Se NÃO estiver logado, avisa e manda para o login
         alert("🔒 Atenção: Para adicionar itens ao carrinho, você precisa fazer login ou criar uma conta.");
         window.location.href = "login.html";
-        return; // Para a execução aqui. Nada é adicionado.
+        return; 
     }
 
-    // 2. SE ESTIVER LOGADO, SEGUE A VIDA:
     let carrinho = JSON.parse(localStorage.getItem('dispemaq_carrinho')) || [];
     const prod = produtosLoja.find(p => p.id === id);
     
     if(prod) {
+        let precoParaSalvar = typeof prod.preco === 'string' 
+            ? parseFloat(prod.preco.replace(',', '.')) 
+            : parseFloat(prod.preco);
+
         const existe = carrinho.find(x => x.id === id);
-        if(existe) existe.qtd++;
-        else carrinho.push({...prod, qtd:1});
+        if(existe) {
+            existe.qtd++;
+        } else {
+            carrinho.push({
+                ...prod, 
+                preco: precoParaSalvar, 
+                qtd: 1
+            });
+        }
         
         localStorage.setItem('dispemaq_carrinho', JSON.stringify(carrinho));
         atualizarBadgeLoja();
@@ -210,23 +255,27 @@ function renderizarItensCarrinhoLateral(carrinho) {
     if(!div) return;
     
     if(carrinho.length === 0) {
-        div.innerHTML = "<p style='padding:20px; text-align:center'>Seu carrinho está vazio.</p>";
+        div.innerHTML = "<p style='padding:20px; text-align:center; color: #666;'>Seu carrinho está vazio.</p>";
         return;
     }
 
     div.innerHTML = "";
     carrinho.forEach(item => {
+        const precoUnitario = parseFloat(item.preco);
+        const subtotal = item.qtd * precoUnitario;
+
         div.innerHTML += `
-            <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;">
                 <div>
-                    <strong>${item.nome}</strong><br>
-                    <small>${item.qtd}x R$ ${parseFloat(item.preco).toFixed(2)}</small>
+                    <strong style="font-size: 0.95rem;">${item.nome}</strong><br>
+                    <small style="color:#888;">${item.qtd}x R$ ${precoUnitario.toFixed(2).replace('.', ',')}</small>
                 </div>
-                <div>R$ ${(item.qtd * item.preco).toFixed(2)}</div>
+                <div style="font-weight:bold; color:#333;">
+                    R$ ${subtotal.toFixed(2).replace('.', ',')}
+                </div>
             </div>
         `;
     });
 }
 
-// Torna global caso precise chamar via console
 window.atualizarBadgeLoja = atualizarBadgeLoja;
