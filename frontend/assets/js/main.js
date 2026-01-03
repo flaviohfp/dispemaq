@@ -4,11 +4,18 @@ import { db, collection, getDocs, auth, onAuthStateChanged, signOut } from './fi
    1. CONFIGURAÇÃO E VARIÁVEIS GLOBAIS
    ============================================================ */
 let carrinho = JSON.parse(localStorage.getItem('dispemaq_carrinho')) || [];
-let marcaAtualSelecionada = ""; // Guarda qual marca o usuário clicou
+let marcaAtualSelecionada = ""; 
+
+// Variáveis do Banner (Novo)
+let bannerSlideAtual = 0;
+let bannerTotalSlides = 0;
+const bannerSlider = document.getElementById('bannerSlider');
 
 /* ============================================================
-   2. CARREGAR PRODUTOS DO FIREBASE
+   2. CARREGAR PRODUTOS E BANNERS DO FIREBASE
    ============================================================ */
+
+// A) Carregar Produtos (Sua função original)
 async function carregarProdutosDestaque() {
     const container = document.getElementById('gradeDestaques');
     if (!container) return; 
@@ -62,14 +69,60 @@ async function carregarProdutosDestaque() {
         });
 
     } catch (error) {
-        console.error("Erro:", error);
+        console.error("Erro produtos:", error);
         container.innerHTML = '<p style="text-align:center;">Erro ao carregar produtos.</p>';
     }
 }
 
+// B) Carregar Banners (Novo - Adicionado para funcionar com o HTML)
+async function carregarBanners() {
+    const slider = document.getElementById('bannerSlider');
+    const indicadores = document.getElementById('bannerIndicadores');
+    if(!slider) return;
+
+    try {
+        const snapshot = await getDocs(collection(db, "banners"));
+        slider.innerHTML = '';
+        if(indicadores) indicadores.innerHTML = '';
+
+        if (snapshot.empty) {
+            // Banner padrão se não tiver nada no banco
+            slider.innerHTML = '<div class="banner-item"><img src="https://placehold.co/1920x500?text=Bem-vindo+a+Dispemaq" alt="Banner Padrão"></div>';
+            return;
+        }
+
+        let index = 0;
+        snapshot.forEach((doc) => {
+            const banner = doc.data();
+            const div = document.createElement('div');
+            div.className = 'banner-item';
+            div.innerHTML = `<img src="${banner.imagem}" alt="Banner Promocional">`;
+            slider.appendChild(div);
+
+            if(indicadores) {
+                const bola = document.createElement('div');
+                bola.className = `indicador ${index === 0 ? 'ativo' : ''}`;
+                const i = index; 
+                bola.onclick = () => window.irParaSlide(i);
+                indicadores.appendChild(bola);
+            }
+            index++;
+        });
+        bannerTotalSlides = index;
+        
+        // Auto-play do banner (muda a cada 5 segundos)
+        setInterval(() => { if(bannerTotalSlides > 1) window.mudarSlide(1); }, 5000);
+
+    } catch (error) {
+        console.error("Erro banner:", error);
+    }
+}
+
 /* ============================================================
-   3. LÓGICA DO CARRINHO (Disponível globalmente)
+   3. FUNÇÕES GLOBAIS (Disponíveis no HTML)
    ============================================================ */
+
+// --- CARRINHO ---
 function atualizarBadge() {
     const badges = document.querySelectorAll('.badge-carrinho'); 
     const total = carrinho.reduce((acc, item) => acc + item.qtd, 0);
@@ -117,7 +170,6 @@ function renderizarCarrinho() {
     if(totalEl) totalEl.innerText = 'R$ ' + totalPreco.toFixed(2).replace('.', ',');
 }
 
-// Funções globais (window) para o HTML acessar
 window.adicionarAoCarrinho = function(el) {
     const produto = {
         id: el.getAttribute('data-id'),
@@ -169,13 +221,43 @@ window.toggleCarrinho = function(e) {
     }
 };
 
+// --- NAVEGAÇÃO / SCROLL ---
+window.subirTopo = function() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// --- BANNER (Setas e Bolinhas) ---
+window.mostrarSlide = function(index) {
+    const slider = document.getElementById('bannerSlider');
+    if (!slider || bannerTotalSlides === 0) return;
+
+    if (index >= bannerTotalSlides) bannerSlideAtual = 0;
+    else if (index < 0) bannerSlideAtual = bannerTotalSlides - 1;
+    else bannerSlideAtual = index;
+
+    slider.style.transform = `translateX(-${bannerSlideAtual * 100}%)`;
+
+    document.querySelectorAll('.indicador').forEach((b, i) => {
+        b.classList.toggle('ativo', i === bannerSlideAtual);
+    });
+}
+
+window.mudarSlide = function(direcao) {
+    window.mostrarSlide(bannerSlideAtual + direcao);
+}
+
+window.irParaSlide = function(index) {
+    window.mostrarSlide(index);
+}
+
 /* ============================================================
-   4. INICIALIZAÇÃO E LÓGICA DE MENUS (DOM READY)
+   4. INICIALIZAÇÃO (DOM READY)
    ============================================================ */
 document.addEventListener('DOMContentLoaded', function() {
     
     // Inicializações
     carregarProdutosDestaque();
+    carregarBanners(); // <--- Adicionado
     atualizarBadge();
 
     // --- A. MENU "VER MAIS MARCAS" ---
@@ -184,14 +266,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (btnVerMais && menuMaisMarcas) {
         btnVerMais.addEventListener("click", function(e) {
-            e.stopPropagation(); // Não deixa fechar na hora
+            e.stopPropagation();
             menuMaisMarcas.classList.toggle("ativo");
             
-            // Fecha o menu de categorias se estiver aberto pra não dar bagunça
+            // Fecha menu de categorias para não sobrepor
             const menuCat = document.getElementById('menuCategoriasFlutuante');
             if(menuCat) menuCat.style.display = 'none';
 
-            // Atualiza texto do botão
             if (menuMaisMarcas.classList.contains("ativo")) {
                 btnVerMais.innerHTML = '<i class="fas fa-minus-circle"></i> Ver menos';
             } else {
@@ -200,16 +281,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- B. SISTEMA DE FILTRAGEM (O QUE VOCÊ PEDIU) ---
+    // --- B. MENU DE CATEGORIAS FLUTUANTE ---
     const menuCategorias = document.getElementById('menuCategoriasFlutuante');
     const tituloMenuCat = document.getElementById('tituloMarcaDropdown');
     const todosBotoesMarca = document.querySelectorAll('.item-marca, .marca-item');
 
-    // 1. Ao clicar na marca (Faixa laranja ou Menu Extra)
+    // 1. Clique na Marca
     todosBotoesMarca.forEach(botao => {
         botao.addEventListener('click', function(e) {
             e.preventDefault();
-            e.stopPropagation(); // Importante para não fechar logo em seguida
+            e.stopPropagation();
 
             // Reset visual
             todosBotoesMarca.forEach(b => {
@@ -218,45 +299,42 @@ document.addEventListener('DOMContentLoaded', function() {
                 b.style.color = '';
             });
 
-            // Ativa visual da marca clicada
+            // Ativa visual
             this.classList.add('selecionada');
             this.style.backgroundColor = '#ff6600';
             this.style.color = 'white';
 
-            // Guarda a marca
+            // Dados da marca
             const marcaNome = this.getAttribute('data-marca') || this.innerText.trim();
             const marcaNomeBonito = this.innerText.trim();
             marcaAtualSelecionada = marcaNome;
 
-            // Prepara o menu de categorias
             if(tituloMenuCat) tituloMenuCat.innerText = "Peças para " + marcaNomeBonito;
 
-            // POSICIONA E MOSTRA O MENU (FLUTUANTE)
+            // Posiciona o Menu Flutuante
             if(menuCategorias) {
-                const rect = this.getBoundingClientRect(); // Pega onde o botão está
-                const top = rect.bottom + window.scrollY; // Logo abaixo dele
+                const rect = this.getBoundingClientRect();
+                const top = rect.bottom + window.scrollY;
                 let left = rect.left + window.scrollX;
 
-                // Se sair da tela na direita, ajusta
+                // Ajuste se sair da tela (mobile/telas pequenas)
                 if (left + 280 > window.innerWidth) {
                     left = window.innerWidth - 290;
                 }
+                if (left < 0) left = 10;
 
                 menuCategorias.style.top = top + 'px';
                 menuCategorias.style.left = left + 'px';
-                menuCategorias.style.display = 'block'; // <<< AQUI QUE ELE APARECE
+                menuCategorias.style.display = 'block';
             }
         });
     });
 
-    // 2. Ao clicar em uma Categoria (Motor, Hidráulica, etc)
+    // 2. Clique na Categoria (Redirecionar)
     const botoesCat = document.querySelectorAll('.item-cat-dropdown');
     botoesCat.forEach(btn => {
         btn.addEventListener('click', function() {
             const categoria = this.getAttribute('data-cat');
-            
-            // Redireciona para a página da loja com os filtros
-            // Ex: loja.html?marca=caterpillar&cat=motor
             let url = `loja.html?marca=${encodeURIComponent(marcaAtualSelecionada)}`;
             if(categoria !== 'todas') {
                 url += `&cat=${encodeURIComponent(categoria)}`;
@@ -265,15 +343,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // 3. Fechar tudo ao clicar fora
+    // 3. Fechar Menus ao clicar fora
     document.addEventListener('click', function(e) {
-        // Fecha menu de categorias
+        // Fecha categorias
         if(menuCategorias && menuCategorias.style.display === 'block') {
             if (!menuCategorias.contains(e.target)) {
                 menuCategorias.style.display = 'none';
             }
         }
-        // Fecha menu de mais marcas
+        // Fecha "Mais Marcas"
         if(menuMaisMarcas && menuMaisMarcas.classList.contains('ativo')) {
             if (!menuMaisMarcas.contains(e.target) && e.target !== btnVerMais) {
                 menuMaisMarcas.classList.remove('ativo');
@@ -304,7 +382,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 btnAuth.href = "login.html";
                 btnAuth.onclick = null;
             }
-            // Popup de aviso
             const popup = document.getElementById('popupAvisoLogin');
             if (popup && !sessionStorage.getItem('popupFechado')) {
                 popup.style.display = 'flex';
@@ -316,4 +393,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnMenu = document.getElementById('botaoMenuMobile');
     const navMenu = document.getElementById('menuNavegacao');
     if (btnMenu) btnMenu.addEventListener('click', () => navMenu.classList.toggle('ativo'));
+
+    // --- E. SCROLL TO TOP (Botão subir) ---
+    window.addEventListener('scroll', () => {
+        const btn = document.getElementById("btnTopo");
+        if (btn) {
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                btn.classList.add("visivel");
+            } else {
+                btn.classList.remove("visivel");
+            }
+        }
+    });
 });

@@ -305,40 +305,211 @@ body {
     font-weight: bold;
     /* ... seus outros estilos de botão ... */
 }
+/* =========================================
+   ESTILOS ESPECÍFICOS DA HOME (INDEX)
+   ========================================= */
 
-
-
-/* --- CSS DO MENU VER MAIS --- */
-.painel-marcas-oculto {
-    display: none; /* Escondido por padrão */
-    background: #f4f4f4;
-    padding: 15px;
-    border-bottom: 4px solid #ea580c;
+/* --- MENU DE MARCAS (DROPDOWN) --- */
+#menuMarcas {
+    display: none; 
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 100%;
+    max-width: 1280px;
+    background: #fff;
+    border-top: 4px solid #ff6600;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    padding: 20px;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 10px;
-    text-align: center;
+    gap: 15px;
+    z-index: 9999;
 }
 
-/* Quando tiver a classe 'aberto', ele aparece */
-.painel-marcas-oculto.aberto {
+#menuMarcas.ativo, #menuMarcas.mostrar {
     display: grid;
 }
 
-.marca-extra {
-    background: white;
-    padding: 10px;
-    border: 1px solid #ccc;
-    cursor: pointer;
-    font-weight: bold;
-    color: #333;
-    text-transform: uppercase;
+.dropdown-marcas {
+    position: relative; 
+    z-index: 900;
+    text-align: center;
 }
 
-.marca-extra:hover {
-    background: #ea580c;
-    color: white;
-    border-color: #ea580c;
+.marca-item.selecionada, .item-marca.selecionada {
+    background-color: #ff6600 !important;
+    color: white !important;
+    border-color: #ff6600 !important;
 }
+
+/* --- BOTÃO VER MAIS MARCAS --- */
+.botao-marcas {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background-color: #fff;
+    color: #ff6600;
+    border: 2px solid #ff6600;
+    padding: 10px 25px;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    margin: 20px auto;
+    outline: none;
+}
+
+.botao-marcas:hover {
+    background-color: #ff6600;
+    color: #fff;
+    box-shadow: 0 6px 12px rgba(255, 102, 0, 0.25);
+    transform: translateY(-2px);
+}
+
+.botao-marcas:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* --- MENU DE CATEGORIAS FLUTUANTE --- */
+#menuCategoriasFlutuante {
+    display: none; 
+    background: white;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* --- CARROSSEL (BANNER) --- */
+.secao-banner {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    background-color: #f4f4f4;
+}
+
+.banner-container {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    width: 100%;
+    height: auto;
+}
+
+.banner-item {
+    min-width: 100%;
+    position: relative;
+}
+
+.banner-item img {
+    width: 100%;
+    height: auto;
+    max-height: 500px;
+    object-fit: cover;
+    display: block;
+}
+
+/* Botões de Navegação (Setas) */
+.btn-prev, .btn-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 15px;
+    cursor: pointer;
+    z-index: 10;
+    border-radius: 50%;
+    font-size: 18px;
+    transition: background 0.3s;
+}
+
+.btn-prev:hover, .btn-next:hover {
+    background-color: rgba(255, 102, 0, 0.8);
+}
+
+.btn-prev { left: 20px; }
+.btn-next { right: 20px; }
+
+/* Indicadores (Bolinhas) */
+.indicadores {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+}
+
+.indicador {
+    width: 12px;
+    height: 12px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.indicador.ativo {
+    background-color: #ff6600;
+    transform: scale(1.2);
+}
+
+@media (max-width: 768px) {
+    .banner-item img {
+        min-height: 200px;
+        object-fit: cover;
+    }
+    .btn-prev, .btn-next {
+        padding: 10px;
+        font-size: 14px;
+    }
+}
+
+/* --- CSS DO BOTÃO "VER MAIS MARCAS" --- */
+.botao-marcas {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* Espaço entre o ícone e o texto */
+    background-color: #fff; /* Fundo branco limpo */
+    color: #ff6600; /* Cor do texto e ícone (laranja da sua marca) */
+    border: 2px solid #ff6600; /* Borda laranja para destaque */
+    padding: 8px 6px; /* Tamanho confortável */
+    font-size: 1rem;
+    font-weight: 700; /* Negrito para chamar atenção */
+    border-radius: 5px; /* Bordas bem arredondadas (estilo pílula) */
+    cursor: pointer; /* Cursor de mãozinha */
+    transition: all 0.3s ease; /* Efeito suave ao passar o mouse */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* Sombra leve para dar profundidade */
+    margin: 15px auto; /* Centraliza se estiver em um container flex/grid */
+    outline: none; /* Remove contorno padrão do navegador */
+}
+
+/* Efeito ao passar o mouse (Hover) */
+.botao-marcas:hover {
+    background-color: #ff6600; /* Preenche o fundo de laranja */
+    color: #fff; /* Muda o texto para branco */
+    box-shadow: 0 6px 12px rgba(255, 102, 0, 0.25); /* Sombra laranja mais forte */
+    transform: translateY(-2px); /* Leve elevação para efeito 3D */
+}
+
+/* Efeito ao clicar */
+.botao-marcas:active {
+    transform: translateY(1px); /* Leve afundamento ao clicar */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Ajuste para o ícone ficar do tamanho certo */
+.botao-marcas i {
+    font-size: 1.2rem;
+}
+
 
 /* --- CSS DO MENU DE CATEGORIAS (FLUTUANTE) --- */
 #menuCategoriasFlutuante {

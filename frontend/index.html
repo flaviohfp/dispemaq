@@ -12,138 +12,7 @@
 
     <link rel="stylesheet" href="./assets/css/style.css" />
 
-    <style>
-        /* --- CSS DO MENU DE MARCAS (DROPDOWN) --- */
-        #menuMarcas {
-            display: none; 
-            position: absolute;
-            top: 100%;
-            right: 0;
-            width: 100%;
-            max-width: 1280px;
-            background: #fff;
-            border-top: 4px solid #ff6600;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            padding: 20px;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 15px;
-            z-index: 9999;
-        }
-        
-        #menuMarcas.ativo, #menuMarcas.mostrar {
-            display: grid;
-        }
-
-        .dropdown-marcas {
-            position: relative; 
-            z-index: 900;
-        }
-
-        .marca-item.selecionada, .item-marca.selecionada {
-            background-color: #ff6600 !important;
-            color: white !important;
-            border-color: #ff6600 !important;
-        }
-
-        /* --- CSS DO MENU DE CATEGORIAS FLUTUANTE --- */
-        #menuCategoriasFlutuante {
-            display: none; 
-            background: white;
-            margin-top: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        /* --- NOVO CSS DO CARROSSEL (BANNER) --- */
-        .secao-banner {
-            width: 100%;
-            position: relative;
-            overflow: hidden;
-            background-color: #f4f4f4; /* Fundo enquanto carrega */
-        }
-
-        .banner-container {
-            display: flex;
-            transition: transform 0.5s ease-in-out;
-            width: 100%;
-            height: auto;
-        }
-
-        .banner-item {
-            min-width: 100%;
-            position: relative;
-        }
-
-        /* Ajuste da imagem para ser responsiva */
-        .banner-item img {
-            width: 100%;
-            height: auto;
-            max-height: 500px; /* Altura máxima para desktop */
-            object-fit: cover; /* Cobre a área sem distorcer */
-            display: block;
-        }
-
-        /* Botões de Navegação (Setas) */
-        .btn-prev, .btn-next {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background-color: rgba(0, 0, 0, 0.5);
-            color: white;
-            border: none;
-            padding: 15px;
-            cursor: pointer;
-            z-index: 10;
-            border-radius: 50%;
-            font-size: 18px;
-            transition: background 0.3s;
-        }
-
-        .btn-prev:hover, .btn-next:hover {
-            background-color: rgba(255, 102, 0, 0.8);
-        }
-
-        .btn-prev { left: 20px; }
-        .btn-next { right: 20px; }
-
-        /* Indicadores (Bolinhas) */
-        .indicadores {
-            position: absolute;
-            bottom: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 10px;
-            z-index: 10;
-        }
-
-        .indicador {
-            width: 12px;
-            height: 12px;
-            background-color: rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .indicador.ativo {
-            background-color: #ff6600;
-            transform: scale(1.2);
-        }
-
-        /* Mobile: Ajuste de altura se necessário */
-        @media (max-width: 768px) {
-            .banner-item img {
-                min-height: 200px; /* Garante altura mínima no celular */
-                object-fit: cover;
-            }
-            .btn-prev, .btn-next {
-                padding: 10px;
-                font-size: 14px;
-            }
-        }
-    </style>
+    
   </head>
   <body>
     <div class="barra-anuncio">
@@ -235,48 +104,48 @@
       </div>
 
     <div id="menuCategoriasFlutuante" class="menu-cat-dropdown">
-    <div class="menu-cat-header" id="tituloMarcaDropdown">Categorias</div>
-    
-    <div class="lista-cat-scroll">
-        <button class="item-cat-dropdown" data-cat="motor">
-            <i class="fas fa-cogs"></i> Motor
-        </button>
-        <button class="item-cat-dropdown" data-cat="combustivel">
-            <i class="fas fa-gas-pump"></i> Sistema de Combustível
-        </button>
-        <button class="item-cat-dropdown" data-cat="transmissao">
-            <i class="fas fa-columns"></i> Transmissão / Comando Final
-        </button>
-        <button class="item-cat-dropdown" data-cat="freios-eixos">
-            <i class="fas fa-life-ring"></i> Direção / Freios / Eixos
-        </button>
-        <button class="item-cat-dropdown" data-cat="eletrica">
-            <i class="fas fa-bolt"></i> Sistema Elétrico
-        </button>
-        <button class="item-cat-dropdown" data-cat="hidraulica">
-            <i class="fas fa-oil-can"></i> Sistema Hidráulico
-        </button>
-        <button class="item-cat-dropdown" data-cat="chassi">
-            <i class="fas fa-th-large"></i> Chassi / Estruturas
-        </button>
-        <button class="item-cat-dropdown" data-cat="cabine">
-            <i class="fas fa-chair"></i> Posto Operação / Cabine
-        </button>
-        <button class="item-cat-dropdown" data-cat="ar-condicionado">
-            <i class="fas fa-snowflake"></i> Sistema Ar Condicionado
-        </button>
-        <button class="item-cat-dropdown" data-cat="implementos">
-            <i class="fas fa-tools"></i> F.P.S. / Implementos
-        </button>
-        <button class="item-cat-dropdown" data-cat="rodante">
-            <i class="fas fa-tractor"></i> Material Rodante
-        </button>
+        <div class="menu-cat-header" id="tituloMarcaDropdown">Categorias</div>
         
-        <button class="item-cat-dropdown destaque" data-cat="todas">
-            <strong>Ver Tudo dessa Marca</strong>
-        </button>
+        <div class="lista-cat-scroll">
+            <button class="item-cat-dropdown" data-cat="motor">
+                <i class="fas fa-cogs"></i> Motor
+            </button>
+            <button class="item-cat-dropdown" data-cat="combustivel">
+                <i class="fas fa-gas-pump"></i> Sistema de Combustível
+            </button>
+            <button class="item-cat-dropdown" data-cat="transmissao">
+                <i class="fas fa-columns"></i> Transmissão / Comando Final
+            </button>
+            <button class="item-cat-dropdown" data-cat="freios-eixos">
+                <i class="fas fa-life-ring"></i> Direção / Freios / Eixos
+            </button>
+            <button class="item-cat-dropdown" data-cat="eletrica">
+                <i class="fas fa-bolt"></i> Sistema Elétrico
+            </button>
+            <button class="item-cat-dropdown" data-cat="hidraulica">
+                <i class="fas fa-oil-can"></i> Sistema Hidráulico
+            </button>
+            <button class="item-cat-dropdown" data-cat="chassi">
+                <i class="fas fa-th-large"></i> Chassi / Estruturas
+            </button>
+            <button class="item-cat-dropdown" data-cat="cabine">
+                <i class="fas fa-chair"></i> Posto Operação / Cabine
+            </button>
+            <button class="item-cat-dropdown" data-cat="ar-condicionado">
+                <i class="fas fa-snowflake"></i> Sistema Ar Condicionado
+            </button>
+            <button class="item-cat-dropdown" data-cat="implementos">
+                <i class="fas fa-tools"></i> F.P.S. / Implementos
+            </button>
+            <button class="item-cat-dropdown" data-cat="rodante">
+                <i class="fas fa-tractor"></i> Material Rodante
+            </button>
+            
+            <button class="item-cat-dropdown destaque" data-cat="todas">
+                <strong>Ver Tudo dessa Marca</strong>
+            </button>
+        </div>
     </div>
-</div>
 
     <section class="secao-banner">
         <div class="banner-container" id="bannerSlider">
@@ -287,6 +156,7 @@
 
         <div class="indicadores" id="bannerIndicadores"></div>
     </section>
+
     <section class="secao-loja">
       <div class="container">
         <div class="cabecalho-secao">
@@ -356,65 +226,65 @@
       </div>
     </section>
 
-   <section class="secao-sobre">
-    <div class="container conteudo-sobre">
-        <div class="imagem-sobre">
-            <i class="fas fa-cogs" style="font-size: 8rem; color: rgba(0, 86, 179, 0.15);"></i>
+    <section class="secao-sobre">
+        <div class="container conteudo-sobre">
+            <div class="imagem-sobre">
+                <i class="fas fa-cogs" style="font-size: 8rem; color: rgba(0, 86, 179, 0.15);"></i>
 
-            <div class="card-flutuante card-2" style="bottom: 30px; right: 30px; top: auto">
-                <i class="fas fa-shipping-fast"></i>
-                <div>
-                    <strong>Agilidade na Entrega</strong>
-                    <span style="display:block; font-size:0.8rem; font-weight:normal;">Para todo o Brasil</span>
+                <div class="card-flutuante card-2" style="bottom: 30px; right: 30px; top: auto">
+                    <i class="fas fa-shipping-fast"></i>
+                    <div>
+                        <strong>Agilidade na Entrega</strong>
+                        <span style="display:block; font-size:0.8rem; font-weight:normal;">Para todo o Brasil</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="texto-sobre">
+                <span class="tag-secao">Quem Somos</span>
+                
+                <h2>Soluções ágeis para sua máquina não parar</h2>
+                
+                <p>
+                    Na Dispemaq, entendemos que cada hora de equipamento parado impacta o seu resultado. 
+                    Por isso, nossa missão é simples: identificar a peça correta e entregá-la com a máxima agilidade.
+                    Trabalhamos com uma seleção rigorosa de fornecedores para garantir durabilidade e desempenho.
+                </p>
+
+                <div class="lista-diferenciais">
+                    <div class="item-diferencial">
+                        <i class="fas fa-check"></i> Peças de reposição linha Premium
+                    </div>
+                    <div class="item-diferencial">
+                        <i class="fas fa-check"></i> Cotação rápida e sem burocracia
+                    </div>
+                    <div class="item-diferencial">
+                        <i class="fas fa-check"></i> Consultoria técnica na venda
+                    </div>
+                </div>
+
+                <div class="estatisticas-sobre">
+                    <div class="stat-item">
+                        <i class="fas fa-award" style="font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px;"></i>
+                        <strong>Garantia</strong>
+                        <span>Procedência</span>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <i class="fas fa-map-marked-alt" style="font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px;"></i>
+                        <strong>Nacional</strong>
+                        <span>Envio p/ todo país</span>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <i class="fas fa-boxes" style="font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px;"></i>
+                        <strong>Completo</strong>
+                        <span>Multimarcas</span>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="texto-sobre">
-            <span class="tag-secao">Quem Somos</span>
-            
-            <h2>Soluções ágeis para sua máquina não parar</h2>
-            
-            <p>
-                Na Dispemaq, entendemos que cada hora de equipamento parado impacta o seu resultado. 
-                Por isso, nossa missão é simples: identificar a peça correta e entregá-la com a máxima agilidade.
-                Trabalhamos com uma seleção rigorosa de fornecedores para garantir durabilidade e desempenho.
-            </p>
-
-            <div class="lista-diferenciais">
-                <div class="item-diferencial">
-                    <i class="fas fa-check"></i> Peças de reposição linha Premium
-                </div>
-                <div class="item-diferencial">
-                    <i class="fas fa-check"></i> Cotação rápida e sem burocracia
-                </div>
-                <div class="item-diferencial">
-                    <i class="fas fa-check"></i> Consultoria técnica na venda
-                </div>
-            </div>
-
-            <div class="estatisticas-sobre">
-                <div class="stat-item">
-                    <i class="fas fa-award" style="font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px;"></i>
-                    <strong>Garantia</strong>
-                    <span>Procedência</span>
-                </div>
-                
-                <div class="stat-item">
-                    <i class="fas fa-map-marked-alt" style="font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px;"></i>
-                    <strong>Nacional</strong>
-                    <span>Envio p/ todo país</span>
-                </div>
-                
-                <div class="stat-item">
-                    <i class="fas fa-boxes" style="font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px;"></i>
-                    <strong>Completo</strong>
-                    <span>Multimarcas</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+    </section>
 
     <section class="secao-contato">
       <div class="container">
@@ -505,7 +375,6 @@
             </ul>
           </div>
 
-          
           <div class="coluna-rodape">
             <h4>Contato</h4>
             <ul class="info-rodape">
@@ -515,9 +384,6 @@
             </ul>
           </div>
         </div>
-
-
-        
 
         <div class="divisor-rodape"></div>
 
@@ -579,201 +445,6 @@
         </div>
     </div>
 
-    <script>
-      // 1. Toggle Carrinho
-      function toggleCarrinho(e) {
-        if (e) e.preventDefault();
-        const carrinho = document.getElementById("carrinhoLateral");
-        const overlay = document.getElementById("overlay");
-        carrinho.classList.toggle("aberto");
-        overlay.classList.toggle("ativo");
-      }
-
-      // Fechar carrinho ao clicar no overlay
-      document.getElementById("overlay").addEventListener("click", function () {
-        document.getElementById("carrinhoLateral").classList.remove("aberto");
-        this.classList.remove("ativo");
-      });
-
-      // 2. Toggle Menu Mobile
-      function toggleMenuMobile() {
-        const menu = document.getElementById("menuNavegacao");
-        menu.classList.toggle("ativo"); 
-      }
-
-      // 3. Botão voltar ao topo
-      window.onscroll = function () {
-        const btn = document.getElementById("btnTopo");
-        if (
-          document.body.scrollTop > 300 ||
-          document.documentElement.scrollTop > 300
-        ) {
-          btn.classList.add("visivel");
-        } else {
-          btn.classList.remove("visivel");
-        }
-      };
-
-      function subirTopo() {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
-
-      // 4. LÓGICA COMPLETA DE MARCAS (MENU E SELEÇÃO)
-      const btnMarcas = document.getElementById("btnMarcas");
-      const menuMarcas = document.getElementById("menuMarcas");
-      const tituloDropdown = document.getElementById("tituloMarcaDropdown");
-      const menuCategorias = document.getElementById("menuCategoriasFlutuante"); 
-
-      // Selecionar Marca
-      const todasMarcas = document.querySelectorAll('.item-marca, .marca-item');
-      
-      todasMarcas.forEach(botao => {
-          botao.addEventListener('click', function() {
-              // 1. Remove a cor de todos
-              todasMarcas.forEach(b => {
-                  b.classList.remove('selecionada');
-                  b.style.backgroundColor = ''; 
-                  b.style.color = '';
-              });
-
-              // 2. Coloca cor no que foi clicado
-              this.classList.add('selecionada');
-              this.style.backgroundColor = '#ff6600';
-              this.style.color = 'white';
-              this.style.borderColor = '#ff6600';
-
-              // 3. Muda o texto de Categorias e MOSTRA O MENU
-              const nomeMarca = this.innerText;
-              if(tituloDropdown) {
-                  tituloDropdown.innerText = "Categorias: " + nomeMarca;
-              }
-              
-              if(menuCategorias) {
-                  menuCategorias.style.display = 'block'; 
-                  menuCategorias.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); 
-              }
-
-              // 4. Se foi clicado dentro do menu, fecha o menu de marcas extras
-              if(menuMarcas && menuMarcas.classList.contains('ativo')) {
-                  menuMarcas.classList.remove('ativo');
-                  btnMarcas.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
-              }
-
-              console.log("Marca selecionada:", nomeMarca);
-          });
-      });
-    </script>
-
-    <script>
-        // --- CONFIGURAÇÃO DO CARROSSEL PARA O PAINEL ADMIN ---
-        // Quando criar o painel, apenas substitua este array por dados vindos do Firebase
-        const banners = [
-            // Use imagens de tamanho 1920x500 ou proporção similar
-            { src: 'https://placehold.co/1920x500?text=Banner+Promocional+1', alt: 'Promoção Peças' },
-            { src: 'https://placehold.co/1920x500?text=Frete+Gratis+Brasil', alt: 'Frete Grátis' },
-            { src: 'https://placehold.co/1920x500?text=Novas+Pecas+Caterpillar', alt: 'Novidades CAT' }
-        ];
-
-        let slideAtual = 0;
-        const bannerSlider = document.getElementById('bannerSlider');
-        const indicadoresContainer = document.getElementById('bannerIndicadores');
-
-        function carregarBanners() {
-            if(!bannerSlider) return;
-
-            // Limpa container
-            bannerSlider.innerHTML = '';
-            indicadoresContainer.innerHTML = '';
-
-            banners.forEach((banner, index) => {
-                // Cria a imagem do banner
-                const div = document.createElement('div');
-                div.className = 'banner-item';
-                div.innerHTML = `<img src="${banner.src}" alt="${banner.alt}">`;
-                bannerSlider.appendChild(div);
-
-                // Cria o indicador (bolinha)
-                const bola = document.createElement('div');
-                bola.className = `indicador ${index === 0 ? 'ativo' : ''}`;
-                bola.onclick = () => irParaSlide(index);
-                indicadoresContainer.appendChild(bola);
-            });
-        }
-
-        function mostrarSlide(index) {
-            if (index >= banners.length) slideAtual = 0;
-            else if (index < 0) slideAtual = banners.length - 1;
-            else slideAtual = index;
-
-            // Move o container
-            bannerSlider.style.transform = `translateX(-${slideAtual * 100}%)`;
-
-            // Atualiza bolinhas
-            const bolinhas = document.querySelectorAll('.indicador');
-            bolinhas.forEach((b, i) => {
-                b.classList.toggle('ativo', i === slideAtual);
-            });
-        }
-
-        function mudarSlide(direcao) {
-            mostrarSlide(slideAtual + direcao);
-        }
-
-        function irParaSlide(index) {
-            mostrarSlide(index);
-        }
-
-        // Auto-play (opcional - a cada 5 segundos)
-        setInterval(() => {
-            mudarSlide(1);
-        }, 5000);
-
-        // Inicia
-        document.addEventListener('DOMContentLoaded', carregarBanners);
-    </script>
-
     <script type="module" src="./assets/js/main.js"></script>
-
-    <script type="module">
-        import { auth, onAuthStateChanged, signOut } from './assets/js/firebase-config.js';
-
-        const btnAuth = document.getElementById('btnAuth');
-        const txtAuth = document.getElementById('txtAuth');
-        const iconAuth = document.getElementById('iconAuth');
-        const popup = document.getElementById('popupAvisoLogin');
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // --- USUÁRIO LOGADO ---
-                if(txtAuth) txtAuth.innerText = "Sair";
-                if(iconAuth) iconAuth.className = "fas fa-sign-out-alt";
-                if(btnAuth) {
-                    btnAuth.href = "#"; 
-                    btnAuth.onclick = (e) => {
-                        e.preventDefault();
-                        if(confirm("Deseja realmente sair?")) {
-                            signOut(auth).then(() => {
-                                window.location.reload();
-                            });
-                        }
-                    };
-                }
-                if(popup) popup.style.display = 'none';
-
-            } else {
-                // --- NINGUÉM LOGADO ---
-                if(txtAuth) txtAuth.innerText = "Entrar";
-                if(iconAuth) iconAuth.className = "fas fa-user-circle";
-                if(btnAuth) {
-                    btnAuth.href = "login.html";
-                    btnAuth.onclick = null;
-                }
-                
-                if (popup && !sessionStorage.getItem('popupFechado')) {
-                    popup.style.display = 'flex';
-                }
-            }
-        });
-    </script>
   </body>
 </html>
