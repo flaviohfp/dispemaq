@@ -3,69 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalhes do Produto - Dispemaq</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="./assets/css/style.css"> <link rel="stylesheet" href="./assets/css/produto.css"> </head>
+    <title>Detalhes do Produto | Dispemaq</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="./assets/css/style.css"> <link rel="stylesheet" href="produto.css"> </head>
 <body>
 
-    <header class="header-site">
+    <header class="cabecalho-principal">
         <div class="container">
-            <a href="index.html" class="logo">Dispemaq</a>
-            <nav>
-                <a href="index.html">Voltar para Loja</a>
-            </nav>
+            <div class="topo-cabecalho">
+                <a href="index.html" class="logo-empresa">
+                   <img src="./assets/images/SITE-LOGO-ESTENDIDA.-PNG-2048x819.png" alt="Logo Dispemaq" style="max-height: 50px;">
+                </a>
+                <a href="index.html" class="botao-voltar"><i class="fas fa-arrow-left"></i> Voltar para Loja</a>
+            </div>
         </div>
     </header>
 
-    <div class="container product-page-container">
+    <main class="container pagina-produto">
         
-        <div class="product-main">
-            <div class="product-gallery">
-                <img id="imgPrincipal" src="" alt="Carregando..." class="main-img">
+        <div id="loading" style="text-align: center; padding: 50px;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #ff6600;"></i>
+            <p>Carregando produto...</p>
+        </div>
+
+        <div id="container-produto" class="produto-wrapper" style="display: none;">
+            
+            <div class="coluna-imagem">
+                <img id="img-produto" src="" alt="Produto">
             </div>
 
-            <div class="product-info">
-                <span class="marca-tag" id="marcaProd">Marca</span>
-                <h1 id="nomeProd">Carregando nome...</h1>
-                <p class="cod-ref">Cód. Ref: <span id="codProd">...</span></p>
-                
-                <div class="price-box">
-                    <span class="currency">R$</span>
-                    <span class="price" id="precoProd">--,--</span>
-                    <p class="price-obs">À vista no PIX ou Boleto</p>
+            <div class="coluna-info">
+                <span class="tag-categoria" id="cat-produto">Categoria</span>
+                <h1 id="nome-produto">Nome do Produto</h1>
+                <p class="codigo">Código: <span id="cod-produto">---</span></p>
+
+                <div class="box-preco">
+                    <span class="preco" id="preco-produto">R$ 0,00</span>
+                    <span class="preco-pix">
+                        <i class="fas fa-check"></i> 5% de desconto no PIX
+                    </span>
+                    <span class="parcelamento">ou até 12x no cartão</span>
                 </div>
 
-                <div class="payment-methods">
-                    <p><i class="far fa-credit-card"></i> Parcelamento em até 12x no cartão</p>
-                    <p><i class="fas fa-barcode"></i> Boleto bancário (5% desc)</p>
-                    <p><i class="fab fa-pix"></i> PIX (10% desc)</p>
-                    <img src="https://logopng.com.br/logos/bandeiras-cartoes-pagamento-16.png" alt="Bandeiras" style="width: 150px; margin-top: 10px; opacity: 0.7;">
-                </div>
-
-                <div class="actions">
-                    <a id="btnZap" href="#" target="_blank" class="btn-comprar">
-                        <i class="fab fa-whatsapp"></i> Comprar / Orçar Agora
+                <div class="acoes-compra">
+                    <button id="btn-comprar" class="btn-grande comprar">
+                        <i class="fas fa-shopping-cart"></i> Adicionar ao Carrinho
+                    </button>
+                    <a id="btn-whatsapp" href="#" target="_blank" class="btn-grande whatsapp">
+                        <i class="fab fa-whatsapp"></i> Comprar pelo WhatsApp
                     </a>
                 </div>
 
-                <div class="product-description">
-                    <h3>Descrição / Detalhes</h3>
-                    <p id="descProd">Informações detalhadas sobre a aplicação da peça, compatibilidade e especificações técnicas.</p>
+                <div class="metodos-pagamento">
+                    <p>Aceitamos:</p>
+                    <div class="icones-pgto">
+                        <i class="fab fa-cc-visa"></i>
+                        <i class="fab fa-cc-mastercard"></i>
+                        <i class="fas fa-barcode"></i>
+                        <i class="fas fa-pix"></i>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="descricao">
+                    <h3>Descrição Técnica</h3>
+                    <p id="desc-produto">Carregando descrição...</p>
                 </div>
             </div>
         </div>
+    </main>
 
-        <hr class="divider">
-
-        <div class="related-section">
-            <h2>Quem viu este produto, viu também</h2>
-            <div class="produtos-grid" id="relatedContainer">
-                <p>Carregando sugestões...</p>
-            </div>
-        </div>
-
-    </div>
-
-    <script type="module" src="./assets/js/produto-detalhes.js"></script>
+    <script type="module" src="produto-detalhes.js"></script>
 </body>
 </html>

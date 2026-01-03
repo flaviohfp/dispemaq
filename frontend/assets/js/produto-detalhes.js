@@ -1,89 +1,111 @@
-import { db } from './firebase-config.js'; // Garanta que o caminho está certo
-import { doc, getDoc, collection, query, where, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { db, doc, getDoc } from './assets/js/firebase-config.js';
 
-// 1. Pegar o ID da URL (ex: produto.html?id=ABC12345)
-const params = new URLSearchParams(window.location.search);
-const produtoId = params.get('id');
-
-const containerRelacionados = document.getElementById('relatedContainer');
-
-// Se não tiver ID, volta pra home
-if (!produtoId) {
-    window.location.href = "index.html";
+// 1. Pegar o ID da URL
+function getProdutoId() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    console.log("ID recuperado da URL:", id); // LOG DE DEBUG
+    return id;
 }
 
-// 2. Função Principal
-async function carregarProduto() {
+// 2. Buscar e Exibir
+async function carregarDetalhes() {
+    const id = getProdutoId();
+    const loading = document.getElementById('loading');
+    const container = document.getElementById('container-produto');
+
+    // Se não tiver ID na URL, para tudo
+    if (!id) {
+        console.error("Nenhum ID fornecido na URL.");
+        loading.innerHTML = "<p>Produto não especificado. Volte para a loja.</p>";
+        return;
+    }
+
     try {
-        const docRef = doc(db, "produtos", produtoId);
+        console.log("Buscando no Firebase..."); // LOG DE DEBUG
+        const docRef = doc(db, "produtos", id);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
+            console.log("Produto encontrado:", docSnap.data()); // LOG DE DEBUG
             const produto = docSnap.data();
-            
-            // Preencher HTML
-            document.getElementById('imgPrincipal').src = produto.imagem;
-            document.getElementById('nomeProd').innerText = produto.nome;
-            document.getElementById('marcaProd').innerText = produto.marca; // ou formatarMarca(produto.marca)
-            document.getElementById('codProd').innerText = docSnap.id; // ou produto.codigo se tiver salvo
+            const preco = parseFloat(produto.preco || 0);
+
+            // Preencher HTML (Verifique se esses IDs existem no seu produto.html)
+            const imgEl = document.getElementById('img-produto');
+            if(imgEl) imgEl.src = produto.urlImagem || 'assets/images/placeholder.jpg';
+
+            const catEl = document.getElementById('cat-produto');
+            if(catEl) catEl.innerText = produto.categoria || 'Geral';
+
+            const nomeEl = document.getElementById('nome-produto');
+            if(nomeEl) nomeEl.innerText = produto.nome || 'Produto sem nome';
+
+            const codEl = document.getElementById('cod-produto');
+            if(codEl) codEl.innerText = produto.codigo || '---';
+
+            const descEl = document.getElementById('desc-produto');
+            if(descEl) descEl.innerText = produto.descricao || "Sem descrição disponível.";
             
             // Preço
-            const precoFormatado = parseFloat(produto.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-            document.getElementById('precoProd').innerText = precoFormatado;
+            const precoEl = document.getElementById('preco-produto');
+            if(precoEl) precoEl.innerText = `R$ ${preco.toFixed(2).replace('.', ',')}`;
 
-            // Link do WhatsApp dinâmico
-            const zapTexto = `Olá, vi o produto *${produto.nome}* no site e gostaria de um orçamento/comprar.`;
-            const zapLink = `https://wa.me/55SEUNUMEROAQUI?text=${encodeURIComponent(zapTexto)}`;
-            document.getElementById('btnZap').href = zapLink;
+            // Configurar Botão WhatsApp
+            const btnZap = document.getElementById('btn-whatsapp');
+            if(btnZap) {
+                const msg = `Olá, vi o produto *${produto.nome}* (Cód: ${produto.codigo}) no site e gostaria de saber mais.`;
+                btnZap.href = `https://wa.me/554984276503?text=${encodeURIComponent(msg)}`;
+            }
 
-            // Carregar Relacionados (Mesma Categoria)
-            carregarRelacionados(produto.categoria, produtoId);
+            // Configurar Botão Comprar (Função global que está no main.js não funciona aqui pois é module, precisamos recriar ou exportar)
+            const btnComprar = document.getElementById('btn-comprar');
+            if(btnComprar) {
+                btnComprar.onclick = () => adicionarCarrinhoLocal({
+                    id: id,
+                    nome: produto.nome,
+                    preco: preco,
+                    img: produto.urlImagem || 'assets/images/placeholder.jpg'
+                });
+            }
+
+            // Esconde loading e mostra produto
+            if(loading) loading.style.display = 'none';
+            if(container) container.style.display = 'grid'; // ou flex, dependendo do seu CSS
 
         } else {
-            document.querySelector('.product-main').innerHTML = "<h2>Produto não encontrado.</h2>";
+            console.error("Documento não existe no Firebase");
+            loading.innerHTML = "<p>Produto não encontrado ou removido.</p>";
         }
     } catch (error) {
-        console.error("Erro ao carregar:", error);
+        console.error("ERRO FATAL ao carregar detalhes:", error);
+        loading.innerHTML = `<p>Erro ao carregar: ${error.message}</p>`;
     }
 }
 
-// 3. Função para carregar Relacionados
-async function carregarRelacionados(categoria, idAtual) {
-    if(!categoria) return;
-
-    // Busca 4 produtos da mesma categoria
-    const q = query(
-        collection(db, "produtos"), 
-        where("categoria", "==", categoria),
-        limit(4)
-    );
-
-    const querySnapshot = await getDocs(q);
+// Função auxiliar de carrinho apenas para esta página
+function adicionarCarrinhoLocal(novoItem) {
+    let carrinho = JSON.parse(localStorage.getItem('dispemaq_carrinho')) || [];
+    const existente = carrinho.find(item => item.id === novoItem.id);
+    if (existente) {
+        existente.qtd++;
+    } else {
+        novoItem.qtd = 1;
+        carrinho.push(novoItem);
+    }
+    localStorage.setItem('dispemaq_carrinho', JSON.stringify(carrinho));
     
-    containerRelacionados.innerHTML = ""; // Limpa
-
-    querySnapshot.forEach((doc) => {
-        // Não mostrar o produto que já estamos vendo
-        if(doc.id === idAtual) return;
-
-        const prod = doc.data();
-        
-        // Cria o card (HTML simplificado)
-        const card = document.createElement('div');
-        card.className = 'produto-card'; // Use a mesma classe do seu CSS principal
-        card.innerHTML = `
-            <img src="${prod.imagem}" alt="${prod.nome}">
-            <h3>${prod.nome}</h3>
-            <p class="preco">R$ ${parseFloat(prod.preco).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
-            <button onclick="window.location.href='produto.html?id=${doc.id}'">Ver Detalhes</button>
-        `;
-        containerRelacionados.appendChild(card);
-    });
-
-    if(containerRelacionados.innerHTML === "") {
-        containerRelacionados.innerHTML = "<p>Nenhum produto relacionado encontrado.</p>";
-    }
+    // Efeito visual no botão
+    const btn = document.getElementById('btn-comprar');
+    btn.innerHTML = '<i class="fas fa-check"></i> Adicionado!';
+    btn.style.backgroundColor = '#1e3a8a';
+    setTimeout(() => {
+        btn.innerHTML = '<i class="fas fa-shopping-cart"></i> Adicionar ao Carrinho';
+        btn.style.backgroundColor = '';
+        // Opcional: Atualizar o badge do carrinho se recarregar ou se comunicar com main.js
+        window.location.reload(); // Recarrega para atualizar o número no header
+    }, 1000);
 }
 
-// Iniciar
-carregarProduto();
+// Inicializar
+document.addEventListener('DOMContentLoaded', carregarDetalhes);

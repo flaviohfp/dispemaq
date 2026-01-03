@@ -6,21 +6,23 @@ import { db, collection, getDocs, auth, onAuthStateChanged, signOut } from './fi
 let carrinho = JSON.parse(localStorage.getItem('dispemaq_carrinho')) || [];
 let marcaAtualSelecionada = ""; 
 
-// Variáveis do Banner (Novo)
+// Variáveis do Banner
 let bannerSlideAtual = 0;
 let bannerTotalSlides = 0;
-const bannerSlider = document.getElementById('bannerSlider');
+// Variável para controlar o timer do banner e não acumular velocidade
+window.intervaloBanner = null; 
 
 /* ============================================================
    2. CARREGAR PRODUTOS E BANNERS DO FIREBASE
    ============================================================ */
 
-// A) Carregar Produtos (Sua função original)
+// A) Carregar Produtos (ATUALIZADO COM LINKS PARA DETALHES)
+// A) Carregar Produtos (Versão corrigida: Clique na Imagem)
 async function carregarProdutosDestaque() {
     const container = document.getElementById('gradeDestaques');
     if (!container) return; 
 
-    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 20px;">Carregando destaques...</p>';
+    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 20px;">Carregando produtos...</p>';
 
     try {
         const querySnapshot = await getDocs(collection(db, "produtos"));
@@ -37,20 +39,33 @@ async function carregarProdutosDestaque() {
             const imagem = produto.urlImagem || './assets/images/placeholder.jpg';
             const preco = parseFloat(produto.preco || 0);
             
+            // LINK IMPORTANTE: Envia o ID pela URL
+            const linkDetalhes = `produto.html?id=${id}`;
+            
             const htmlProduto = `
                 <div class="card-produto">
                     <div class="produto-imagem">
                         ${produto.promocao ? '<span class="badge-desconto">Oferta</span>' : ''}
-                        <img src="${imagem}" alt="${produto.nome}">
+                        
+                        <a href="${linkDetalhes}" style="display:block; width:100%; height:100%;">
+                            <img src="${imagem}" alt="${produto.nome}" style="cursor:pointer;">
+                        </a>
                     </div>
+
                     <div class="produto-info">
                         <span class="produto-categoria">${produto.categoria || 'Peças'}</span>
-                        <h3 class="produto-nome">${produto.nome}</h3>
+                        
+                        <a href="${linkDetalhes}" style="text-decoration:none; color:inherit;">
+                            <h3 class="produto-nome">${produto.nome}</h3>
+                        </a>
+
                         <span class="produto-codigo">Cód: ${produto.codigo || '--'}</span>
+                        
                         <div class="produto-precos">
                             <span class="preco-atual">R$ ${preco.toFixed(2).replace('.', ',')}</span>
                             <span class="preco-pix"><i class="fas fa-barcode"></i> R$ ${(preco * 0.95).toFixed(2).replace('.', ',')} no PIX</span>
                         </div>
+                        
                         <div class="produto-acoes">
                             <button class="botao-adicionar" 
                                 onclick="adicionarAoCarrinho(this)"
@@ -60,7 +75,6 @@ async function carregarProdutosDestaque() {
                                 data-img="${imagem}">
                                 <i class="fas fa-shopping-cart"></i> Comprar
                             </button>
-                            <button class="botao-detalhes"><i class="fas fa-eye"></i></button>
                         </div>
                     </div>
                 </div>
@@ -69,12 +83,13 @@ async function carregarProdutosDestaque() {
         });
 
     } catch (error) {
-        console.error("Erro produtos:", error);
+        console.error("Erro ao carregar produtos:", error);
         container.innerHTML = '<p style="text-align:center;">Erro ao carregar produtos.</p>';
     }
 }
 
-// B) Carregar Banners (Novo - Adicionado para funcionar com o HTML)
+ 
+// B) Carregar Banners (Mantida original)
 async function carregarBanners() {
     const slider = document.getElementById('bannerSlider');
     const indicadores = document.getElementById('bannerIndicadores');
@@ -82,39 +97,58 @@ async function carregarBanners() {
 
     try {
         const snapshot = await getDocs(collection(db, "banners"));
+        let bannersData = [];
+
+        // Verifica se tem banners no banco. 
+        // Se NÃO tiver, cria 3 fictícios para o carrossel rodar (teste).
+        if (!snapshot.empty) {
+            snapshot.forEach(doc => bannersData.push(doc.data()));
+        } else {
+            console.log("Nenhum banner no Firebase. Usando banners de teste.");
+            bannersData = [
+                { imagem: 'https://placehold.co/1920x600/1e3a8a/FFF?text=Banner+1+-+Ofertas+da+Semana' },
+                { imagem: 'https://placehold.co/1920x600/ff6600/FFF?text=Banner+2+-+Envio+para+todo+Brasil' },
+                { imagem: 'https://placehold.co/1920x600/333333/FFF?text=Banner+3+-+Peças+Caterpillar' }
+            ];
+        }
+
+        // Limpa o HTML atual
         slider.innerHTML = '';
         if(indicadores) indicadores.innerHTML = '';
 
-        if (snapshot.empty) {
-            // Banner padrão se não tiver nada no banco
-            slider.innerHTML = '<div class="banner-item"><img src="https://placehold.co/1920x500?text=Bem-vindo+a+Dispemaq" alt="Banner Padrão"></div>';
-            return;
-        }
-
-        let index = 0;
-        snapshot.forEach((doc) => {
-            const banner = doc.data();
+        // Renderiza os Banners
+        bannersData.forEach((banner, index) => {
+            // Cria a div da imagem
             const div = document.createElement('div');
             div.className = 'banner-item';
-            div.innerHTML = `<img src="${banner.imagem}" alt="Banner Promocional">`;
+            div.innerHTML = `<img src="${banner.imagem}" alt="Banner ${index}">`;
             slider.appendChild(div);
 
+            // Cria a bolinha indicadora
             if(indicadores) {
                 const bola = document.createElement('div');
                 bola.className = `indicador ${index === 0 ? 'ativo' : ''}`;
-                const i = index; 
-                bola.onclick = () => window.irParaSlide(i);
+                // Função de clique na bolinha
+                bola.onclick = () => window.irParaSlide(index);
                 indicadores.appendChild(bola);
             }
-            index++;
         });
-        bannerTotalSlides = index;
+
+        // Configura variáveis de controle
+        bannerTotalSlides = bannersData.length;
+        bannerSlideAtual = 0;
+
+        // Inicia o Auto-Play (limpa anterior se existir)
+        if (window.intervaloBanner) clearInterval(window.intervaloBanner);
         
-        // Auto-play do banner (muda a cada 5 segundos)
-        setInterval(() => { if(bannerTotalSlides > 1) window.mudarSlide(1); }, 5000);
+        window.intervaloBanner = setInterval(() => {
+            if(bannerTotalSlides > 1) window.mudarSlide(1);
+        }, 5000); // Muda a cada 5 segundos
 
     } catch (error) {
         console.error("Erro banner:", error);
+        // Fallback visual em caso de erro grave
+        slider.innerHTML = '<div class="banner-item"><img src="https://placehold.co/1920x500?text=Erro+ao+carregar+banners" alt="Erro"></div>';
     }
 }
 
@@ -226,17 +260,20 @@ window.subirTopo = function() {
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// --- BANNER (Setas e Bolinhas) ---
+// --- BANNER (CONTROLES) ---
 window.mostrarSlide = function(index) {
     const slider = document.getElementById('bannerSlider');
     if (!slider || bannerTotalSlides === 0) return;
 
+    // Lógica circular (se passar do último, volta pro primeiro)
     if (index >= bannerTotalSlides) bannerSlideAtual = 0;
     else if (index < 0) bannerSlideAtual = bannerTotalSlides - 1;
     else bannerSlideAtual = index;
 
+    // Move o container
     slider.style.transform = `translateX(-${bannerSlideAtual * 100}%)`;
 
+    // Atualiza as bolinhas
     document.querySelectorAll('.indicador').forEach((b, i) => {
         b.classList.toggle('ativo', i === bannerSlideAtual);
     });
@@ -257,7 +294,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Inicializações
     carregarProdutosDestaque();
-    carregarBanners(); // <--- Adicionado
+    carregarBanners(); 
     atualizarBadge();
 
     // --- A. MENU "VER MAIS MARCAS" ---

@@ -1,127 +1,146 @@
-/* Container Principal */
-.product-page-container {
+/* produto.css */
+
+.pagina-produto {
     padding-top: 40px;
     padding-bottom: 60px;
 }
 
-/* Layout em Grid (2 Colunas) */
-.product-main {
+.botao-voltar {
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.produto-wrapper {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr; /* Duas colunas iguais */
     gap: 40px;
     background: #fff;
-    padding: 20px;
-    border-radius: 8px;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
 /* Imagem */
-.product-gallery {
-    text-align: center;
+.coluna-imagem {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
     border: 1px solid #eee;
-    padding: 20px;
     border-radius: 8px;
+    padding: 20px;
 }
 
-.main-img {
+.coluna-imagem img {
     max-width: 100%;
     max-height: 500px;
     object-fit: contain;
 }
 
 /* Informações */
-.product-info h1 {
-    font-size: 2rem;
-    color: #333;
-    margin: 10px 0;
-}
-
-.marca-tag {
-    background: #eee;
-    padding: 4px 10px;
+.tag-categoria {
+    background: #f4f4f4;
+    padding: 5px 10px;
     border-radius: 4px;
     font-size: 0.85rem;
+    color: #666;
     text-transform: uppercase;
-    color: #555;
-    font-weight: bold;
 }
 
-.cod-ref {
+#nome-produto {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    font-size: 2rem;
+    color: #333;
+    line-height: 1.2;
+}
+
+.codigo {
     color: #888;
-    font-size: 0.9rem;
     margin-bottom: 20px;
+    font-size: 0.9rem;
 }
 
-/* Preço */
-.price-box {
-    background: #f9f9f9;
+.box-preco {
+    background: #f9fbfd;
     padding: 20px;
     border-radius: 8px;
-    margin-bottom: 20px;
     border-left: 5px solid #ff6600;
+    margin-bottom: 25px;
 }
 
-.price {
+.preco {
+    display: block;
     font-size: 2.5rem;
     font-weight: 800;
-    color: #333;
+    color: #1e3a8a; /* Azul escuro */
 }
 
-.price-obs {
-    margin: 0;
-    color: #2ecc71; /* Verde */
+.preco-pix {
+    display: block;
+    color: #2e7d32; /* Verde */
     font-weight: 600;
+    margin-top: 5px;
 }
 
-/* Métodos de Pagamento */
-.payment-methods p {
-    margin: 8px 0;
+.parcelamento {
+    display: block;
+    font-size: 0.9rem;
     color: #666;
+    margin-top: 5px;
+}
+
+/* Botões */
+.acoes-compra {
     display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.btn-grande {
+    display: flex;
+    justify-content: center;
     align-items: center;
     gap: 10px;
-}
-
-/* Botão Comprar */
-.btn-comprar {
-    display: block;
-    width: 100%;
-    background-color: #25d366; /* Verde Zap */
-    color: white;
-    text-align: center;
-    padding: 18px;
-    font-size: 1.2rem;
+    padding: 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
     font-weight: bold;
-    border-radius: 8px;
+    cursor: pointer;
     text-decoration: none;
-    transition: 0.3s;
-    margin-top: 20px;
+    transition: 0.2s;
 }
 
-.btn-comprar:hover {
-    background-color: #1ebc57;
-    box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+.btn-grande.comprar {
+    background-color: #28a745;
+    color: white;
 }
+.btn-grande.comprar:hover { background-color: #218838; }
 
-/* Descrição */
-.product-description {
-    margin-top: 30px;
-    border-top: 1px solid #eee;
-    padding-top: 20px;
+.btn-grande.whatsapp {
+    background-color: white;
+    border: 2px solid #25D366;
+    color: #25D366;
 }
+.btn-grande.whatsapp:hover { background-color: #25D366; color: white; }
 
-/* Responsivo (Celular) */
-@media (max-width: 768px) {
-    .product-main {
-        grid-template-columns: 1fr; /* Vira 1 coluna */
-    }
-}
+/* Outros */
+.metodos-pagamento p { font-weight: bold; margin-bottom: 10px; }
+.icones-pgto { font-size: 2rem; color: #ccc; display: flex; gap: 15px; }
 
-/* Estilo Básico para os Relacionados (reaproveitando grid do site) */
-.related-section {
-    margin-top: 50px;
-}
-.related-section h2 {
+.descricao h3 {
     border-bottom: 2px solid #ff6600;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
+    display: inline-block;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+}
+
+.descricao p { line-height: 1.6; color: #555; }
+
+/* Responsivo */
+@media(max-width: 768px) {
+    .produto-wrapper { grid-template-columns: 1fr; }
+    #nome-produto { font-size: 1.5rem; }
 }

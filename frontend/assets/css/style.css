@@ -305,9 +305,7 @@ body {
     font-weight: bold;
     /* ... seus outros estilos de botão ... */
 }
-/* =========================================
-   ESTILOS ESPECÍFICOS DA HOME (INDEX)
-   ========================================= */
+
 
 /* --- MENU DE MARCAS (DROPDOWN) --- */
 #menuMarcas {
@@ -420,11 +418,11 @@ body {
     background-color: rgba(0, 0, 0, 0.5);
     color: white;
     border: none;
-    padding: 15px;
+    padding: 10px;
     cursor: pointer;
     z-index: 10;
-    border-radius: 50%;
-    font-size: 18px;
+    border-radius: 1px;
+    font-size: 15px;
     transition: background 0.3s;
 }
 
@@ -432,8 +430,8 @@ body {
     background-color: rgba(255, 102, 0, 0.8);
 }
 
-.btn-prev { left: 20px; }
-.btn-next { right: 20px; }
+.btn-prev { left: 5px; }
+.btn-next { right: 5px; }
 
 /* Indicadores (Bolinhas) */
 .indicadores {
