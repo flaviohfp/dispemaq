@@ -97,16 +97,16 @@
         </div>
 
         <div class="card-admin" style="border-left: 5px solid #007bff;">
-            <h2><i class="fas fa-images"></i> Gerenciar Carrossel</h2>
-            <p>Adicione até 5 imagens para ficarem rodando no topo do site.</p>
+            <h2><i class="fas fa-images"></i> Gerenciar Carrossel (Topo do Site)</h2>
+            <p>Adicione banners para rodar no topo da loja (Recomendado: 1920x500px).</p>
             
             <div style="display: flex; gap: 10px; align-items: flex-end; background: #f8f9fa; padding: 15px; border-radius: 5px;">
                 <div style="flex: 1;">
-                    <label style="font-weight: bold;">Adicionar Novo Banner (1920x600px)</label>
-                    <input type="file" id="arquivoBanner" accept="image/*" style="margin-top: 5px;">
+                    <label style="font-weight: bold;">Selecionar Imagem:</label>
+                    <input type="file" id="arquivoBanner" accept="image/*" style="margin-top: 5px; width: 100%;">
                 </div>
-                <button onclick="adicionarBanner()" class="btn-add" style="background-color: #007bff; margin:0; height: 40px;">
-                    <i class="fas fa-upload"></i> Enviar
+                <button type="button" id="btnUploadBanner" class="btn-add" style="background-color: #007bff; margin:0; height: 40px;">
+                    <i class="fas fa-upload"></i> Enviar Banner
                 </button>
             </div>
 
@@ -114,10 +114,10 @@
             
             <h3>Banners Ativos:</h3>
             <div id="listaBannersAdmin" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-                <p style="color: #666;">Carregando banners...</p>
+                <p style="color: #666;">Carregando lista...</p>
             </div>
         </div>
-
+        
         <div class="card-admin">
             <h2>Produtos Cadastrados</h2>
             <p id="statusCarregamento">Carregando lista...</p>

@@ -110,7 +110,7 @@ async function carregarBanners() {
             } 
             // SE NÃO, VERIFICA SE TEM URL ÚNICA (Sistema antigo - compatibilidade)
             else if (dados.url) {
-                bannersData = [{ imagem: dados.url }];
+                bannersData = [{ img: dados.url }];
             }
         } 
         
@@ -118,8 +118,8 @@ async function carregarBanners() {
         if (bannersData.length === 0) {
             console.log("Nenhum banner configurado. Usando padrão.");
             bannersData = [
-                { imagem: 'https://placehold.co/1920x600/1e3a8a/FFF?text=Banner+1+-+Ofertas+da+Semana' },
-                { imagem: 'https://placehold.co/1920x600/ff6600/FFF?text=Banner+2+-+Envio+para+todo+Brasil' }
+                { img: 'https://placehold.co/1920x600/1e3a8a/FFF?text=Banner+1+-+Ofertas+da+Semana' },
+                { img: 'https://placehold.co/1920x600/ff6600/FFF?text=Banner+2+-+Envio+para+todo+Brasil' }
             ];
         }
 
@@ -129,10 +129,13 @@ async function carregarBanners() {
 
         // Renderiza os Banners
         bannersData.forEach((banner, index) => {
+            // CORREÇÃO: Tenta ler .img (novo admin) ou .imagem (antigo), para garantir que funcione
+            const imgSrc = banner.img || banner.imagem;
+
             // Cria a Div da Imagem
             const div = document.createElement('div');
             div.className = 'banner-item';
-            div.innerHTML = `<img src="${banner.imagem}" alt="Banner ${index + 1}">`;
+            div.innerHTML = `<img src="${imgSrc}" alt="Banner ${index + 1}">`;
             slider.appendChild(div);
 
             // Cria a Bolinha (Indicador) - Só se o elemento existir no HTML

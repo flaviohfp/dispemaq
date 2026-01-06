@@ -176,6 +176,29 @@ td img {
     background-color: #c82333;
 }
 
+
+.slider-container {
+    width: 100%;
+    height: 500px; /* ou a altura que preferir */
+    position: relative;
+    overflow: hidden;
+}
+
+.slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1s ease-in-out; /* Efeito suave */
+}
+
+.slide.active {
+    opacity: 1; /* Só o banner com 'active' aparece */
+}
+
 /* --- MOBILE --- */
 @media (max-width: 650px) {
     .form-grid {
@@ -201,3 +224,5 @@ td img {
     
     td img { width: 50px; height: 50px; }
 }
+
+
