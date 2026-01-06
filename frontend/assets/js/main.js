@@ -1,4 +1,4 @@
-import { db, collection, getDocs, auth, onAuthStateChanged, signOut } from './firebase-config.js';
+import { db, collection, getDocs, doc, getDoc, auth, onAuthStateChanged, signOut } from './firebase-config.js';
 
 /* ============================================================
    1. CONFIGURAÇÃO E VARIÁVEIS GLOBAIS
@@ -9,14 +9,16 @@ let marcaAtualSelecionada = "";
 // Variáveis do Banner
 let bannerSlideAtual = 0;
 let bannerTotalSlides = 0;
-// Variável para controlar o timer do banner e não acumular velocidade
 window.intervaloBanner = null; 
+
+// Email do Admin (Deve ser igual ao cadastrado no Firebase Auth)
+const EMAIL_ADMIN = "admin@dispemaq.com"; 
 
 /* ============================================================
    2. CARREGAR PRODUTOS E BANNERS DO FIREBASE
    ============================================================ */
 
-// A) Carregar Produtos (Versão corrigida: Clique na Imagem leva aos detalhes)
+// A) Carregar Produtos
 async function carregarProdutosDestaque() {
     const container = document.getElementById('gradeDestaques');
     if (!container) return; 
@@ -32,20 +34,19 @@ async function carregarProdutosDestaque() {
             return;
         }
 
-        querySnapshot.forEach((doc) => {
-            const produto = doc.data();
-            const id = doc.id;
-            const imagem = produto.urlImagem || './assets/images/placeholder.jpg';
+        querySnapshot.forEach((docSnap) => {
+            const produto = docSnap.data();
+            const id = docSnap.id;
+            // Garante que pega a imagem nova (img) ou antiga (urlImagem)
+            const imagem = produto.img || produto.urlImagem || './assets/images/placeholder.jpg'; 
             const preco = parseFloat(produto.preco || 0);
             
-            // LINK IMPORTANTE: Envia o ID pela URL
             const linkDetalhes = `produto.html?id=${id}`;
             
             const htmlProduto = `
                 <div class="card-produto">
                     <div class="produto-imagem">
                         ${produto.promocao ? '<span class="badge-desconto">Oferta</span>' : ''}
-                        
                         <a href="${linkDetalhes}" style="display:block; width:100%; height:100%;">
                             <img src="${imagem}" alt="${produto.nome}" style="cursor:pointer;">
                         </a>
@@ -58,7 +59,7 @@ async function carregarProdutosDestaque() {
                             <h3 class="produto-nome">${produto.nome}</h3>
                         </a>
 
-                        <span class="produto-codigo">Cód: ${produto.codigo || '--'}</span>
+                        <span class="produto-codigo">Cód: ${produto.cod || produto.codigo || '--'}</span>
                         
                         <div class="produto-precos">
                             <span class="preco-atual">R$ ${preco.toFixed(2).replace('.', ',')}</span>
@@ -87,7 +88,6 @@ async function carregarProdutosDestaque() {
     }
 }
 
- 
 // B) Carregar Banners
 async function carregarBanners() {
     const slider = document.getElementById('bannerSlider');
@@ -95,19 +95,19 @@ async function carregarBanners() {
     if(!slider) return;
 
     try {
-        const snapshot = await getDocs(collection(db, "banners"));
         let bannersData = [];
 
-        // Verifica se tem banners no banco. 
-        // Se NÃO tiver, cria 3 fictícios para o carrossel rodar (teste).
-        if (!snapshot.empty) {
-            snapshot.forEach(doc => bannersData.push(doc.data()));
+        // 1. Tenta pegar o banner oficial configurado no Admin
+        const docRef = doc(db, "configuracoes", "banner_site");
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            bannersData.push({ imagem: docSnap.data().url });
         } else {
-            console.log("Nenhum banner no Firebase. Usando banners de teste.");
+            console.log("Nenhum banner configurado. Usando padrão.");
             bannersData = [
                 { imagem: 'https://placehold.co/1920x600/1e3a8a/FFF?text=Banner+1+-+Ofertas+da+Semana' },
-                { imagem: 'https://placehold.co/1920x600/ff6600/FFF?text=Banner+2+-+Envio+para+todo+Brasil' },
-                { imagem: 'https://placehold.co/1920x600/333333/FFF?text=Banner+3+-+Peças+Caterpillar' }
+                { imagem: 'https://placehold.co/1920x600/ff6600/FFF?text=Banner+2+-+Envio+para+todo+Brasil' }
             ];
         }
 
@@ -117,42 +117,39 @@ async function carregarBanners() {
 
         // Renderiza os Banners
         bannersData.forEach((banner, index) => {
-            // Cria a div da imagem
             const div = document.createElement('div');
             div.className = 'banner-item';
-            div.innerHTML = `<img src="${banner.imagem}" alt="Banner ${index}">`;
+            div.innerHTML = `<img src="${banner.imagem}" alt="Banner Principal">`;
             slider.appendChild(div);
 
-            // Cria a bolinha indicadora
-            if(indicadores) {
+            if(indicadores && bannersData.length > 1) {
                 const bola = document.createElement('div');
                 bola.className = `indicador ${index === 0 ? 'ativo' : ''}`;
-                // Função de clique na bolinha
                 bola.onclick = () => window.irParaSlide(index);
                 indicadores.appendChild(bola);
             }
         });
 
-        // Configura variáveis de controle
         bannerTotalSlides = bannersData.length;
         bannerSlideAtual = 0;
 
-        // Inicia o Auto-Play (limpa anterior se existir)
+        // Auto-Play
         if (window.intervaloBanner) clearInterval(window.intervaloBanner);
         
-        window.intervaloBanner = setInterval(() => {
-            if(bannerTotalSlides > 1) window.mudarSlide(1);
-        }, 5000); // Muda a cada 5 segundos
+        if (bannerTotalSlides > 1) {
+            window.intervaloBanner = setInterval(() => {
+                window.mudarSlide(1);
+            }, 5000);
+        }
 
     } catch (error) {
         console.error("Erro banner:", error);
-        // Fallback visual em caso de erro grave
-        slider.innerHTML = '<div class="banner-item"><img src="https://placehold.co/1920x500?text=Erro+ao+carregar+banners" alt="Erro"></div>';
+        slider.innerHTML = '<div class="banner-item"><img src="https://placehold.co/1920x500?text=Erro+ao+carregar" alt="Erro"></div>';
     }
 }
 
 /* ============================================================
-   3. FUNÇÕES GLOBAIS (Disponíveis no HTML)
+   3. FUNÇÕES GLOBAIS (CARRINHO E UI)
    ============================================================ */
 
 // --- CARRINHO ---
@@ -200,12 +197,12 @@ function renderizarCarrinho() {
             `;
         });
     }
-    // Verificação de segurança caso o elemento totalEl não exista na página
     if(totalEl) {
         totalEl.innerText = 'R$ ' + totalPreco.toFixed(2).replace('.', ',');
     }
 }
 
+// Funções Globais (window)
 window.adicionarAoCarrinho = function(el) {
     const produto = {
         id: el.getAttribute('data-id'),
@@ -257,7 +254,6 @@ window.toggleCarrinho = function(e) {
     }
 };
 
-// --- NAVEGAÇÃO / SCROLL ---
 window.subirTopo = function() {
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -265,17 +261,14 @@ window.subirTopo = function() {
 // --- BANNER (CONTROLES) ---
 window.mostrarSlide = function(index) {
     const slider = document.getElementById('bannerSlider');
-    if (!slider || bannerTotalSlides === 0) return;
+    if (!slider || bannerTotalSlides <= 1) return;
 
-    // Lógica circular (se passar do último, volta pro primeiro)
     if (index >= bannerTotalSlides) bannerSlideAtual = 0;
     else if (index < 0) bannerSlideAtual = bannerTotalSlides - 1;
     else bannerSlideAtual = index;
 
-    // Move o container
     slider.style.transform = `translateX(-${bannerSlideAtual * 100}%)`;
 
-    // Atualiza as bolinhas
     document.querySelectorAll('.indicador').forEach((b, i) => {
         b.classList.toggle('ativo', i === bannerSlideAtual);
     });
@@ -294,12 +287,12 @@ window.irParaSlide = function(index) {
    ============================================================ */
 document.addEventListener('DOMContentLoaded', function() {
     
-    // Inicializações
+    // Inicia funções principais
     carregarProdutosDestaque();
     carregarBanners(); 
     atualizarBadge();
 
-    // --- A. MENU "VER MAIS MARCAS" ---
+    // --- MENUS E INTERFACE ---
     const btnVerMais = document.getElementById("btnMarcas");
     const menuMaisMarcas = document.getElementById("menuMarcas");
     
@@ -307,8 +300,6 @@ document.addEventListener('DOMContentLoaded', function() {
         btnVerMais.addEventListener("click", function(e) {
             e.stopPropagation();
             menuMaisMarcas.classList.toggle("ativo");
-            
-            // Fecha menu de categorias para não sobrepor
             const menuCat = document.getElementById('menuCategoriasFlutuante');
             if(menuCat) menuCat.style.display = 'none';
 
@@ -320,46 +311,38 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- B. MENU DE CATEGORIAS FLUTUANTE ---
+    // --- MENU DE CATEGORIAS FLUTUANTE ---
     const menuCategorias = document.getElementById('menuCategoriasFlutuante');
     const tituloMenuCat = document.getElementById('tituloMarcaDropdown');
     const todosBotoesMarca = document.querySelectorAll('.item-marca, .marca-item');
 
-    // 1. Clique na Marca
     todosBotoesMarca.forEach(botao => {
         botao.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
 
-            // Reset visual
             todosBotoesMarca.forEach(b => {
                 b.classList.remove('selecionada');
                 b.style.backgroundColor = '';
                 b.style.color = '';
             });
 
-            // Ativa visual
             this.classList.add('selecionada');
             this.style.backgroundColor = '#ff6600';
             this.style.color = 'white';
 
-            // Dados da marca
             const marcaNome = this.getAttribute('data-marca') || this.innerText.trim();
             const marcaNomeBonito = this.innerText.trim();
             marcaAtualSelecionada = marcaNome;
 
             if(tituloMenuCat) tituloMenuCat.innerText = "Peças para " + marcaNomeBonito;
 
-            // Posiciona o Menu Flutuante
             if(menuCategorias) {
                 const rect = this.getBoundingClientRect();
                 const top = rect.bottom + window.scrollY;
                 let left = rect.left + window.scrollX;
 
-                // Ajuste se sair da tela (mobile/telas pequenas)
-                if (left + 280 > window.innerWidth) {
-                    left = window.innerWidth - 290;
-                }
+                if (left + 280 > window.innerWidth) left = window.innerWidth - 290;
                 if (left < 0) left = 10;
 
                 menuCategorias.style.top = top + 'px';
@@ -369,28 +352,21 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // 2. Clique na Categoria (Redirecionar)
     const botoesCat = document.querySelectorAll('.item-cat-dropdown');
     botoesCat.forEach(btn => {
         btn.addEventListener('click', function() {
             const categoria = this.getAttribute('data-cat');
             let url = `loja.html?marca=${encodeURIComponent(marcaAtualSelecionada)}`;
-            if(categoria !== 'todas') {
-                url += `&cat=${encodeURIComponent(categoria)}`;
-            }
+            if(categoria !== 'todas') url += `&cat=${encodeURIComponent(categoria)}`;
             window.location.href = url;
         });
     });
 
-    // 3. Fechar Menus ao clicar fora
+    // Fechar menus ao clicar fora
     document.addEventListener('click', function(e) {
-        // Fecha categorias
         if(menuCategorias && menuCategorias.style.display === 'block') {
-            if (!menuCategorias.contains(e.target)) {
-                menuCategorias.style.display = 'none';
-            }
+            if (!menuCategorias.contains(e.target)) menuCategorias.style.display = 'none';
         }
-        // Fecha "Mais Marcas"
         if(menuMaisMarcas && menuMaisMarcas.classList.contains('ativo')) {
             if (!menuMaisMarcas.contains(e.target) && e.target !== btnVerMais) {
                 menuMaisMarcas.classList.remove('ativo');
@@ -399,13 +375,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // --- C. LOGIN / LOGOUT ---
+    // --- LOGIN / LOGOUT / ADMIN BTN ---
     const btnAuth = document.getElementById('btnAuth');
     const txtAuth = document.getElementById('txtAuth');
+    const btnLinkAdmin = document.getElementById('btnLinkAdmin'); // Botão secreto
     
     onAuthStateChanged(auth, (user) => {
         if (user) {
+            // -- LOGADO --
+            
+            // 1. Muda texto para "Sair"
             if(txtAuth) txtAuth.innerText = "Sair";
+            
+            // 2. Configura botão Sair
             if(btnAuth) {
                 btnAuth.href = "#";
                 btnAuth.onclick = (e) => {
@@ -413,27 +395,37 @@ document.addEventListener('DOMContentLoaded', function() {
                     if(confirm("Sair da conta?")) signOut(auth).then(() => window.location.reload());
                 };
             }
+
+            // 3. MOSTRAR BOTÃO ADMIN (Só se for o email certo)
+            if (user.email === EMAIL_ADMIN) {
+                if(btnLinkAdmin) btnLinkAdmin.style.display = 'inline-flex';
+            } else {
+                if(btnLinkAdmin) btnLinkAdmin.style.display = 'none';
+            }
+
+            // Remove popup
             const popup = document.getElementById('popupAvisoLogin');
             if(popup) popup.style.display = 'none';
+
         } else {
+            // -- DESLOGADO --
+            
             if(txtAuth) txtAuth.innerText = "Entrar";
             if(btnAuth) {
                 btnAuth.href = "login.html";
                 btnAuth.onclick = null;
             }
-            const popup = document.getElementById('popupAvisoLogin');
-            if (popup && !sessionStorage.getItem('popupFechado')) {
-                popup.style.display = 'flex';
-            }
+            // Esconde botão admin
+            if(btnLinkAdmin) btnLinkAdmin.style.display = 'none';
         }
     });
 
-    // --- D. MENU MOBILE ---
+    // --- MENU MOBILE ---
     const btnMenu = document.getElementById('botaoMenuMobile');
     const navMenu = document.getElementById('menuNavegacao');
     if (btnMenu) btnMenu.addEventListener('click', () => navMenu.classList.toggle('ativo'));
 
-    // --- E. SCROLL TO TOP (Botão subir) ---
+    // --- BOTÃO TOPO ---
     window.addEventListener('scroll', () => {
         const btn = document.getElementById("btnTopo");
         if (btn) {

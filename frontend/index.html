@@ -11,9 +11,8 @@
     />
 
     <link rel="stylesheet" href="./assets/css/style.css" />
+ </head>
 
-    
-  </head>
   <body>
     <div class="barra-anuncio">
       <div class="container">
@@ -40,7 +39,9 @@
               id="campoBusca"
               placeholder="Buscar peça, código ou máquina..."
             />
-            <button class="botao-buscar" id="botaoBuscar"><i class="fas fa-search"></i></button>
+            <button class="botao-buscar" id="botaoBuscar">
+              <i class="fas fa-search"></i>
+            </button>
           </div>
 
           <div class="acoes-usuario">
@@ -48,7 +49,24 @@
               <i class="fas fa-user-circle" id="iconAuth"></i>
               <span id="txtAuth">Entrar</span>
             </a>
-            
+
+            <a
+              id="btnLinkAdmin"
+              href="admin.html"
+              style="
+                display: none;
+                background-color: #dc3545;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 5px;
+                text-decoration: none;
+                font-weight: bold;
+                margin-right: 10px;
+              "
+            >
+              <i class="fas fa-cogs"></i> Painel
+            </a>
+
             <a href="#" class="item-acao" onclick="toggleCarrinho(event)">
               <div class="carrinho-botao">
                 <i class="fas fa-shopping-cart"></i>
@@ -56,7 +74,10 @@
               </div>
               <span>Carrinho</span>
             </a>
-            <a href="https://wa.me/554984276503?text=Ol%C3%A1%20tudo%20bem?" class="item-acao destaque-whatsapp">
+            <a
+              href="https://wa.me/554984276503?text=Ol%C3%A1%20tudo%20bem?"
+              class="item-acao destaque-whatsapp"
+            >
               <i class="fab fa-whatsapp"></i>
               <span>Vendas</span>
             </a>
@@ -70,91 +91,99 @@
       </div>
     </header>
 
-    <nav class="menu-navegacao" id="menuNavegacao">
-    </nav>
+    <nav class="menu-navegacao" id="menuNavegacao"></nav>
 
     <div class="barra-marcas">
-      <button class="item-marca" data-marca="cnh-fiatitallis"><i></i> CNH / FIATALLIS</button>
-      <button class="item-marca" data-marca="caterpillar"><i></i> CATERPILLAR</button>
+      <button class="item-marca" data-marca="cnh-fiatitallis">
+        <i></i> CNH / FIATALLIS
+      </button>
+      <button class="item-marca" data-marca="caterpillar">
+        <i></i> CATERPILLAR
+      </button>
       <button class="item-marca" data-marca="jcb"><i></i> JCB</button>
       <button class="item-marca" data-marca="komatsu"><i></i> KOMATSU</button>
       <button class="item-marca" data-marca="hyundai"><i></i> HYUNDAI</button>
-      <button class="item-marca" data-marca="volvo-michigan"><i></i> VOLVO / MICHIGAN</button>
+      <button class="item-marca" data-marca="volvo-michigan">
+        <i></i> VOLVO / MICHIGAN
+      </button>
       <button class="item-marca" data-marca="bobcat"><i></i> BOBCAT</button>
       <button class="item-marca" data-marca="cummins"><i></i> CUMMINS</button>
-      <button class="item-marca" data-marca="doosan"><i></i> DOOSAN – DEVELON</button>
+      <button class="item-marca" data-marca="doosan">
+        <i></i> DOOSAN – DEVELON
+      </button>
       <button class="item-marca" data-marca="isuzu"><i></i> ISUZU</button>
     </div>
-    
+
     <div class="dropdown-marcas">
-        <button id="btnMarcas" class="botao-marcas">
-            <i class="fas fa-plus-circle"></i> Ver mais marcas
+      <button id="btnMarcas" class="botao-marcas">
+        <i class="fas fa-plus-circle"></i> Ver mais marcas
+      </button>
+
+      <div id="menuMarcas">
+        <button class="marca-item" data-marca="kubota">Kubota</button>
+        <button class="marca-item" data-marca="link-belt">Link-Belt</button>
+        <button class="marca-item" data-marca="massey">
+          Massey Ferguson – Maxion
         </button>
-        
-        <div id="menuMarcas">
-            <button class="marca-item" data-marca="kubota">Kubota</button>
-            <button class="marca-item" data-marca="link-belt">Link-Belt</button>
-            <button class="marca-item" data-marca="massey">Massey Ferguson – Maxion</button>
-            <button class="marca-item" data-marca="muller">Muller – Randon</button>
-            <button class="marca-item" data-marca="perkins">Perkins</button>
-            <button class="marca-item" data-marca="sany">SANY</button>
-            <button class="marca-item" data-marca="sdlg">SDLG</button>
-            <button class="marca-item" data-marca="xcmg">XCMG</button>
-        </div>
+        <button class="marca-item" data-marca="muller">Muller – Randon</button>
+        <button class="marca-item" data-marca="perkins">Perkins</button>
+        <button class="marca-item" data-marca="sany">SANY</button>
+        <button class="marca-item" data-marca="sdlg">SDLG</button>
+        <button class="marca-item" data-marca="xcmg">XCMG</button>
       </div>
+    </div>
 
     <div id="menuCategoriasFlutuante" class="menu-cat-dropdown">
-        <div class="menu-cat-header" id="tituloMarcaDropdown">Categorias</div>
-        
-        <div class="lista-cat-scroll">
-            <button class="item-cat-dropdown" data-cat="motor">
-                <i class="fas fa-cogs"></i> Motor
-            </button>
-            <button class="item-cat-dropdown" data-cat="combustivel">
-                <i class="fas fa-gas-pump"></i> Sistema de Combustível
-            </button>
-            <button class="item-cat-dropdown" data-cat="transmissao">
-                <i class="fas fa-columns"></i> Transmissão / Comando Final
-            </button>
-            <button class="item-cat-dropdown" data-cat="freios-eixos">
-                <i class="fas fa-life-ring"></i> Direção / Freios / Eixos
-            </button>
-            <button class="item-cat-dropdown" data-cat="eletrica">
-                <i class="fas fa-bolt"></i> Sistema Elétrico
-            </button>
-            <button class="item-cat-dropdown" data-cat="hidraulica">
-                <i class="fas fa-oil-can"></i> Sistema Hidráulico
-            </button>
-            <button class="item-cat-dropdown" data-cat="chassi">
-                <i class="fas fa-th-large"></i> Chassi / Estruturas
-            </button>
-            <button class="item-cat-dropdown" data-cat="cabine">
-                <i class="fas fa-chair"></i> Posto Operação / Cabine
-            </button>
-            <button class="item-cat-dropdown" data-cat="ar-condicionado">
-                <i class="fas fa-snowflake"></i> Sistema Ar Condicionado
-            </button>
-            <button class="item-cat-dropdown" data-cat="implementos">
-                <i class="fas fa-tools"></i> F.P.S. / Implementos
-            </button>
-            <button class="item-cat-dropdown" data-cat="rodante">
-                <i class="fas fa-tractor"></i> Material Rodante
-            </button>
-            
-            <button class="item-cat-dropdown destaque" data-cat="todas">
-                <strong>Ver Tudo dessa Marca</strong>
-            </button>
-        </div>
+      <div class="menu-cat-header" id="tituloMarcaDropdown">Categorias</div>
+
+      <div class="lista-cat-scroll">
+        <button class="item-cat-dropdown" data-cat="motor">
+          <i class="fas fa-cogs"></i> Motor
+        </button>
+        <button class="item-cat-dropdown" data-cat="combustivel">
+          <i class="fas fa-gas-pump"></i> Sistema de Combustível
+        </button>
+        <button class="item-cat-dropdown" data-cat="transmissao">
+          <i class="fas fa-columns"></i> Transmissão / Comando Final
+        </button>
+        <button class="item-cat-dropdown" data-cat="freios-eixos">
+          <i class="fas fa-life-ring"></i> Direção / Freios / Eixos
+        </button>
+        <button class="item-cat-dropdown" data-cat="eletrica">
+          <i class="fas fa-bolt"></i> Sistema Elétrico
+        </button>
+        <button class="item-cat-dropdown" data-cat="hidraulica">
+          <i class="fas fa-oil-can"></i> Sistema Hidráulico
+        </button>
+        <button class="item-cat-dropdown" data-cat="chassi">
+          <i class="fas fa-th-large"></i> Chassi / Estruturas
+        </button>
+        <button class="item-cat-dropdown" data-cat="cabine">
+          <i class="fas fa-chair"></i> Posto Operação / Cabine
+        </button>
+        <button class="item-cat-dropdown" data-cat="ar-condicionado">
+          <i class="fas fa-snowflake"></i> Sistema Ar Condicionado
+        </button>
+        <button class="item-cat-dropdown" data-cat="implementos">
+          <i class="fas fa-tools"></i> F.P.S. / Implementos
+        </button>
+        <button class="item-cat-dropdown" data-cat="rodante">
+          <i class="fas fa-tractor"></i> Material Rodante
+        </button>
+
+        <button class="item-cat-dropdown destaque" data-cat="todas">
+          <strong>Ver Tudo dessa Marca</strong>
+        </button>
+      </div>
     </div>
 
     <section class="secao-banner">
-        <div class="banner-container" id="bannerSlider">
-            </div>
+      <div class="banner-container" id="bannerSlider"></div>
 
-        <button class="btn-prev" onclick="mudarSlide(-1)">&#10094;</button>
-        <button class="btn-next" onclick="mudarSlide(1)">&#10095;</button>
+      <button class="btn-prev" onclick="mudarSlide(-1)">&#10094;</button>
+      <button class="btn-next" onclick="mudarSlide(1)">&#10095;</button>
 
-        <div class="indicadores" id="bannerIndicadores"></div>
+      <div class="indicadores" id="bannerIndicadores"></div>
     </section>
 
     <section class="secao-loja">
@@ -169,11 +198,12 @@
           </div>
         </div>
 
-        <div id="gradeDestaques" class="grade-produtos">
-             </div>
+        <div id="gradeDestaques" class="grade-produtos"></div>
 
         <div class="centralizado" style="margin-top: 40px">
-          <a href="loja.html" class="botao botao-outline-pequeno">Ver todos os produtos</a>
+          <a href="loja.html" class="botao botao-outline-pequeno"
+            >Ver todos os produtos</a
+          >
         </div>
       </div>
     </section>
@@ -217,73 +247,106 @@
       <div class="container conteudo-cta">
         <div class="texto-cta">
           <h2>Não encontrou a peça que precisa?</h2>
-          <p>
-             Fale com um
-            consultor agora mesmo!
-          </p>
+          <p>Fale com um consultor agora mesmo!</p>
         </div>
-        <a href="https://wa.me/554984276503?text=Ol%C3%A1%20tudo%20bem?" class="botao botao-outline botao-grande"><i class="fab fa-whatsapp"></i> Falar no WhatsApp</a>
+        <a
+          href="https://wa.me/554984276503?text=Ol%C3%A1%20tudo%20bem?"
+          class="botao botao-outline botao-grande"
+          ><i class="fab fa-whatsapp"></i> Falar no WhatsApp</a
+        >
       </div>
     </section>
 
     <section class="secao-sobre">
-        <div class="container conteudo-sobre">
-            <div class="imagem-sobre">
-                <i class="fas fa-cogs" style="font-size: 8rem; color: rgba(0, 86, 179, 0.15);"></i>
+      <div class="container conteudo-sobre">
+        <div class="imagem-sobre">
+          <i
+            class="fas fa-cogs"
+            style="font-size: 8rem; color: rgba(0, 86, 179, 0.15)"
+          ></i>
 
-                <div class="card-flutuante card-2" style="bottom: 30px; right: 30px; top: auto">
-                    <i class="fas fa-shipping-fast"></i>
-                    <div>
-                        <strong>Agilidade na Entrega</strong>
-                        <span style="display:block; font-size:0.8rem; font-weight:normal;">Para todo o Brasil</span>
-                    </div>
-                </div>
+          <div
+            class="card-flutuante card-2"
+            style="bottom: 30px; right: 30px; top: auto"
+          >
+            <i class="fas fa-shipping-fast"></i>
+            <div>
+              <strong>Agilidade na Entrega</strong>
+              <span
+                style="display: block; font-size: 0.8rem; font-weight: normal"
+                >Para todo o Brasil</span
+              >
             </div>
-
-            <div class="texto-sobre">
-                <span class="tag-secao">Quem Somos</span>
-                
-                <h2>Soluções ágeis para sua máquina não parar</h2>
-                
-                <p>
-                    Na Dispemaq, entendemos que cada hora de equipamento parado impacta o seu resultado. 
-                    Por isso, nossa missão é simples: identificar a peça correta e entregá-la com a máxima agilidade.
-                    Trabalhamos com uma seleção rigorosa de fornecedores para garantir durabilidade e desempenho.
-                </p>
-
-                <div class="lista-diferenciais">
-                    <div class="item-diferencial">
-                        <i class="fas fa-check"></i> Peças de reposição linha Premium
-                    </div>
-                    <div class="item-diferencial">
-                        <i class="fas fa-check"></i> Cotação rápida e sem burocracia
-                    </div>
-                    <div class="item-diferencial">
-                        <i class="fas fa-check"></i> Consultoria técnica na venda
-                    </div>
-                </div>
-
-                <div class="estatisticas-sobre">
-                    <div class="stat-item">
-                        <i class="fas fa-award" style="font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px;"></i>
-                        <strong>Garantia</strong>
-                        <span>Procedência</span>
-                    </div>
-                    
-                    <div class="stat-item">
-                        <i class="fas fa-map-marked-alt" style="font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px;"></i>
-                        <strong>Nacional</strong>
-                        <span>Envio p/ todo país</span>
-                    </div>
-                    
-                    <div class="stat-item">
-                        <i class="fas fa-boxes" style="font-size: 1.5rem; color: var(--primary-color); margin-bottom: 5px;"></i>
-                        <strong>Completo</strong>
-                        <span>Multimarcas</span>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
+
+        <div class="texto-sobre">
+          <span class="tag-secao">Quem Somos</span>
+
+          <h2>Soluções ágeis para sua máquina não parar</h2>
+
+          <p>
+            Na Dispemaq, entendemos que cada hora de equipamento parado impacta
+            o seu resultado. Por isso, nossa missão é simples: identificar a
+            peça correta e entregá-la com a máxima agilidade. Trabalhamos com
+            uma seleção rigorosa de fornecedores para garantir durabilidade e
+            desempenho.
+          </p>
+
+          <div class="lista-diferenciais">
+            <div class="item-diferencial">
+              <i class="fas fa-check"></i> Peças de reposição linha Premium
+            </div>
+            <div class="item-diferencial">
+              <i class="fas fa-check"></i> Cotação rápida e sem burocracia
+            </div>
+            <div class="item-diferencial">
+              <i class="fas fa-check"></i> Consultoria técnica na venda
+            </div>
+          </div>
+
+          <div class="estatisticas-sobre">
+            <div class="stat-item">
+              <i
+                class="fas fa-award"
+                style="
+                  font-size: 1.5rem;
+                  color: var(--primary-color);
+                  margin-bottom: 5px;
+                "
+              ></i>
+              <strong>Garantia</strong>
+              <span>Procedência</span>
+            </div>
+
+            <div class="stat-item">
+              <i
+                class="fas fa-map-marked-alt"
+                style="
+                  font-size: 1.5rem;
+                  color: var(--primary-color);
+                  margin-bottom: 5px;
+                "
+              ></i>
+              <strong>Nacional</strong>
+              <span>Envio p/ todo país</span>
+            </div>
+
+            <div class="stat-item">
+              <i
+                class="fas fa-boxes"
+                style="
+                  font-size: 1.5rem;
+                  color: var(--primary-color);
+                  margin-bottom: 5px;
+                "
+              ></i>
+              <strong>Completo</strong>
+              <span>Multimarcas</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section class="secao-contato">
@@ -309,7 +372,11 @@
             </div>
             <h3>WhatsApp</h3>
             <p>Atendimento rápido e envio de fotos</p>
-            <a href="https://wa.me/554984276503?text=Ol%C3%A1%20tudo%20bem?" class="link-contato">Iniciar Conversa</a>
+            <a
+              href="https://wa.me/554984276503?text=Ol%C3%A1%20tudo%20bem?"
+              class="link-contato"
+              >Iniciar Conversa</a
+            >
           </div>
 
           <div class="card-contato">
@@ -318,7 +385,6 @@
             </div>
             <h3>Atendimento</h3>
             <p>Segunda a Sexta: 07:30h às 18h</p>
-            
           </div>
         </div>
 
@@ -379,8 +445,17 @@
             <h4>Contato</h4>
             <ul class="info-rodape">
               <li><i class="fas fa-phone-alt"></i> (49) 8427-6503</li>
-              <li><i class="fab fa-whatsapp"></i> <a href="https://wa.me/554984276503?text=Ol%C3%A1%20tudo%20bem?" class="link-contato">Iniciar Conversa</a></li>
-              <li><i class="far fa-envelope"></i> comercial.dispemaq@gmail.com</li>
+              <li>
+                <i class="fab fa-whatsapp"></i>
+                <a
+                  href="https://wa.me/554984276503?text=Ol%C3%A1%20tudo%20bem?"
+                  class="link-contato"
+                  >Iniciar Conversa</a
+                >
+              </li>
+              <li>
+                <i class="far fa-envelope"></i> comercial.dispemaq@gmail.com
+              </li>
             </ul>
           </div>
         </div>
@@ -404,7 +479,7 @@
     </footer>
 
     <div class="overlay-categorias" id="overlay"></div>
-    
+
     <div class="carrinho-lateral" id="carrinhoLateral">
       <div class="carrinho-header">
         <h3><i class="fas fa-shopping-bag"></i> Seu Carrinho</h3>
@@ -412,8 +487,7 @@
           &times;
         </button>
       </div>
-      <div class="carrinho-conteudo">
-        </div>
+      <div class="carrinho-conteudo"></div>
       <div class="carrinho-footer">
         <div class="carrinho-total">
           <span>Total:</span>
@@ -434,15 +508,67 @@
       <i class="fas fa-arrow-up"></i>
     </button>
 
-    <div id="popupAvisoLogin" class="overlay-popup" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center;">
-        <div class="box-popup" style="background: white; padding: 30px; border-radius: 10px; text-align: center; max-width: 400px; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
-            <button onclick="document.getElementById('popupAvisoLogin').style.display='none'; sessionStorage.setItem('popupFechado', 'true');" style="position: absolute; top: 10px; right: 15px; border: none; background: none; font-size: 20px; cursor: pointer;">&times;</button>
-            <h3 style="color: #333; margin-bottom: 10px;">Bem-vindo à Dispemaq!</h3>
-            <p style="color: #666; margin-bottom: 20px;">Faça login para salvar seus favoritos e ver seus pedidos.</p>
-            <div>
-                <a href="login.html" style="background: #ff6600; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Entrar ou Cadastrar</a>
-            </div>
+    <div
+      id="popupAvisoLogin"
+      class="overlay-popup"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <div
+        class="box-popup"
+        style="
+          background: white;
+          padding: 30px;
+          border-radius: 10px;
+          text-align: center;
+          max-width: 400px;
+          position: relative;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        "
+      >
+        <button
+          onclick="document.getElementById('popupAvisoLogin').style.display='none'; sessionStorage.setItem('popupFechado', 'true');"
+          style="
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            border: none;
+            background: none;
+            font-size: 20px;
+            cursor: pointer;
+          "
+        >
+          &times;
+        </button>
+        <h3 style="color: #333; margin-bottom: 10px">Bem-vindo à Dispemaq!</h3>
+        <p style="color: #666; margin-bottom: 20px">
+          Faça login para salvar seus favoritos e ver seus pedidos.
+        </p>
+        <div>
+          <a
+            href="login.html"
+            style="
+              background: #ff6600;
+              color: white;
+              padding: 10px 20px;
+              text-decoration: none;
+              border-radius: 5px;
+              font-weight: bold;
+            "
+            >Entrar ou Cadastrar</a
+          >
         </div>
+      </div>
     </div>
 
     <script type="module" src="./assets/js/main.js"></script>

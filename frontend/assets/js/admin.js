@@ -1,39 +1,36 @@
 /* =========================================
-   ADMIN.JS - COMPLETO E SEGURO
-   (Proteção de Login + Produtos + Banner)
+   ADMIN.JS - CORRIGIDO E COMPLETO
+   (Firebase: Produtos + Banner Dinâmico)
    ========================================= */
 
-// 1. IMPORTAÇÕES (Incluindo Auth e SignOut)
+// 1. IMPORTAÇÕES
 import { 
     db, storage, auth, onAuthStateChanged, signOut,
-    collection, addDoc, getDocs, deleteDoc, doc, ref, uploadBytes, getDownloadURL, setDoc 
+    collection, addDoc, getDocs, deleteDoc, doc, ref, uploadBytes, getDownloadURL, setDoc, getDoc
 } from './firebase-config.js';
 
 const prodCollection = collection(db, "produtos");
 
-// 2. CONFIGURAÇÃO DE SEGURANÇA (O GUARDIÃO)
-// Troque pelo e-mail que você criou para seu cliente no Firebase
+// 2. CONFIGURAÇÃO DE SEGURANÇA
 const EMAIL_ADMIN = "admin@dispemaq.com"; 
 
 onAuthStateChanged(auth, (user) => {
     if (!user) {
-        // Se ninguém estiver logado -> Manda pro Login
         window.location.href = "login.html";
     } else if (user.email !== EMAIL_ADMIN) {
-        // Se estiver logado, mas não for o dono -> Manda pra Loja
         alert("Acesso Negado: Área restrita ao administrador.");
         window.location.href = "loja.html";
     } else {
-        // Se for o dono -> Libera o uso e carrega os produtos
-        console.log("Acesso Admin Liberado para: ", user.email);
+        console.log("Admin logado:", user.email);
         carregarProdutos(); 
+        carregarBannerNaTela(); // <--- NOVA FUNÇÃO PARA MOSTRAR O BANNER
     }
 });
 
-// 3. LOGICA DA PÁGINA (Botões e Formulários)
+// 3. EVENTOS (DOM LOADED)
 document.addEventListener("DOMContentLoaded", () => {
     
-    // Botão de Sair (Logout) - Caso você adicione no HTML depois
+    // Logout
     const btnLogout = document.getElementById("btnLogout");
     if(btnLogout) {
         btnLogout.addEventListener("click", async () => {
@@ -42,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // EVENTO: CADASTRAR PRODUTO
+    // Cadastrar Produto
     const form = document.getElementById("formProduto");
     if(form) {
         form.addEventListener("submit", async (e) => {
@@ -51,37 +48,45 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // EVENTO: ATUALIZAR BANNER
+    // Salvar Banner (Agora previne o refresh da página)
     const btnBanner = document.getElementById("btnSalvarBanner");
     if(btnBanner) {
-        btnBanner.addEventListener("click", atualizarBannerSite);
+        btnBanner.addEventListener("click", async (e) => {
+            e.preventDefault(); // Impede o formulário de recarregar a página
+            await atualizarBannerSite();
+        });
     }
 
-    // EVENTO: DELETAR PRODUTO (Delegação de Eventos)
+    // Deletar Produto (Delegação de Eventos)
     const tabela = document.getElementById("tabelaProdutos");
     if(tabela) {
         tabela.addEventListener("click", async (e) => {
-            // Verifica se clicou no botão de deletar ou no ícone dentro dele
             const btn = e.target.closest(".btn-delete");
-            
             if (btn) {
                 const id = btn.dataset.id;
-                if(id) {
-                    await deletarProduto(id, btn);
-                }
+                if(id) await deletarProduto(id, btn);
+            }
+        });
+    }
+
+    // Deletar Banner (Delegação de Eventos)
+    const listaBanners = document.getElementById("listaBanners");
+    if(listaBanners) {
+        listaBanners.addEventListener("click", async (e) => {
+            if(e.target.closest(".btn-delete-banner")) {
+                await deletarBanner();
             }
         });
     }
 });
 
 /* ----------------------------------------------------------------
-   FUNÇÃO 1: CADASTRAR PRODUTO (Completa)
+   FUNÇÕES DE PRODUTOS (Mantidas iguais, pois estavam boas)
    ---------------------------------------------------------------- */
 async function cadastrarComFoto() {
     const btn = document.querySelector('.btn-add');
     const textoOriginal = btn.innerHTML;
     
-    // Pega os dados do formulário
     const nome = document.getElementById('nome').value;
     const cod = document.getElementById('cod').value;
     const marca = document.getElementById('marca').value;
@@ -95,21 +100,16 @@ async function cadastrarComFoto() {
     }
 
     try {
-        btn.innerHTML = "Enviando foto...";
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
         btn.disabled = true;
 
         const arquivo = arquivoInput.files[0];
-        // Cria nome único para a imagem
         const nomeArquivo = `produtos/${Date.now()}-${arquivo.name}`;
         
-        // 1. Upload da Imagem
         const storageRef = ref(storage, nomeArquivo);
         await uploadBytes(storageRef, arquivo);
         const urlFoto = await getDownloadURL(storageRef);
 
-        btn.innerHTML = "Salvando dados...";
-
-        // 2. Salva no Firestore
         await addDoc(prodCollection, {
             nome: nome,
             cod: cod,
@@ -122,7 +122,7 @@ async function cadastrarComFoto() {
 
         alert("Produto cadastrado com sucesso!");
         document.getElementById("formProduto").reset(); 
-        carregarProdutos(); // Atualiza a tabela
+        carregarProdutos(); 
 
     } catch (error) {
         console.error("Erro ao cadastrar:", error);
@@ -133,15 +133,12 @@ async function cadastrarComFoto() {
     }
 }
 
-/* ----------------------------------------------------------------
-   FUNÇÃO 2: LISTAR PRODUTOS NA TABELA
-   ---------------------------------------------------------------- */
 async function carregarProdutos() {
     const tbody = document.getElementById("tabelaProdutos");
     const status = document.getElementById("statusCarregamento");
     
     if(!tbody) return;
-    tbody.innerHTML = ""; // Limpa a tabela antes de encher
+    tbody.innerHTML = ""; 
 
     try {
         const querySnapshot = await getDocs(prodCollection);
@@ -155,24 +152,16 @@ async function carregarProdutos() {
 
         querySnapshot.forEach((docItem) => {
             const produto = docItem.data();
-            const id = docItem.id; // ID do Firebase
+            const id = docItem.id; 
 
             const tr = document.createElement("tr");
             tr.innerHTML = `
-                <td>
-                    <img src="${produto.img}" alt="foto" style="width:50px; height:50px; object-fit:cover; border-radius:4px;">
-                </td>
-                <td>
-                    <strong>${produto.nome}</strong><br>
-                    <small style="color:#666">${produto.cod || '-'}</small>
-                </td>
-                <td>
-                    <span style="text-transform:capitalize">${produto.marca}</span> / 
-                    <small>${produto.categoria}</small>
-                </td>
+                <td><img src="${produto.img}" style="width:50px; height:50px; object-fit:cover; border-radius:4px;"></td>
+                <td><strong>${produto.nome}</strong><br><small style="color:#666">${produto.cod || '-'}</small></td>
+                <td><span style="text-transform:capitalize">${produto.marca}</span></td>
                 <td style="color:#28a745; font-weight:bold;">R$ ${produto.preco}</td>
                 <td>
-                    <button class="btn-delete" data-id="${id}" style="cursor:pointer; background:red; color:white; border:none; width:35px; height:35px; border-radius:4px; display:flex; align-items:center; justify-content:center;">
+                    <button class="btn-delete" data-id="${id}" style="background:red; color:white; border:none; width:30px; height:30px; border-radius:4px; cursor:pointer;">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -182,37 +171,26 @@ async function carregarProdutos() {
 
     } catch (error) {
         console.error("Erro ao listar:", error);
-        if(status) status.innerText = "Erro ao carregar lista.";
     }
 }
 
-/* ----------------------------------------------------------------
-   FUNÇÃO 3: DELETAR PRODUTO (Remover)
-   ---------------------------------------------------------------- */
 async function deletarProduto(id, botao) {
-    if(confirm("Tem certeza que deseja excluir este produto do estoque?")) {
+    if(confirm("Excluir este produto?")) {
         try {
-            console.log("Tentando deletar ID:", id);
-            
-            // Remove do Banco
             await deleteDoc(doc(db, "produtos", id));
-            
-            // Remove da Tela (Visual)
-            const linha = botao.closest("tr");
-            linha.remove();
-            
-            alert("Produto excluído com sucesso!");
-
+            botao.closest("tr").remove();
+            alert("Produto excluído!");
         } catch (error) {
-            console.error("Erro ao deletar:", error);
             alert("Erro ao excluir: " + error.message);
         }
     }
 }
 
 /* ----------------------------------------------------------------
-   FUNÇÃO 4: ATUALIZAR BANNER (Nova)
+   FUNÇÕES DO BANNER (Corrigidas e Integradas com HTML)
    ---------------------------------------------------------------- */
+
+// 1. ATUALIZAR (Upload + Salvar no Firestore)
 async function atualizarBannerSite() {
     const input = document.getElementById("arquivoBanner");
     const btn = document.getElementById("btnSalvarBanner");
@@ -229,28 +207,82 @@ async function atualizarBannerSite() {
         btn.innerHTML = "Enviando...";
         btn.disabled = true;
 
-        // 1. Salva no Storage (sempre sobrescreve o arquivo 'banner_oficial')
-        const storageRef = ref(storage, 'config_site/banner_oficial');
+        // Dica: Usar Date.now() no nome evita cache do navegador ao trocar imagem
+        const nomeArquivo = `config_site/banner_oficial_${Date.now()}`; 
+        
+        // 1. Upload
+        const storageRef = ref(storage, nomeArquivo);
         await uploadBytes(storageRef, arquivo);
         
-        // 2. Pega o link novo
+        // 2. Pegar URL
         const urlBanner = await getDownloadURL(storageRef);
 
-        // 3. Salva link no Banco de Dados
+        // 3. Atualizar documento de Configuração
         await setDoc(doc(db, "configuracoes", "banner_site"), {
             url: urlBanner,
             atualizado_em: new Date()
         });
 
-        alert("Banner atualizado! Vá na loja conferir.");
+        alert("Banner atualizado com sucesso!");
         input.value = ""; 
+        carregarBannerNaTela(); // Atualiza a visualização na hora
 
         btn.innerHTML = textoOriginal;
         btn.disabled = false;
 
     } catch (error) {
         console.error("Erro no banner:", error);
-        alert("Erro ao atualizar banner: " + error.message);
+        alert("Erro: " + error.message);
         btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-upload"></i> Enviar Banner';
+    }
+}
+
+// 2. CARREGAR (Mostrar o banner atual na div #listaBanners)
+async function carregarBannerNaTela() {
+    const container = document.getElementById("listaBanners");
+    if(!container) return;
+
+    try {
+        container.innerHTML = "Buscando banner...";
+        const docRef = doc(db, "configuracoes", "banner_site");
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const dados = docSnap.data();
+            
+            container.innerHTML = `
+                <div style="position: relative; width: 300px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+                    <img src="${dados.url}" style="width: 100%; height: auto; display: block;">
+                    <div style="padding: 10px; background: #fff; text-align: center;">
+                        <small style="color: green; font-weight: bold;">Ativo no Site</small>
+                        <br>
+                        <button class="btn-delete-banner" style="margin-top: 5px; background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                            <i class="fas fa-trash"></i> Remover Banner
+                        </button>
+                    </div>
+                </div>
+            `;
+        } else {
+            container.innerHTML = "<p>Nenhum banner configurado.</p>";
+        }
+    } catch (error) {
+        console.error("Erro ao carregar banner:", error);
+        container.innerHTML = "<p>Erro ao carregar.</p>";
+    }
+}
+
+// 3. DELETAR BANNER
+async function deletarBanner() {
+    if(confirm("Tem certeza que deseja remover o banner do site?")) {
+        try {
+            // Remove o documento de configuração (o site ficará sem banner)
+            await deleteDoc(doc(db, "configuracoes", "banner_site"));
+            carregarBannerNaTela(); // Atualiza tela
+            alert("Banner removido!");
+        } catch (error) {
+            console.error(error);
+            alert("Erro ao remover.");
+        }
     }
 }
