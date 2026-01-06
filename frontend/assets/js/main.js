@@ -1,4 +1,4 @@
-import { db, collection, getDocs, doc, getDoc, auth, onAuthStateChanged, signOut } from './firebase-config.js';
+import { db, collection, getDocs, doc, getDoc, auth, onAuthStateChanged, signOut, query, limit } from './firebase-config.js';
 
 /* ============================================================
    1. CONFIGURAÇÃO E VARIÁVEIS GLOBAIS
@@ -15,22 +15,31 @@ window.intervaloBanner = null;
 const EMAIL_ADMIN = "admin@dispemaq.com"; 
 
 /* ============================================================
-   2. CARREGAR PRODUTOS E BANNERS DO FIREBASE
+   2. CARREGAR PRODUTOS (COM LIMITAÇÃO) E BANNERS
    ============================================================ */
 
-// A) Carregar Produtos
+// A) Carregar Produtos (OTIMIZADO PARA ESCALABILIDADE)
 async function carregarProdutosDestaque() {
     const container = document.getElementById('gradeDestaques');
     if (!container) return; 
 
-    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 20px;">Carregando produtos...</p>';
+    // Loader simples enquanto carrega
+    container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px;"><i class="fas fa-spinner fa-spin fa-2x"></i><p>Carregando destaques...</p></div>';
 
     try {
-        const querySnapshot = await getDocs(collection(db, "produtos"));
+        // --- QUERY OTIMIZADA: Traz apenas 12 produtos para não pesar ---
+        const q = query(
+            collection(db, "produtos"),
+            limit(12) 
+        );
+        
+        const querySnapshot = await getDocs(q);
+        // ---------------------------------------------------------------
+
         container.innerHTML = ''; 
 
         if (querySnapshot.empty) {
-            container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Nenhum produto cadastrado.</p>';
+            container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Nenhum produto em destaque no momento.</p>';
             return;
         }
 
@@ -48,7 +57,7 @@ async function carregarProdutosDestaque() {
                     <div class="produto-imagem">
                         ${produto.promocao ? '<span class="badge-desconto">Oferta</span>' : ''}
                         <a href="${linkDetalhes}" style="display:block; width:100%; height:100%;">
-                            <img src="${imagem}" alt="${produto.nome}" style="cursor:pointer;">
+                            <img src="${imagem}" alt="${produto.nome}" loading="lazy">
                         </a>
                     </div>
 
@@ -82,13 +91,22 @@ async function carregarProdutosDestaque() {
             container.innerHTML += htmlProduto;
         });
 
+        // Adiciona botão para ver o catálogo completo
+        container.innerHTML += `
+            <div style="grid-column: 1/-1; text-align: center; margin-top: 30px; margin-bottom: 20px;">
+                <a href="loja.html" class="cta-button" style="text-decoration: none; padding: 12px 30px; border-radius: 5px;">
+                    Ver Catálogo Completo <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        `;
+
     } catch (error) {
         console.error("Erro ao carregar produtos:", error);
         container.innerHTML = '<p style="text-align:center;">Erro ao carregar produtos.</p>';
     }
 }
 
-// B) Carregar Banners (ATUALIZADO PARA LISTA MÚLTIPLA)
+// B) Carregar Banners
 async function carregarBanners() {
     const slider = document.getElementById('bannerSlider');
     const indicadores = document.getElementById('bannerIndicadores');
@@ -129,7 +147,6 @@ async function carregarBanners() {
 
         // Renderiza os Banners
         bannersData.forEach((banner, index) => {
-            // CORREÇÃO: Tenta ler .img (novo admin) ou .imagem (antigo), para garantir que funcione
             const imgSrc = banner.img || banner.imagem;
 
             // Cria a Div da Imagem
@@ -138,7 +155,7 @@ async function carregarBanners() {
             div.innerHTML = `<img src="${imgSrc}" alt="Banner ${index + 1}">`;
             slider.appendChild(div);
 
-            // Cria a Bolinha (Indicador) - Só se o elemento existir no HTML
+            // Cria a Bolinha (Indicador)
             if(indicadores) {
                 const bola = document.createElement('div');
                 bola.className = `indicador ${index === 0 ? 'ativo' : ''}`;
@@ -151,7 +168,7 @@ async function carregarBanners() {
         bannerTotalSlides = bannersData.length;
         bannerSlideAtual = 0;
 
-        // Auto-Play: Limpa anterior e inicia novo se tiver mais de 1 slide
+        // Auto-Play
         if (window.intervaloBanner) clearInterval(window.intervaloBanner);
         
         if (bannerTotalSlides > 1) {
@@ -360,6 +377,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const top = rect.bottom + window.scrollY;
                 let left = rect.left + window.scrollX;
 
+                // Ajuste para não estourar a tela na direita
                 if (left + 280 > window.innerWidth) left = window.innerWidth - 290;
                 if (left < 0) left = 10;
 
@@ -374,6 +392,7 @@ document.addEventListener('DOMContentLoaded', function() {
     botoesCat.forEach(btn => {
         btn.addEventListener('click', function() {
             const categoria = this.getAttribute('data-cat');
+            // Redirecionamento correto para loja.html com filtros na URL
             let url = `loja.html?marca=${encodeURIComponent(marcaAtualSelecionada)}`;
             if(categoria !== 'todas') url += `&cat=${encodeURIComponent(categoria)}`;
             window.location.href = url;
@@ -396,16 +415,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- LOGIN / LOGOUT / ADMIN BTN ---
     const btnAuth = document.getElementById('btnAuth');
     const txtAuth = document.getElementById('txtAuth');
-    const btnLinkAdmin = document.getElementById('btnLinkAdmin'); // Botão secreto
+    const btnLinkAdmin = document.getElementById('btnLinkAdmin'); 
     
     onAuthStateChanged(auth, (user) => {
         if (user) {
             // -- LOGADO --
-            
-            // 1. Muda texto para "Sair"
             if(txtAuth) txtAuth.innerText = "Sair";
             
-            // 2. Configura botão Sair
             if(btnAuth) {
                 btnAuth.href = "#";
                 btnAuth.onclick = (e) => {
@@ -414,26 +430,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
             }
 
-            // 3. MOSTRAR BOTÃO ADMIN (Só se for o email certo)
+            // MOSTRAR BOTÃO ADMIN (Só se for o email certo)
             if (user.email === EMAIL_ADMIN) {
                 if(btnLinkAdmin) btnLinkAdmin.style.display = 'inline-flex';
             } else {
                 if(btnLinkAdmin) btnLinkAdmin.style.display = 'none';
             }
 
-            // Remove popup
             const popup = document.getElementById('popupAvisoLogin');
             if(popup) popup.style.display = 'none';
 
         } else {
             // -- DESLOGADO --
-            
             if(txtAuth) txtAuth.innerText = "Entrar";
             if(btnAuth) {
                 btnAuth.href = "login.html";
                 btnAuth.onclick = null;
             }
-            // Esconde botão admin
             if(btnLinkAdmin) btnLinkAdmin.style.display = 'none';
         }
     });

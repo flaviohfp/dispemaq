@@ -13,9 +13,11 @@
     --cinza-medio: #6b7280;
     --cinza-claro: #f9fafb;
     --branco: #ffffff;
+    --preto: #000000;
     --sombra-leve: 0 1px 3px rgba(0,0,0,0.1);
     --sombra-media: 0 4px 6px rgba(0,0,0,0.1);
     --sombra-forte: 0 10px 15px rgba(0,0,0,0.1);
+    
 }
 
 body {
@@ -48,7 +50,7 @@ body {
 
 /* ===== CABEÇALHO ===== */
 .cabecalho-principal {
-    background: var(--branco);
+    background: var(--cinza-escuro);
     box-shadow: var(--sombra-media);
     position: sticky;
     top: 0;
@@ -127,7 +129,7 @@ body {
     padding: 8px 15px;
     border-radius: 8px;
     text-decoration: none;
-    color: var(--cinza-escuro);
+    color: var(--branco);
     transition: 0.3s;
     font-size: 0.85rem;
 }
@@ -433,30 +435,6 @@ body {
 .btn-prev { left: 5px; }
 .btn-next { right: 5px; }
 
-/* Indicadores (Bolinhas) */
-.indicadores {
-    position: absolute;
-    bottom: 15px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 10px;
-    z-index: 10;
-}
-
-.indicador {
-    width: 12px;
-    height: 12px;
-    background-color: rgba(255, 255, 255, 0.5);
-    border-radius: 50%;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.indicador.ativo {
-    background-color: #ff6600;
-    transform: scale(1.2);
-}
 
 @media (max-width: 768px) {
     .banner-item img {
@@ -1584,7 +1562,7 @@ body {
 
 .divisor-rodape {
     height: 1px;
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
     margin: 30px 0;
 }
 
