@@ -15,7 +15,7 @@ window.intervaloBanner = null;
 const EMAIL_ADMIN = "admin@dispemaq.com"; 
 
 /* ============================================================
-   2. CARREGAR PRODUTOS E BANNERS
+   2. CARREGAR PRODUTOS (COM LIMITAÇÃO) E BANNERS
    ============================================================ */
 
 // A) Carregar Produtos
@@ -32,7 +32,7 @@ async function carregarProdutosDestaque() {
         container.innerHTML = ''; 
 
         if (querySnapshot.empty) {
-            container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Nenhum produto em destaque.</p>';
+            container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Nenhum produto em destaque no momento.</p>';
             return;
         }
 
@@ -63,7 +63,7 @@ async function carregarProdutosDestaque() {
                         </div>
                         <div class="produto-acoes">
                             <button class="botao-adicionar" 
-                                onclick="adicionarAoCarrinho(this)"
+                                onclick="window.adicionarAoCarrinho(this)"
                                 data-id="${id}"
                                 data-nome="${produto.nome}"
                                 data-preco="${preco}"
@@ -86,7 +86,7 @@ async function carregarProdutosDestaque() {
         `;
 
     } catch (error) {
-        console.error("Erro produtos:", error);
+        console.error("Erro ao carregar produtos:", error);
         container.innerHTML = '<p style="text-align:center;">Erro ao carregar produtos.</p>';
     }
 }
@@ -113,7 +113,8 @@ async function carregarBanners() {
         
         if (bannersData.length === 0) {
             bannersData = [
-                { img: 'https://placehold.co/1920x600/1e3a8a/FFF?text=Banner+Padrão' }
+                { img: 'https://placehold.co/1920x600/1e3a8a/FFF?text=Banner+1' },
+                { img: 'https://placehold.co/1920x600/ff6600/FFF?text=Banner+2' }
             ];
         }
 
@@ -121,9 +122,10 @@ async function carregarBanners() {
         if(indicadores) indicadores.innerHTML = '';
 
         bannersData.forEach((banner, index) => {
+            const imgSrc = banner.img || banner.imagem;
             const div = document.createElement('div');
             div.className = 'banner-item';
-            div.innerHTML = `<img src="${banner.img || banner.imagem}" alt="Banner ${index + 1}">`;
+            div.innerHTML = `<img src="${imgSrc}" alt="Banner ${index + 1}">`;
             slider.appendChild(div);
 
             if(indicadores) {
@@ -139,10 +141,13 @@ async function carregarBanners() {
 
         if (window.intervaloBanner) clearInterval(window.intervaloBanner);
         if (bannerTotalSlides > 1) {
-            window.intervaloBanner = setInterval(() => { window.mudarSlide(1); }, 5000);
+            window.intervaloBanner = setInterval(() => {
+                window.mudarSlide(1);
+            }, 5000);
         }
-
-    } catch (error) { console.error("Erro banner:", error); }
+    } catch (error) {
+        console.error("Erro banner:", error);
+    }
 }
 
 /* ============================================================
@@ -182,22 +187,26 @@ function renderizarCarrinho() {
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <span style="font-weight: bold; color: #1e3a8a;">R$ ${(item.preco * item.qtd).toFixed(2).replace('.',',')}</span>
                             <div style="border: 1px solid #ddd; border-radius: 4px; display:flex;">
-                                <button onclick="alterarQuantidade('${item.id}', 'diminuir')" style="border:none; background:none; padding: 2px 8px; cursor:pointer;">-</button>
+                                <button onclick="window.alterarQuantidade('${item.id}', 'diminuir')" style="border:none; background:none; padding: 2px 8px; cursor:pointer;">-</button>
                                 <span style="font-size: 0.8rem; padding: 2px 5px;">${item.qtd}</span>
-                                <button onclick="alterarQuantidade('${item.id}', 'aumentar')" style="border:none; background:none; padding: 2px 8px; cursor:pointer;">+</button>
+                                <button onclick="window.alterarQuantidade('${item.id}', 'aumentar')" style="border:none; background:none; padding: 2px 8px; cursor:pointer;">+</button>
                             </div>
                         </div>
                     </div>
-                    <button onclick="removerItem('${item.id}')" style="border:none; background:none; color: red; cursor:pointer;"><i class="fas fa-trash"></i></button>
+                    <button onclick="window.removerItem('${item.id}')" style="border:none; background:none; color: red; cursor:pointer;"><i class="fas fa-trash"></i></button>
                 </div>
             `;
         });
     }
-    if(totalEl) totalEl.innerText = 'R$ ' + totalPreco.toFixed(2).replace('.', ',');
+    if(totalEl) {
+        totalEl.innerText = 'R$ ' + totalPreco.toFixed(2).replace('.', ',');
+    }
 }
 
-// Helpers Globais
+// === EXPORTANDO FUNÇÕES PARA O WINDOW PARA O HTML ACESSAR ===
+
 window.adicionarAoCarrinho = function(el) {
+    // Se o elemento vir do onclick(this), ele é o botão.
     const produto = {
         id: el.getAttribute('data-id'),
         nome: el.getAttribute('data-nome'),
@@ -205,13 +214,19 @@ window.adicionarAoCarrinho = function(el) {
         img: el.getAttribute('data-img'),
         qtd: 1
     };
+
     const existente = carrinho.find(i => i.id === produto.id);
     if (existente) existente.qtd++;
     else carrinho.push(produto);
+
     atualizarBadge();
     renderizarCarrinho();
-    document.getElementById("carrinhoLateral").classList.add("aberto");
-    document.getElementById("overlay").classList.add("ativo");
+    
+    // Força abertura do carrinho
+    const car = document.getElementById("carrinhoLateral");
+    const over = document.getElementById("overlay");
+    if(car) car.classList.add("aberto");
+    if(over) over.classList.add("ativo");
 };
 
 window.alterarQuantidade = function(id, acao) {
@@ -236,148 +251,209 @@ window.toggleCarrinho = function(e) {
     if(e) e.preventDefault();
     const car = document.getElementById("carrinhoLateral");
     const over = document.getElementById("overlay");
-    if(car.classList.contains("aberto")) {
-        car.classList.remove("aberto");
-        over.classList.remove("ativo");
+    
+    if (car) {
+        if(car.classList.contains("aberto")) {
+            car.classList.remove("aberto");
+            if(over) over.classList.remove("ativo");
+        } else {
+            renderizarCarrinho();
+            car.classList.add("aberto");
+            if(over) over.classList.add("ativo");
+        }
     } else {
-        renderizarCarrinho();
-        car.classList.add("aberto");
-        over.classList.add("ativo");
+        console.error("Elemento carrinhoLateral não encontrado no HTML");
     }
 };
 
-window.subirTopo = function() { window.scrollTo({ top: 0, behavior: "smooth" }); }
+window.subirTopo = function() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
 
-// Banner Controles
+// --- BANNER CONTROLES ---
 window.mostrarSlide = function(index) {
     const slider = document.getElementById('bannerSlider');
     if (!slider || bannerTotalSlides <= 1) return;
+
     if (index >= bannerTotalSlides) bannerSlideAtual = 0;
     else if (index < 0) bannerSlideAtual = bannerTotalSlides - 1;
     else bannerSlideAtual = index;
+
     slider.style.transform = `translateX(-${bannerSlideAtual * 100}%)`;
+
     document.querySelectorAll('.indicador').forEach((b, i) => {
         b.classList.toggle('ativo', i === bannerSlideAtual);
     });
 }
-window.mudarSlide = function(direcao) { window.mostrarSlide(bannerSlideAtual + direcao); }
-window.irParaSlide = function(index) { window.mostrarSlide(index); }
+window.mudarSlide = (d) => window.mostrarSlide(bannerSlideAtual + d);
+window.irParaSlide = (i) => window.mostrarSlide(i);
+
 
 /* ============================================================
    4. INICIALIZAÇÃO (DOM READY)
    ============================================================ */
 document.addEventListener('DOMContentLoaded', function() {
     
-    // Inicia funções básicas
+    // Inicia funções
     carregarProdutosDestaque();
     carregarBanners(); 
     atualizarBadge();
 
-    // =================================================================
-    // >>> CORREÇÃO PARA OS BOTÕES DE MARCAS NA HOME <<<
-    // =================================================================
-    
-    // 1. CLIQUE NO CARD DA MARCA (Redirecionar para Loja)
-    const marcasCards = document.querySelectorAll('.card-marca');
-    marcasCards.forEach(card => {
-        // Garante que o cursor pareça clicável
-        card.style.cursor = "pointer";
-        
-        card.addEventListener('click', function() {
-            const marca = this.getAttribute('data-marca');
-            if (marca) {
-                console.log("Indo para loja, marca:", marca);
-                window.location.href = `loja.html?marca=${encodeURIComponent(marca)}`;
-            } else {
-                console.warn("Card sem data-marca definido.");
-            }
-        });
-    });
-
-    // 2. BOTÃO "VER MAIS MARCAS" (Correção de ID)
-    // Tenta pegar pelo ID que você usou no HTML novo (btnVerMaisMarcasHome) 
-    // OU pelo ID antigo (btnMarcas) caso não tenha atualizado o HTML.
-    const btnVerMais = document.getElementById("btnVerMaisMarcasHome") || document.getElementById("btnMarcas");
-    const menuMaisMarcas = document.getElementById("marcasEscondidasHome") || document.getElementById("menuMarcas");
+    // 1. Lógica do Botão "Ver Mais Marcas"
+    const btnVerMais = document.getElementById("btnMarcas");
+    const menuMaisMarcas = document.getElementById("menuMarcas");
     
     if (btnVerMais && menuMaisMarcas) {
         btnVerMais.addEventListener("click", function(e) {
-            e.preventDefault();
+            e.preventDefault(); 
+            e.stopPropagation();
             
-            // Verifica se está visível (block, flex ou grid)
-            const estiloDisplay = window.getComputedStyle(menuMaisMarcas).display;
-            const estaVisivel = estiloDisplay !== 'none';
+            // Alterna a classe que mostra/esconde (conforme seu CSS)
+            menuMaisMarcas.classList.toggle("ativo");
+            
+            // Esconde o menu flutuante de categorias para não atrapalhar
+            const menuCat = document.getElementById('menuCategoriasFlutuante');
+            if(menuCat) menuCat.style.display = 'none';
 
-            if (estaVisivel) {
-                menuMaisMarcas.style.display = 'none';
-                btnVerMais.innerHTML = 'Ver todas as marcas <i class="fas fa-chevron-down"></i>';
-            } else {
-                // Abre como grid (ou flex, dependendo do seu CSS original)
-                menuMaisMarcas.style.display = 'grid'; 
-                btnVerMais.innerHTML = 'Ver menos <i class="fas fa-chevron-up"></i>';
-            }
+            // Muda o texto do botão
+            const icone = menuMaisMarcas.classList.contains("ativo") ? "minus" : "plus";
+            const texto = menuMaisMarcas.classList.contains("ativo") ? "Ver menos" : "Ver mais marcas";
+            btnVerMais.innerHTML = `<i class="fas fa-${icone}-circle"></i> ${texto}`;
         });
     }
-    // =================================================================
 
-    // --- MANTENDO O MENU FLUTUANTE (Para o Header/Navbar) ---
+    // 2. Lógica de Clicar na Marca -> Abrir Menu Flutuante
     const menuCategorias = document.getElementById('menuCategoriasFlutuante');
     const tituloMenuCat = document.getElementById('tituloMarcaDropdown');
-    const todosBotoesMarca = document.querySelectorAll('.item-marca, .marca-item'); // Navbar items
+    // Pegamos todos os botões, inclusive os que estão dentro do menu oculto
+    const todosBotoesMarca = document.querySelectorAll('.item-marca, .marca-item');
 
     todosBotoesMarca.forEach(botao => {
         botao.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
 
+            // Remove seleção visual dos outros
             todosBotoesMarca.forEach(b => {
                 b.classList.remove('selecionada');
                 b.style.backgroundColor = '';
                 b.style.color = '';
             });
 
+            // Adiciona seleção neste
             this.classList.add('selecionada');
+            // Mantendo seu estilo inline, mas o ideal seria via CSS
             this.style.backgroundColor = '#ff6600';
             this.style.color = 'white';
 
+            // Pega dados da marca
             const marcaNome = this.getAttribute('data-marca') || this.innerText.trim();
             const marcaNomeBonito = this.innerText.trim();
             marcaAtualSelecionada = marcaNome;
 
             if(tituloMenuCat) tituloMenuCat.innerText = "Peças para " + marcaNomeBonito;
 
+            // Posicionamento do Menu Flutuante
             if(menuCategorias) {
+                // Calcula posição baseado no botão clicado
                 const rect = this.getBoundingClientRect();
-                const top = rect.bottom + window.scrollY;
-                let left = rect.left + window.scrollX;
-                if (left + 280 > window.innerWidth) left = window.innerWidth - 290;
-                if (left < 0) left = 10;
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+                const top = rect.bottom + scrollTop;
+                let left = rect.left + scrollLeft;
+
+                // Ajuste para não sair da tela na direita
+                if (left + 280 > window.innerWidth) {
+                    left = window.innerWidth - 290;
+                }
+                if (left < 0) left = 10; // Ajuste esquerda
+
                 menuCategorias.style.top = top + 'px';
                 menuCategorias.style.left = left + 'px';
+                
+                // Força a exibição (block) e classe ativo se usar CSS
                 menuCategorias.style.display = 'block';
+                menuCategorias.classList.add('ativo');
+
+                // Opcional: Mostrar overlay escuro se existir
+                const overlay = document.getElementById('overlay');
+                if(overlay) overlay.classList.add('ativo');
             }
         });
     });
 
-    // Cliques dentro do Menu Flutuante
+    // 3. Clique nas Categorias (Dentro do Flutuante) -> Ir para Loja
     const botoesCat = document.querySelectorAll('.item-cat-dropdown');
     botoesCat.forEach(btn => {
         btn.addEventListener('click', function() {
             const categoria = this.getAttribute('data-cat');
+            
+            // Monta URL de busca
             let url = `loja.html?marca=${encodeURIComponent(marcaAtualSelecionada)}`;
-            if(categoria !== 'todas') url += `&cat=${encodeURIComponent(categoria)}`;
+            if(categoria && categoria !== 'todas') {
+                url += `&cat=${encodeURIComponent(categoria)}`;
+            }
             window.location.href = url;
         });
     });
 
-    // Fechar menus ao clicar fora
+    // 4. Fechar Menus ao Clicar Fora
     document.addEventListener('click', function(e) {
-        if(menuCategorias && menuCategorias.style.display === 'block') {
-            if (!menuCategorias.contains(e.target)) menuCategorias.style.display = 'none';
+        // Fechar Menu Categorias
+        if(menuCategorias && (menuCategorias.style.display === 'block' || menuCategorias.classList.contains('ativo'))) {
+            // Se o clique não foi no menu nem nos botões de marca
+            const clicouNoMenu = menuCategorias.contains(e.target);
+            const clicouEmMarca = e.target.closest('.item-marca') || e.target.closest('.marca-item');
+            
+            if (!clicouNoMenu && !clicouEmMarca) {
+                menuCategorias.style.display = 'none';
+                menuCategorias.classList.remove('ativo');
+                // Remove destaque dos botões
+                todosBotoesMarca.forEach(b => {
+                    b.style.backgroundColor = '';
+                    b.style.color = '';
+                });
+                
+                // Se o carrinho não estiver aberto, fecha overlay
+                const car = document.getElementById("carrinhoLateral");
+                const overlay = document.getElementById("overlay");
+                if (overlay && (!car || !car.classList.contains("aberto"))) {
+                    overlay.classList.remove("ativo");
+                }
+            }
+        }
+
+        // Fechar Menu Mais Marcas (se clicar fora dele)
+        if(menuMaisMarcas && menuMaisMarcas.classList.contains('ativo')) {
+            if (!menuMaisMarcas.contains(e.target) && e.target !== btnVerMais && !btnVerMais.contains(e.target)) {
+                // Não fecha automático se clicar dentro, apenas fora
+                // (Opcional: se quiser fechar ao clicar fora, descomente abaixo)
+                // menuMaisMarcas.classList.remove('ativo');
+                // btnVerMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
+            }
         }
     });
+    
+    // Fechar Overlay fecha tudo
+    const overlay = document.getElementById('overlay');
+    if(overlay) {
+        overlay.addEventListener('click', function() {
+            // Fecha carrinho
+            const car = document.getElementById("carrinhoLateral");
+            if(car) car.classList.remove("aberto");
+            
+            // Fecha menu categorias
+            if(menuCategorias) {
+                menuCategorias.style.display = 'none';
+                menuCategorias.classList.remove('ativo');
+            }
+            
+            overlay.classList.remove("ativo");
+        });
+    }
 
-    // --- AUTH & ADMIN ---
+    // --- LOGIN / LOGOUT ---
     const btnAuth = document.getElementById('btnAuth');
     const txtAuth = document.getElementById('txtAuth');
     const btnLinkAdmin = document.getElementById('btnLinkAdmin'); 
@@ -392,9 +468,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     if(confirm("Sair da conta?")) signOut(auth).then(() => window.location.reload());
                 };
             }
-            if (user.email === EMAIL_ADMIN && btnLinkAdmin) btnLinkAdmin.style.display = 'inline-flex';
-            else if(btnLinkAdmin) btnLinkAdmin.style.display = 'none';
-            
+            if (user.email === EMAIL_ADMIN && btnLinkAdmin) {
+                btnLinkAdmin.style.display = 'inline-flex';
+            }
             const popup = document.getElementById('popupAvisoLogin');
             if(popup) popup.style.display = 'none';
         } else {
@@ -407,16 +483,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Mobile & Scroll
+    // --- MENU MOBILE ---
     const btnMenu = document.getElementById('botaoMenuMobile');
     const navMenu = document.getElementById('menuNavegacao');
     if (btnMenu) btnMenu.addEventListener('click', () => navMenu.classList.toggle('ativo'));
 
+    // --- BOTÃO TOPO ---
     window.addEventListener('scroll', () => {
         const btn = document.getElementById("btnTopo");
         if (btn) {
-            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) btn.classList.add("visivel");
-            else btn.classList.remove("visivel");
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                btn.classList.add("visivel");
+            } else {
+                btn.classList.remove("visivel");
+            }
         }
     });
 });
