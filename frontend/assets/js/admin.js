@@ -15,11 +15,11 @@ onAuthStateChanged(auth, (user) => {
         window.location.href = "login.html";
     } else if (user.email !== EMAIL_ADMIN) {
         alert("Acesso Negado.");
-        window.location.href = "index.html"; // Redireciona para a home se não for admin
+        window.location.href = "index.html";
     } else {
-        console.log("Admin logado");
+        console.log("Admin logado:", user.email);
         carregarProdutos(); 
-        carregarBannersAdmin(); // Carrega a lista de banners ao iniciar
+        carregarBannersAdmin(); // <--- IMPORTANTE: Carrega a lista assim que loga
     }
 });
 
@@ -39,27 +39,28 @@ document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("formProduto");
     if(form) form.addEventListener("submit", cadastrarProduto);
 
-    // 3. EVENTO DO BOTÃO DE BANNER (CORREÇÃO PRINCIPAL)
-    // Tenta pegar pelo ID novo ou pelo botão genérico dentro do formulário de banner
-    const btnUpload = document.getElementById("btnUploadBanner") || document.getElementById("btnSalvarBanner");
-    
+    // 3. EVENTO DO BANNER (CRUCIAL)
+    const btnUpload = document.getElementById("btnUploadBanner");
+    const inputBanner = document.getElementById("arquivoBanner");
+
     if(btnUpload) {
-        // Remove qualquer onclick antigo do HTML para evitar conflito e usa o JS moderno
-        btnUpload.onclick = null; 
+        // Garante que o clique chame a função correta
         btnUpload.addEventListener("click", async (e) => {
-            e.preventDefault(); // Impede recarregar a página
+            e.preventDefault(); // Impede resetar a página
             await adicionarBanner();
         });
+    } else {
+        console.error("Botão btnUploadBanner não encontrado no HTML!");
     }
 
-    // 4. Delegação de Eventos para botões de Excluir (Funciona para itens criados dinamicamente)
+    // 4. Botões de Excluir (Delegação de evento para itens dinâmicos)
     document.body.addEventListener('click', function(e) {
-        // Deletar Produto
+        // Excluir Produto
         if(e.target.closest('.btn-delete-prod')) {
             const id = e.target.closest('.btn-delete-prod').dataset.id;
             deletarProduto(id, e.target);
         }
-        // Deletar Banner
+        // Excluir Banner
         if(e.target.closest('.btn-delete-banner')) {
             const index = e.target.closest('.btn-delete-banner').dataset.index;
             removerBanner(index);
@@ -88,13 +89,11 @@ async function cadastrarProduto(e) {
 
         if (arquivoInput.files.length === 0) throw new Error("Selecione uma foto!");
 
-        // Upload
         const arquivo = arquivoInput.files[0];
         const storageRef = ref(storage, `produtos/${Date.now()}-${arquivo.name}`);
         await uploadBytes(storageRef, arquivo);
         const urlFoto = await getDownloadURL(storageRef);
 
-        // Salvar Firestore
         await addDoc(prodCollection, {
             nome, cod, marca, categoria, preco,
             img: urlFoto, 
@@ -153,12 +152,7 @@ async function deletarProduto(id, elementoBtn) {
     if(confirm("Excluir produto?")) {
         try {
             await deleteDoc(doc(db, "produtos", id));
-            // Remove a linha da tabela visualmente sem precisar recarregar tudo
-            if(elementoBtn && elementoBtn.closest("tr")) {
-                elementoBtn.closest("tr").remove();
-            } else {
-                carregarProdutos();
-            }
+            elementoBtn.closest("tr").remove();
         } catch (error) {
             alert("Erro ao excluir: " + error.message);
         }
@@ -166,61 +160,51 @@ async function deletarProduto(id, elementoBtn) {
 }
 
 /* ============================================================
-   LÓGICA DE BANNERS (MÚLTIPLOS / CARROSSEL)
+   LÓGICA DE BANNERS (SISTEMA DE LISTA)
    ============================================================ */
 
+// 1. Adicionar Banner à Lista
 async function adicionarBanner() {
     const input = document.getElementById("arquivoBanner");
+    const btn = document.getElementById("btnUploadBanner");
     
-    // Tenta pegar o botão pelo ID novo ou busca o botão próximo ao input
-    let btn = document.getElementById("btnUploadBanner");
-    if(!btn) {
-        // Fallback: tenta achar o botão dentro do card de banners se o ID não existir
-        btn = input.parentElement.parentElement.querySelector("button"); 
-    }
-
-    if(!input.files || input.files.length === 0) {
-        alert("Selecione uma imagem para o banner!");
+    if(!input || !input.files || input.files.length === 0) {
+        alert("Por favor, selecione uma imagem primeiro!");
         return;
     }
 
-    const txtOriginal = btn ? btn.innerHTML : "Enviar";
-
     try {
         if(btn) {
-            btn.innerHTML = 'Enviando...';
+            btn.innerText = "Enviando...";
             btn.disabled = true;
         }
         
-        // 1. Upload da Imagem
+        // A. Upload da Imagem
         const file = input.files[0];
-        // Usar timestamp garante nome único
         const storageRef = ref(storage, `banners/${Date.now()}_${file.name}`);
         await uploadBytes(storageRef, file);
         const url = await getDownloadURL(storageRef);
 
-        // 2. Pegar a lista atual do Firestore
+        // B. Pegar a lista atual do Firestore
         const docRef = doc(db, "configuracoes", "banner_site");
         const docSnap = await getDoc(docRef);
         
         let listaAtual = [];
-        // Se já existir lista, pega ela. Se não, começa vazia.
         if (docSnap.exists() && docSnap.data().listaBanners) {
             listaAtual = docSnap.data().listaBanners;
         }
 
-        // 3. Adicionar nova imagem ao array
-        // IMPORTANTE: Estou usando 'img' para ficar compatível com o main.js que te passei
+        // C. Adicionar nova imagem ao array (no final da lista)
         listaAtual.push({
-            img: url, 
+            img: url,
             criadoEm: Date.now()
         });
 
-        // 4. Salvar a lista atualizada (sobrescreve o array antigo com o novo contendo +1 item)
+        // D. Salvar a lista atualizada no banco
         await setDoc(docRef, { listaBanners: listaAtual }, { merge: true });
 
         alert("Banner adicionado com sucesso!");
-        input.value = ""; // Limpa o input
+        input.value = ""; // Limpa o campo
         carregarBannersAdmin(); // Atualiza a visualização na hora
 
     } catch (error) {
@@ -228,39 +212,47 @@ async function adicionarBanner() {
         alert("Erro ao enviar banner: " + error.message);
     } finally {
         if(btn) {
-            btn.innerHTML = txtOriginal;
+            btn.innerHTML = '<i class="fas fa-upload"></i> Enviar Banner';
             btn.disabled = false;
         }
     }
 }
 
+// 2. Mostrar Lista de Banners
 async function carregarBannersAdmin() {
     const container = document.getElementById("listaBannersAdmin");
     if(!container) return;
 
-    container.innerHTML = "<p>Carregando banners...</p>";
+    container.innerHTML = "Carregando lista de banners...";
 
     try {
         const docRef = doc(db, "configuracoes", "banner_site");
         const docSnap = await getDoc(docRef);
 
+        // Verifica se tem lista
         if (!docSnap.exists() || !docSnap.data().listaBanners || docSnap.data().listaBanners.length === 0) {
-            container.innerHTML = "<p>Nenhum banner ativo no momento.</p>";
+            container.innerHTML = "<p style='padding:10px; color:#777;'>Nenhum banner ativo. Adicione um acima.</p>";
             return;
         }
 
         const banners = docSnap.data().listaBanners;
-        container.innerHTML = ""; // Limpa a mensagem de carregando
+        container.innerHTML = ""; // Limpa para desenhar
 
-        // Cria o HTML para cada banner da lista
+        // Desenha cada banner
         banners.forEach((banner, index) => {
+            // Suporte para campo 'img' (novo) ou 'imagem' (legado)
+            const imgUrl = banner.img || banner.imagem;
+
             container.innerHTML += `
-                <div style="display: flex; align-items: center; justify-content: space-between; background: #fff; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 10px;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span style="font-weight:bold; color:#666;">#${index + 1}</span>
-                        <img src="${banner.img || banner.imagem}" style="height: 60px; width: 120px; object-fit: cover; border-radius: 4px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; background: #fff; padding: 15px; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <span style="font-weight:bold; color:#007bff; font-size: 1.2em;">#${index + 1}</span>
+                        <img src="${imgUrl}" style="height: 60px; width: 150px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc;">
+                        <div>
+                            <small style="color:#999;">Banner Ativo</small>
+                        </div>
                     </div>
-                    <button class="btn-delete-banner" data-index="${index}" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                    <button class="btn-delete-banner" data-index="${index}" style="background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9em;">
                         <i class="fas fa-trash"></i> Remover
                     </button>
                 </div>
@@ -269,12 +261,13 @@ async function carregarBannersAdmin() {
 
     } catch (error) {
         console.error(error);
-        container.innerHTML = "<p>Erro ao carregar lista de banners.</p>";
+        container.innerHTML = "<p style='color:red;'>Erro ao carregar banners.</p>";
     }
 }
 
+// 3. Remover Banner Específico
 async function removerBanner(index) {
-    if(!confirm("Tem certeza que deseja remover este banner?")) return;
+    if(!confirm("Tem certeza que deseja remover este banner do carrossel?")) return;
 
     try {
         const docRef = doc(db, "configuracoes", "banner_site");
@@ -283,10 +276,10 @@ async function removerBanner(index) {
         if (docSnap.exists()) {
             let lista = docSnap.data().listaBanners || [];
             
-            // Remove o item pelo índice (posição na lista)
+            // Remove o item da lista usando o índice
             lista.splice(index, 1);
 
-            // Salva a nova lista no banco
+            // Atualiza o banco
             await updateDoc(docRef, { listaBanners: lista });
             
             carregarBannersAdmin(); // Atualiza a tela

@@ -12,7 +12,10 @@
 
     <header class="admin-header">
         <h1><i class="fas fa-tools"></i> Painel Admin</h1>
-        <a href="./index.html" target="_blank"><i class="fas fa-external-link-alt"></i> Ver Loja</a>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <a href="./index.html" target="_blank" style="color: white; text-decoration: none;"><i class="fas fa-external-link-alt"></i> Ver Loja</a>
+            <button id="btnLogout" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Sair</button>
+        </div>
     </header>
 
     <div class="container">
@@ -97,24 +100,25 @@
         </div>
 
         <div class="card-admin" style="border-left: 5px solid #007bff;">
-            <h2><i class="fas fa-images"></i> Gerenciar Carrossel (Topo do Site)</h2>
-            <p>Adicione banners para rodar no topo da loja (Recomendado: 1920x500px).</p>
+            <h3><i class="fas fa-images"></i> Gerenciar Carrossel (Topo do Site)</h3>
+            <p>Adicione banners para rodar no topo da loja. (Recomendado: 1920x500px).</p>
             
-            <div style="display: flex; gap: 10px; align-items: flex-end; background: #f8f9fa; padding: 15px; border-radius: 5px;">
-                <div style="flex: 1;">
-                    <label style="font-weight: bold;">Selecionar Imagem:</label>
-                    <input type="file" id="arquivoBanner" accept="image/*" style="margin-top: 5px; width: 100%;">
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px dashed #ccc; margin-bottom: 20px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 10px; color: #333;">Adicionar Novo Banner:</label>
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                    <input type="file" id="arquivoBanner" accept="image/*" style="padding: 10px; background: white; border: 1px solid #ddd; border-radius: 4px; flex: 1; min-width: 200px;">
+                    
+                    <button id="btnUploadBanner" style="background: #007bff; color: white; border: none; padding: 12px 25px; border-radius: 4px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-upload"></i> Enviar Banner
+                    </button>
                 </div>
-                <button type="button" id="btnUploadBanner" class="btn-add" style="background-color: #007bff; margin:0; height: 40px;">
-                    <i class="fas fa-upload"></i> Enviar Banner
-                </button>
             </div>
 
-            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ddd;">
+            <h4 style="border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">Banners Ativos:</h4>
             
-            <h3>Banners Ativos:</h3>
-            <div id="listaBannersAdmin" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-                <p style="color: #666;">Carregando lista...</p>
+            <div id="listaBannersAdmin" style="display: flex; flex-direction: column; gap: 10px;">
+                <p style="color: #666; font-style: italic;">Carregando lista...</p>
             </div>
         </div>
         
@@ -144,4 +148,4 @@
     <script type="module" src="./assets/js/admin.js"></script>
 
 </body>
-</html>
+</html> 
