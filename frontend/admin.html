@@ -6,7 +6,6 @@
     <title>Admin - Dispemaq</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <link rel="stylesheet" href="./assets/css/admin.css">
 </head>
 <body>
@@ -85,7 +84,6 @@
                     <div class="form-group">
                         <label>Foto do Produto</label>
                         <input type="file" id="arquivoImagem" accept="image/*" required>
-                        <img id="previewImagem" src="" style="max-width:100%; display:none; margin-top:10px;">
                     </div>
                 </div>
 
@@ -99,25 +97,24 @@
         </div>
 
         <div class="card-admin" style="border-left: 5px solid #007bff;">
-            <h2>Gerenciar Banners do Site</h2>
-            <p>Adicione imagens para o carrossel do topo da loja.</p>
+            <h2><i class="fas fa-images"></i> Gerenciar Carrossel</h2>
+            <p>Adicione até 5 imagens para ficarem rodando no topo do site.</p>
             
-            <form id="formBanner">
-                <div class="form-grid" style="grid-template-columns: 1fr; gap: 10px;">
-                    <div class="form-group">
-                        <label>Nova Imagem do Banner (1920x500 recomendado)</label>
-                        <input type="file" id="arquivoBanner" accept="image/*" required>
-                    </div>
-                    <button type="submit" id="btnSalvarBanner" class="btn-add" style="background-color: #007bff; margin-top:0;">
-                        <i class="fas fa-upload"></i> Enviar Banner
-                    </button>
+            <div style="display: flex; gap: 10px; align-items: flex-end; background: #f8f9fa; padding: 15px; border-radius: 5px;">
+                <div style="flex: 1;">
+                    <label style="font-weight: bold;">Adicionar Novo Banner (1920x600px)</label>
+                    <input type="file" id="arquivoBanner" accept="image/*" style="margin-top: 5px;">
                 </div>
-            </form>
+                <button onclick="adicionarBanner()" class="btn-add" style="background-color: #007bff; margin:0; height: 40px;">
+                    <i class="fas fa-upload"></i> Enviar
+                </button>
+            </div>
 
             <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ddd;">
+            
             <h3>Banners Ativos:</h3>
-            <div id="listaBanners" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
-                <p style="color: #666; font-size: 0.9em;">Carregando banners...</p>
+            <div id="listaBannersAdmin" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                <p style="color: #666;">Carregando banners...</p>
             </div>
         </div>
 
@@ -125,19 +122,21 @@
             <h2>Produtos Cadastrados</h2>
             <p id="statusCarregamento">Carregando lista...</p>
             
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr style="background: #f4f4f4; text-align: left;">
-                        <th style="padding: 10px;">Foto</th>
-                        <th style="padding: 10px;">Nome / Código</th>
-                        <th style="padding: 10px;">Marca / Categ.</th>
-                        <th style="padding: 10px;">Preço</th>
-                        <th style="padding: 10px;">Ação</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelaProdutos">
-                    </tbody>
-            </table>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f4f4f4; text-align: left;">
+                            <th style="padding: 10px;">Foto</th>
+                            <th style="padding: 10px;">Nome / Código</th>
+                            <th style="padding: 10px;">Marca / Categ.</th>
+                            <th style="padding: 10px;">Preço</th>
+                            <th style="padding: 10px;">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaProdutos">
+                        </tbody>
+                </table>
+            </div>
         </div>
 
     </div>

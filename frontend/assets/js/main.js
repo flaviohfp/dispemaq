@@ -88,7 +88,7 @@ async function carregarProdutosDestaque() {
     }
 }
 
-// B) Carregar Banners
+// B) Carregar Banners (ATUALIZADO PARA LISTA MÚLTIPLA)
 async function carregarBanners() {
     const slider = document.getElementById('bannerSlider');
     const indicadores = document.getElementById('bannerIndicadores');
@@ -97,13 +97,25 @@ async function carregarBanners() {
     try {
         let bannersData = [];
 
-        // 1. Tenta pegar o banner oficial configurado no Admin
+        // 1. Busca configuração no Firebase
         const docRef = doc(db, "configuracoes", "banner_site");
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-            bannersData.push({ imagem: docSnap.data().url });
-        } else {
+            const dados = docSnap.data();
+            
+            // VERIFICA SE TEM LISTA (Novo sistema)
+            if (dados.listaBanners && Array.isArray(dados.listaBanners) && dados.listaBanners.length > 0) {
+                bannersData = dados.listaBanners;
+            } 
+            // SE NÃO, VERIFICA SE TEM URL ÚNICA (Sistema antigo - compatibilidade)
+            else if (dados.url) {
+                bannersData = [{ imagem: dados.url }];
+            }
+        } 
+        
+        // Se não achou nada, usa placeholders
+        if (bannersData.length === 0) {
             console.log("Nenhum banner configurado. Usando padrão.");
             bannersData = [
                 { imagem: 'https://placehold.co/1920x600/1e3a8a/FFF?text=Banner+1+-+Ofertas+da+Semana' },
@@ -117,12 +129,14 @@ async function carregarBanners() {
 
         // Renderiza os Banners
         bannersData.forEach((banner, index) => {
+            // Cria a Div da Imagem
             const div = document.createElement('div');
             div.className = 'banner-item';
-            div.innerHTML = `<img src="${banner.imagem}" alt="Banner Principal">`;
+            div.innerHTML = `<img src="${banner.imagem}" alt="Banner ${index + 1}">`;
             slider.appendChild(div);
 
-            if(indicadores && bannersData.length > 1) {
+            // Cria a Bolinha (Indicador) - Só se o elemento existir no HTML
+            if(indicadores) {
                 const bola = document.createElement('div');
                 bola.className = `indicador ${index === 0 ? 'ativo' : ''}`;
                 bola.onclick = () => window.irParaSlide(index);
@@ -130,10 +144,11 @@ async function carregarBanners() {
             }
         });
 
+        // Configura variáveis de controle
         bannerTotalSlides = bannersData.length;
         bannerSlideAtual = 0;
 
-        // Auto-Play
+        // Auto-Play: Limpa anterior e inicia novo se tiver mais de 1 slide
         if (window.intervaloBanner) clearInterval(window.intervaloBanner);
         
         if (bannerTotalSlides > 1) {
