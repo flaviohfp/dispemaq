@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
 
-// --- ADICIONADO: Importações de Autenticação ---
+// --- AUTH ---
 import { 
     getAuth, 
     signInWithEmailAndPassword, 
@@ -9,8 +9,26 @@ import {
     onAuthStateChanged 
 } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
+// --- FIRESTORE (Adicionado updateDoc que faltava) ---
+import { 
+    getFirestore, 
+    collection, 
+    addDoc, 
+    getDocs, 
+    deleteDoc, 
+    doc, 
+    setDoc, 
+    getDoc,
+    updateDoc 
+} from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+// --- STORAGE ---
+import { 
+    getStorage, 
+    ref, 
+    uploadBytes, 
+    getDownloadURL 
+} from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
 
 // Suas chaves originais
 const firebaseConfig = {
@@ -26,29 +44,35 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 // Inicializa os serviços
-const auth = getAuth(app); // --- ADICIONADO: Inicializa o Auth
+const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-// Exportando TUDO (Antigos + Novos de Login)
+// Exportando TUDO (Adicionado updateDoc)
 export { 
     app,
-    auth, // O objeto de autenticação
+    auth, 
     db, 
     storage, 
+    
+    // Auth
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged,
+
+    // Firestore
     collection, 
     addDoc, 
     getDocs, 
     deleteDoc, 
     doc, 
-    ref, 
-    uploadBytes, 
-    getDownloadURL, 
     setDoc, 
     getDoc,
-    // Funções de Login que o site precisa agora:
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged
+    updateDoc, 
+
+    // Storage
+    ref, 
+    uploadBytes, 
+    getDownloadURL
 };
