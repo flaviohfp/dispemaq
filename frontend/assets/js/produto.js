@@ -1,4 +1,4 @@
-import { db, doc, getDoc, collection, query, limit, getDocs } from './firebase-config.js';
+import { db, doc, getDoc } from './firebase-config.js';
 
 // Pegar ID da URL
 const params = new URLSearchParams(window.location.search);
@@ -48,7 +48,9 @@ async function carregarProduto() {
             els.breadNome.innerText = produtoAtual.nome;
             els.cod.innerText = `Cód: ${produtoAtual.cod || produtoAtual.codigo || '--'}`;
             els.preco.innerText = `R$ ${preco.toFixed(2).replace('.', ',')}`;
-            els.desc.innerHTML = produtoAtual.descricao || "Sem descrição.";
+            
+            // Renderiza descrição ou mensagem padrão
+            els.desc.innerHTML = produtoAtual.descricao || "Sem descrição disponível.";
 
             // Configurar Cliques dos Botões
             configurarBotoes(produtoId, produtoAtual, preco);
@@ -63,51 +65,81 @@ async function carregarProduto() {
 
 // 3. Configurar Botões
 function configurarBotoes(id, prod, preco) {
-    
-    // A) ADICIONAR AO CARRINHO (Mantém na página)
+    const imagemProd = prod.img || prod.urlImagem || './assets/images/placeholder.jpg';
+
+    // A) ADICIONAR AO CARRINHO (Sem reload, usando o main.js)
     els.btnAdicionar.onclick = () => {
-        const qtd = parseInt(els.qtdInput.value);
-        
-        // Se a função window.adicionarAoCarrinho do main.js existir (ela espera um elemento HTML),
-        // mas aqui vamos manipular direto o localStorage para ser mais seguro,
-        // e depois chamar o toggleCarrinho.
-        
-        let carrinho = JSON.parse(localStorage.getItem('dispemaq_carrinho')) || [];
-        const existente = carrinho.find(i => i.id === id);
+        const qtdSelecionada = parseInt(els.qtdInput.value) || 1;
 
-        if (existente) {
-            existente.qtd += qtd;
+        // Se o main.js carregou corretamente, usamos a função dele
+        if (typeof window.adicionarAoCarrinho === 'function') {
+            
+            // Criamos um elemento "falso" para simular o clique que o main.js espera
+            // Isso evita duplicar código e garante que o menu lateral abra corretamente
+            const elementoSimulado = {
+                getAttribute: (attr) => {
+                    if (attr === 'data-id') return id;
+                    if (attr === 'data-nome') return prod.nome;
+                    if (attr === 'data-preco') return preco;
+                    if (attr === 'data-img') return imagemProd;
+                    return null;
+                }
+            };
+
+            // 1. Adiciona o primeiro item e abre o carrinho
+            window.adicionarAoCarrinho(elementoSimulado);
+
+            // 2. Se o cliente escolheu mais de 1 (ex: 3), adicionamos o restante
+            if (qtdSelecionada > 1 && typeof window.alterarQuantidade === 'function') {
+                // Loop para adicionar a quantidade extra
+                for (let i = 0; i < qtdSelecionada - 1; i++) {
+                    window.alterarQuantidade(id, 'aumentar');
+                }
+            }
+
         } else {
-            carrinho.push({
-                id: id,
-                nome: prod.nome,
-                preco: preco,
-                img: prod.img || prod.urlImagem,
-                qtd: qtd
-            });
-        }
-        
-        localStorage.setItem('dispemaq_carrinho', JSON.stringify(carrinho));
-        
-        // Atualiza badge e abre carrinho (funções do main.js)
-        if(window.toggleCarrinho) {
-            window.location.reload(); // Recarrega para atualizar o número no header
+            // Fallback (caso main.js falhe): Método manual com reload
+            console.warn("Função adicionarAoCarrinho não encontrada. Usando método manual.");
+            adicionarManual(id, prod, preco, qtdSelecionada, false);
         }
     };
 
-    // B) COMPRAR AGORA (Vai pro checkout)
+    // B) COMPRAR AGORA (Salva e redireciona direto)
     els.btnComprar.onclick = () => {
-        const qtd = parseInt(els.qtdInput.value);
-        let carrinho = JSON.parse(localStorage.getItem('dispemaq_carrinho')) || [];
+        const qtdSelecionada = parseInt(els.qtdInput.value) || 1;
         
-        // Adiciona e vai
-        const existente = carrinho.find(i => i.id === id);
-        if (existente) existente.qtd += qtd;
-        else carrinho.push({ id, nome: prod.nome, preco, img: prod.img || prod.urlImagem, qtd });
-
-        localStorage.setItem('dispemaq_carrinho', JSON.stringify(carrinho));
-        window.location.href = 'checkout.html'; // Crie esta página depois
+        // Aqui usamos o método manual para não abrir o carrinho lateral antes de mudar de página
+        adicionarManual(id, prod, preco, qtdSelecionada, true);
     };
+}
+
+// Função auxiliar para manipular LocalStorage diretamente (usada no Comprar Agora)
+function adicionarManual(id, prod, preco, qtd, redirecionar) {
+    let carrinho = JSON.parse(localStorage.getItem('dispemaq_carrinho')) || [];
+    const imagemProd = prod.img || prod.urlImagem || './assets/images/placeholder.jpg';
+
+    // Procura se já existe (comparando ID como string para segurança)
+    const existente = carrinho.find(i => String(i.id) === String(id));
+
+    if (existente) {
+        existente.qtd += qtd;
+    } else {
+        carrinho.push({
+            id: id,
+            nome: prod.nome,
+            preco: preco,
+            img: imagemProd,
+            qtd: qtd
+        });
+    }
+
+    localStorage.setItem('dispemaq_carrinho', JSON.stringify(carrinho));
+
+    if (redirecionar) {
+        window.location.href = 'checkout.html';
+    } else {
+        window.location.reload(); // Só recarrega se for o fallback
+    }
 }
 
 document.addEventListener('DOMContentLoaded', carregarProduto);

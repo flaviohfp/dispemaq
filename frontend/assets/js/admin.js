@@ -19,7 +19,7 @@ onAuthStateChanged(auth, (user) => {
     } else {
         console.log("Admin logado:", user.email);
         carregarProdutos(); 
-        carregarBannersAdmin(); // <--- IMPORTANTE: Carrega a lista assim que loga
+        carregarBannersAdmin(); 
     }
 });
 
@@ -39,28 +39,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("formProduto");
     if(form) form.addEventListener("submit", cadastrarProduto);
 
-    // 3. EVENTO DO BANNER (CRUCIAL)
+    // 3. EVENTO DO BANNER
     const btnUpload = document.getElementById("btnUploadBanner");
     const inputBanner = document.getElementById("arquivoBanner");
 
     if(btnUpload) {
-        // Garante que o clique chame a função correta
         btnUpload.addEventListener("click", async (e) => {
-            e.preventDefault(); // Impede resetar a página
+            e.preventDefault(); 
             await adicionarBanner();
         });
     } else {
         console.error("Botão btnUploadBanner não encontrado no HTML!");
     }
 
-    // 4. Botões de Excluir (Delegação de evento para itens dinâmicos)
+    // 4. Botões de Excluir (Delegação)
     document.body.addEventListener('click', function(e) {
-        // Excluir Produto
         if(e.target.closest('.btn-delete-prod')) {
             const id = e.target.closest('.btn-delete-prod').dataset.id;
             deletarProduto(id, e.target);
         }
-        // Excluir Banner
         if(e.target.closest('.btn-delete-banner')) {
             const index = e.target.closest('.btn-delete-banner').dataset.index;
             removerBanner(index);
@@ -69,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* ============================================================
-   LÓGICA DE PRODUTOS
+   LÓGICA DE PRODUTOS (ATUALIZADA COM DESCRIÇÃO)
    ============================================================ */
 async function cadastrarProduto(e) {
     e.preventDefault();
@@ -80,13 +77,20 @@ async function cadastrarProduto(e) {
         btn.innerHTML = 'Salvando...';
         btn.disabled = true;
 
+        // --- DADOS BÁSICOS ---
         const nome = document.getElementById('nome').value;
         const cod = document.getElementById('cod').value;
         const marca = document.getElementById('marca').value;
         const categoria = document.getElementById('categoria').value;
         const preco = parseFloat(document.getElementById('preco').value);
-        const arquivoInput = document.getElementById('arquivoImagem');
+        
+        // --- NOVO: PEGAR A DESCRIÇÃO TÉCNICA ---
+        // Se o elemento não existir (caso esqueça de por no HTML), salva vazio
+        const descElement = document.getElementById('desc-produto');
+        const descricao = descElement ? descElement.value : "Sem descrição técnica.";
 
+        // --- IMAGEM ---
+        const arquivoInput = document.getElementById('arquivoImagem');
         if (arquivoInput.files.length === 0) throw new Error("Selecione uma foto!");
 
         const arquivo = arquivoInput.files[0];
@@ -94,17 +98,24 @@ async function cadastrarProduto(e) {
         await uploadBytes(storageRef, arquivo);
         const urlFoto = await getDownloadURL(storageRef);
 
+        // --- SALVAR NO FIRESTORE ---
         await addDoc(prodCollection, {
-            nome, cod, marca, categoria, preco,
+            nome: nome,
+            cod: cod,
+            marca: marca,
+            categoria: categoria,
+            preco: preco,
+            descricao: descricao, // <--- CAMPO NOVO SALVO AQUI
             img: urlFoto, 
             data_cadastro: new Date()
         });
 
-        alert("Produto cadastrado!");
+        alert("Produto cadastrado com sucesso!");
         document.getElementById("formProduto").reset();
         carregarProdutos();
 
     } catch (error) {
+        console.error("Erro ao cadastrar:", error);
         alert("Erro: " + error.message);
     } finally {
         btn.innerHTML = txtOriginal;
@@ -160,10 +171,9 @@ async function deletarProduto(id, elementoBtn) {
 }
 
 /* ============================================================
-   LÓGICA DE BANNERS (SISTEMA DE LISTA)
+   LÓGICA DE BANNERS
    ============================================================ */
 
-// 1. Adicionar Banner à Lista
 async function adicionarBanner() {
     const input = document.getElementById("arquivoBanner");
     const btn = document.getElementById("btnUploadBanner");
@@ -185,7 +195,7 @@ async function adicionarBanner() {
         await uploadBytes(storageRef, file);
         const url = await getDownloadURL(storageRef);
 
-        // B. Pegar a lista atual do Firestore
+        // B. Pegar a lista atual
         const docRef = doc(db, "configuracoes", "banner_site");
         const docSnap = await getDoc(docRef);
         
@@ -194,18 +204,18 @@ async function adicionarBanner() {
             listaAtual = docSnap.data().listaBanners;
         }
 
-        // C. Adicionar nova imagem ao array (no final da lista)
+        // C. Adicionar nova imagem
         listaAtual.push({
             img: url,
             criadoEm: Date.now()
         });
 
-        // D. Salvar a lista atualizada no banco
+        // D. Salvar
         await setDoc(docRef, { listaBanners: listaAtual }, { merge: true });
 
         alert("Banner adicionado com sucesso!");
-        input.value = ""; // Limpa o campo
-        carregarBannersAdmin(); // Atualiza a visualização na hora
+        input.value = ""; 
+        carregarBannersAdmin(); 
 
     } catch (error) {
         console.error("Erro banner:", error);
@@ -218,7 +228,6 @@ async function adicionarBanner() {
     }
 }
 
-// 2. Mostrar Lista de Banners
 async function carregarBannersAdmin() {
     const container = document.getElementById("listaBannersAdmin");
     if(!container) return;
@@ -229,18 +238,15 @@ async function carregarBannersAdmin() {
         const docRef = doc(db, "configuracoes", "banner_site");
         const docSnap = await getDoc(docRef);
 
-        // Verifica se tem lista
         if (!docSnap.exists() || !docSnap.data().listaBanners || docSnap.data().listaBanners.length === 0) {
             container.innerHTML = "<p style='padding:10px; color:#777;'>Nenhum banner ativo. Adicione um acima.</p>";
             return;
         }
 
         const banners = docSnap.data().listaBanners;
-        container.innerHTML = ""; // Limpa para desenhar
+        container.innerHTML = ""; 
 
-        // Desenha cada banner
         banners.forEach((banner, index) => {
-            // Suporte para campo 'img' (novo) ou 'imagem' (legado)
             const imgUrl = banner.img || banner.imagem;
 
             container.innerHTML += `
@@ -265,7 +271,6 @@ async function carregarBannersAdmin() {
     }
 }
 
-// 3. Remover Banner Específico
 async function removerBanner(index) {
     if(!confirm("Tem certeza que deseja remover este banner do carrossel?")) return;
 
@@ -275,14 +280,9 @@ async function removerBanner(index) {
 
         if (docSnap.exists()) {
             let lista = docSnap.data().listaBanners || [];
-            
-            // Remove o item da lista usando o índice
             lista.splice(index, 1);
-
-            // Atualiza o banco
             await updateDoc(docRef, { listaBanners: lista });
-            
-            carregarBannersAdmin(); // Atualiza a tela
+            carregarBannersAdmin();
         }
     } catch (error) {
         console.error(error);

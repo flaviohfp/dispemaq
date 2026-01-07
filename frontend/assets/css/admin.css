@@ -103,6 +103,16 @@ h2 {
     outline: none;
 }
 
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: Arial, sans-serif;
+    resize: vertical; /* Permite o usuário aumentar a altura se quiser */
+    margin-bottom: 15px;
+}
+
 /* Botão de Adicionar */
 button.btn-add {
     background-color: #28a745;

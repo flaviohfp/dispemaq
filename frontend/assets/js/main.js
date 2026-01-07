@@ -36,17 +36,20 @@ async function carregarProdutosDestaque() {
 
         querySnapshot.forEach((docSnap) => {
             const produto = docSnap.data();
-            const id = docSnap.id;
+            const id = docSnap.id; // ID DO FIREBASE
+            
             // Garante que pega a imagem nova (img) ou antiga (urlImagem)
             const imagem = produto.img || produto.urlImagem || './assets/images/placeholder.jpg'; 
             const preco = parseFloat(produto.preco || 0);
             
+            // CRIA O LINK COM O ID
             const linkDetalhes = `produto.html?id=${id}`;
             
             const htmlProduto = `
                 <div class="card-produto">
                     <div class="produto-imagem">
                         ${produto.promocao ? '<span class="badge-desconto">Oferta</span>' : ''}
+                        
                         <a href="${linkDetalhes}" style="display:block; width:100%; height:100%;">
                             <img src="${imagem}" alt="${produto.nome}" style="cursor:pointer;">
                         </a>
@@ -88,7 +91,7 @@ async function carregarProdutosDestaque() {
     }
 }
 
-// B) Carregar Banners (ATUALIZADO PARA LISTA MÚLTIPLA)
+// B) Carregar Banners
 async function carregarBanners() {
     const slider = document.getElementById('bannerSlider');
     const indicadores = document.getElementById('bannerIndicadores');
@@ -129,7 +132,6 @@ async function carregarBanners() {
 
         // Renderiza os Banners
         bannersData.forEach((banner, index) => {
-            // CORREÇÃO: Tenta ler .img (novo admin) ou .imagem (antigo), para garantir que funcione
             const imgSrc = banner.img || banner.imagem;
 
             // Cria a Div da Imagem
@@ -138,7 +140,7 @@ async function carregarBanners() {
             div.innerHTML = `<img src="${imgSrc}" alt="Banner ${index + 1}">`;
             slider.appendChild(div);
 
-            // Cria a Bolinha (Indicador) - Só se o elemento existir no HTML
+            // Cria a Bolinha (Indicador)
             if(indicadores) {
                 const bola = document.createElement('div');
                 bola.className = `indicador ${index === 0 ? 'ativo' : ''}`;
@@ -151,7 +153,7 @@ async function carregarBanners() {
         bannerTotalSlides = bannersData.length;
         bannerSlideAtual = 0;
 
-        // Auto-Play: Limpa anterior e inicia novo se tiver mais de 1 slide
+        // Auto-Play
         if (window.intervaloBanner) clearInterval(window.intervaloBanner);
         
         if (bannerTotalSlides > 1) {
@@ -396,16 +398,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- LOGIN / LOGOUT / ADMIN BTN ---
     const btnAuth = document.getElementById('btnAuth');
     const txtAuth = document.getElementById('txtAuth');
-    const btnLinkAdmin = document.getElementById('btnLinkAdmin'); // Botão secreto
+    const btnLinkAdmin = document.getElementById('btnLinkAdmin'); 
     
     onAuthStateChanged(auth, (user) => {
         if (user) {
             // -- LOGADO --
-            
-            // 1. Muda texto para "Sair"
             if(txtAuth) txtAuth.innerText = "Sair";
             
-            // 2. Configura botão Sair
             if(btnAuth) {
                 btnAuth.href = "#";
                 btnAuth.onclick = (e) => {
@@ -414,26 +413,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
             }
 
-            // 3. MOSTRAR BOTÃO ADMIN (Só se for o email certo)
+            // MOSTRAR BOTÃO ADMIN
             if (user.email === EMAIL_ADMIN) {
                 if(btnLinkAdmin) btnLinkAdmin.style.display = 'inline-flex';
             } else {
                 if(btnLinkAdmin) btnLinkAdmin.style.display = 'none';
             }
 
-            // Remove popup
             const popup = document.getElementById('popupAvisoLogin');
             if(popup) popup.style.display = 'none';
 
         } else {
             // -- DESLOGADO --
-            
             if(txtAuth) txtAuth.innerText = "Entrar";
             if(btnAuth) {
                 btnAuth.href = "login.html";
                 btnAuth.onclick = null;
             }
-            // Esconde botão admin
             if(btnLinkAdmin) btnLinkAdmin.style.display = 'none';
         }
     });
