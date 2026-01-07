@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalhes do Produto</title>
+    <title>Detalhes do Produto | Dispemaq</title>
+    <link rel="stylesheet" href="./assets/css/style.css"> 
     <link rel="stylesheet" href="./assets/css/produto.css">
-    </head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
 <body>
 
-   </head>
-  <body>
     <div class="barra-anuncio">
       <div class="container">
         <p>
@@ -22,14 +22,9 @@
     <header class="cabecalho-principal">
       <div class="container">
         <div class="topo-cabecalho">
-          <a href="#" class="logo-empresa">
-            <img
-              src="./assets/images/SITE-LOGO-ESTENDIDA.-PNG-2048x819.png"
-              alt="Logo Empresa"
-            />
+          <a href="index.html" class="logo-empresa">
+            <img src="./assets/images/SITE-LOGO-ESTENDIDA.-PNG-2048x819.png" alt="Logo Empresa" />
           </a>
-
-          
 
           <div class="acoes-usuario">
             <a href="login.html" class="item-acao" id="btnAuth">
@@ -37,21 +32,19 @@
               <span id="txtAuth">Entrar</span>
             </a>
             
-            <a href="#" class="item-acao" onclick="toggleCarrinho(event)">
+            <a href="#" class="item-acao" onclick="window.toggleCarrinho(event)">
               <div class="carrinho-botao">
                 <i class="fas fa-shopping-cart"></i>
                 <span class="badge-carrinho">0</span>
               </div>
               <span>Carrinho</span>
             </a>
-            <a href="https://wa.me/554984276503?text=Ol%C3%A1%20tudo%20bem?" class="item-acao destaque-whatsapp">
+            <a href="https://wa.me/554984276503" class="item-acao destaque-whatsapp">
               <i class="fab fa-whatsapp"></i>
               <span>Vendas</span>
             </a>
             <button class="botao-menu-mobile" id="botaoMenuMobile">
-              <span></span>
-              <span></span>
-              <span></span>
+              <span></span><span></span><span></span>
             </button>
           </div>
         </div>
@@ -60,96 +53,110 @@
 
     <div class="container main-produto">
         
+        <div class="breadcrumb">
+            <a href="index.html">Início</a> / <a href="loja.html">Loja</a> / <span id="bread-nome">...</span>
+        </div>
+
         <div class="grid-detalhes">
             <div class="area-foto">
-                <img id="img-principal" src="" alt="Carregando...">
+                <div class="container-imagem">
+                    <img id="img-principal" src="./assets/images/placeholder.jpg" alt="Produto">
+                </div>
             </div>
 
             <div class="area-info">
-                <small id="cod-produto" class="codigo">Cód: ---</small>
-                <h1 id="nome-produto">Carregando...</h1>
+                <h1 id="nome-produto">Carregando produto...</h1>
+                <div class="sub-info">
+                    <span id="cod-produto">Cód: ---</span> | 
+                    <span class="estoque-ok"><i class="fas fa-check-circle"></i> Disponível</span>
+                </div>
                 
-                <h2 id="preco-produto" class="preco-destaque">R$ ---</h2>
-                <p class="parcelamento">em até 12x no cartão</p>
+                <hr class="divisor">
 
-                <div class="controle-qtd">
-                    <button onclick="mudarQtd(-1)">-</button>
-                    <input type="number" id="qtd" value="1" readonly>
-                    <button onclick="mudarQtd(1)">+</button>
+                <div class="bloco-preco">
+                    <h2 id="preco-produto" class="preco-destaque">R$ ---</h2>
+                    <p class="parcelamento">ou em até <strong>12x</strong> no cartão de crédito</p>
+                    <p class="pix-desconto"><i class="fas fa-bolt"></i> <strong>5% de desconto</strong> no PIX</p>
                 </div>
 
-                <button onclick="adicionarCarrinho()" class="btn-comprar">
-                    ADICIONAR AO CARRINHO
-                </button>
+                <div class="pagamento-icons">
+                    <i class="fab fa-cc-visa"></i>
+                    <i class="fab fa-cc-mastercard"></i>
+                    <i class="fab fa-cc-amex"></i>
+                    <i class="fas fa-barcode"></i>
+                    <i class="fas fa-pix"></i>
+                </div>
 
-                <div class="descricao">
-                    <h3>Descrição da Peça</h3>
-                    <p id="desc-produto">...</p>
+                <div class="box-compra">
+                    <label>Quantidade:</label>
+                    <div class="linha-acoes">
+                        <div class="controle-qtd">
+                            <button onclick="window.mudarQtd(-1)">-</button>
+                            <input type="number" id="qtd" value="1" readonly>
+                            <button onclick="window.mudarQtd(1)">+</button>
+                        </div>
+
+                        <button id="btn-comprar-agora" class="btn-acao btn-primary">
+                            <i class="fas fa-check"></i> COMPRAR AGORA
+                        </button>
+                    </div>
+
+                    <button id="btn-adicionar" class="btn-acao btn-secondary">
+                        <i class="fas fa-shopping-cart"></i> Adicionar ao carrinho
+                    </button>
+                </div>
+
+                <div class="box-frete">
+                    <p><i class="fas fa-truck"></i> Calcular Frete e Prazo</p>
+                    <div class="input-frete">
+                        <input type="text" placeholder="Digite seu CEP">
+                        <button>OK</button>
+                    </div>
+                    <a href="https://buscacepinter.correios.com.br/app/endereco/index.php" target="_blank">Não sei meu CEP</a>
+                </div>
+
+                <div class="compra-segura">
+                    <i class="fas fa-shield-alt"></i> Compra Garantida | 7 dias para devolução
                 </div>
             </div>
         </div>
 
+        <div class="secao-descricao">
+            <h3>Descrição Técnica</h3>
+            <div id="desc-produto" class="conteudo-desc">
+                Carregando detalhes...
+            </div>
+        </div>
+
         <div class="relacionados-section">
-            <h3>Veja também</h3>
+            <h3>Quem viu este produto também comprou</h3>
             <div id="relacionados-lista" class="grid-relacionados"></div>
         </div>
 
     </div>
 
-     <footer class="rodape-principal">
+    <footer class="rodape-principal">
       <div class="container">
-        <div class="conteudo-rodape">
-          <div class="coluna-rodape">
-            <h3>Sobre Nós</h3>
-            <p>
-              Especialistas em peças de reposição para máquinas pesadas e
-              tratores agrícolas. Qualidade e confiança para o seu equipamento.
-            </p>
-            <div class="redes-sociais">
-              <a href="#"><i class="fab fa-instagram"></i></a>
-              <a href="#"><i class="fab fa-facebook-f"></i></a>
-              <a href="#"><i class="fab fa-linkedin-in"></i></a>
-            </div>
-          </div>
-
-          <div class="coluna-rodape">
-            <h4>Links Rápidos</h4>
-            <ul class="links-rodape">
-              <li><a href="./index.html">Início</a></li>
-              <li><a href="#">Minha Conta</a></li>
-              <li><a href="#">Rastrear Pedido</a></li>
-              <li><a href="./trocasDevolucoes.html">Trocas e Devoluções</a></li>
-            </ul>
-          </div>
-
-          <div class="coluna-rodape">
-            <h4>Contato</h4>
-            <ul class="info-rodape">
-              <li><i class="fas fa-phone-alt"></i> (49) 8427-6503</li>
-              <li><i class="fab fa-whatsapp"></i> <a href="https://wa.me/554984276503?text=Ol%C3%A1%20tudo%20bem?" class="link-contato">Iniciar Conversa</a></li>
-              <li><i class="far fa-envelope"></i> comercial.dispemaq@gmail.com</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="divisor-rodape"></div>
-
         <div class="rodape-inferior">
-          <p>&copy; 2026 Dispemaq. Todos os direitos reservados.</p>
-          <div class="formas-pagamento">
-            <i class="fab fa-cc-visa"></i>
-            <i class="fab fa-cc-mastercard"></i>
-            <i class="fas fa-barcode"></i>
-            <i class="fas fa-pix"></i>
-          </div>
-          <div class="links-legais">
-            <a href="#">Termos de Uso</a>
-            <a href="./politicaDePrivacidade.html">Política de Privacidade</a>
-          </div>
+           <p>&copy; 2026 Dispemaq.</p>
         </div>
       </div>
     </footer>
 
-    <script src="./assets/js/produto.js"></script>
+    <div id="overlay"></div>
+    <div id="carrinhoLateral">
+        <div class="carrinho-header">
+            <h3>Seu Carrinho</h3>
+            <span onclick="window.toggleCarrinho()">X</span>
+        </div>
+        <div class="carrinho-conteudo"></div>
+        <div class="carrinho-total">
+            Total: <strong>R$ 0,00</strong>
+        </div>
+        <button class="carrinho-finalizar" onclick="window.location.href='checkout.html'">Finalizar Compra</button>
+    </div>
+
+    <script type="module" src="./assets/js/main.js"></script>
+    <script type="module" src="./assets/js/produto.js"></script>
 </body>
 </html>

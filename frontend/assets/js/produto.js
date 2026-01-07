@@ -1,137 +1,113 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Pega os produtos do LocalStorage (Criados no Admin)
-    const storedProducts = JSON.parse(localStorage.getItem('meusProdutos')) || [];
+import { db, doc, getDoc, collection, query, limit, getDocs } from './firebase-config.js';
 
-    // 2. Descobre qual produto abrir através da URL (ex: produto.html?id=123)
-    const urlParams = new URLSearchParams(window.location.search);
-    const productId = urlParams.get('id');
+// Pegar ID da URL
+const params = new URLSearchParams(window.location.search);
+const produtoId = params.get('id');
 
-    // Elementos da tela
-    const contentDiv = document.getElementById('product-content');
-    const errorDiv = document.getElementById('error-message');
+let produtoAtual = null;
 
-    // 3. Validação: Temos produtos e temos um ID na URL?
-    if (!productId || storedProducts.length === 0) {
-        // Se entrou direto na página sem clicar em nada, mostra o primeiro produto como "exemplo"
-        // Ou mostra erro se a lista estiver totalmente vazia
-        if (storedProducts.length > 0) {
-            renderProduct(storedProducts[0]); // Carrega o primeiro da lista
-            renderRelated(storedProducts, storedProducts[0].id);
+// Elementos
+const els = {
+    img: document.getElementById('img-principal'),
+    nome: document.getElementById('nome-produto'),
+    breadNome: document.getElementById('bread-nome'),
+    cod: document.getElementById('cod-produto'),
+    preco: document.getElementById('preco-produto'),
+    desc: document.getElementById('desc-produto'),
+    qtdInput: document.getElementById('qtd'),
+    btnAdicionar: document.getElementById('btn-adicionar'),
+    btnComprar: document.getElementById('btn-comprar-agora')
+};
+
+// 1. Controle de Quantidade Visual
+window.mudarQtd = function(valor) {
+    let atual = parseInt(els.qtdInput.value) || 1;
+    let novo = atual + valor;
+    if (novo < 1) novo = 1;
+    els.qtdInput.value = novo;
+};
+
+// 2. Carregar Produto
+async function carregarProduto() {
+    if (!produtoId) {
+        window.location.href = 'loja.html';
+        return;
+    }
+
+    try {
+        const docRef = doc(db, "produtos", produtoId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            produtoAtual = docSnap.data();
+            const preco = parseFloat(produtoAtual.preco || 0);
+
+            // Preencher HTML
+            els.img.src = produtoAtual.img || produtoAtual.urlImagem || './assets/images/placeholder.jpg';
+            els.nome.innerText = produtoAtual.nome;
+            els.breadNome.innerText = produtoAtual.nome;
+            els.cod.innerText = `Cód: ${produtoAtual.cod || produtoAtual.codigo || '--'}`;
+            els.preco.innerText = `R$ ${preco.toFixed(2).replace('.', ',')}`;
+            els.desc.innerHTML = produtoAtual.descricao || "Sem descrição.";
+
+            // Configurar Cliques dos Botões
+            configurarBotoes(produtoId, produtoAtual, preco);
+
         } else {
-            contentDiv.style.display = 'none';
-            errorDiv.style.display = 'block';
-            errorDiv.innerHTML = 'Nenhum produto cadastrado no sistema. <br><br> <a href="admin.html">Ir para o Painel Admin</a>';
+            document.querySelector('.area-info').innerHTML = "<h2>Produto não encontrado.</h2>";
         }
-        return;
+    } catch (error) {
+        console.error("Erro:", error);
     }
-
-    // 4. Busca o produto específico pelo ID
-    // O ID no localStorage pode ser string ou number, comparamos como string pra garantir
-    const product = storedProducts.find(p => p.id == productId);
-
-    if (product) {
-        renderProduct(product);
-        renderRelated(storedProducts, product.id);
-    } else {
-        contentDiv.style.display = 'none';
-        errorDiv.style.display = 'block';
-        errorDiv.innerText = 'Produto não encontrado no estoque.';
-    }
-});
-
-// --- FUNÇÕES DE RENDERIZAÇÃO ---
-
-function renderProduct(product) {
-    // Formata Preço
-    const priceNum = parseFloat(product.preco);
-    const priceFormatted = priceNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-    const parcelaVal = (priceNum / 12).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
-    // Injeta nos campos HTML
-    document.getElementById('bread-name').innerText = product.nome;
-    document.getElementById('prod-id').innerText = product.id;
-    document.getElementById('prod-name').innerText = product.nome;
-    document.getElementById('prod-desc').innerText = product.descricao || "Produto original com garantia de fábrica. Compatível com diversos modelos.";
-    
-    // Imagem (Usa placeholder se não tiver link)
-    const imgUrl = product.imagem && product.imagem.length > 5 ? product.imagem : 'https://via.placeholder.com/400?text=Sem+Foto';
-    document.getElementById('prod-img').src = imgUrl;
-
-    document.getElementById('prod-price').innerText = priceFormatted;
-    document.getElementById('prod-installments').innerText = `em até 12x de ${parcelaVal}`;
-
-    // Guarda o ID atual num atributo global para o botão comprar usar
-    document.getElementById('product-content').setAttribute('data-current-id', product.id);
 }
 
-function renderRelated(allProducts, currentId) {
-    const grid = document.getElementById('related-grid');
-    const noRelatedMsg = document.getElementById('no-related');
+// 3. Configurar Botões
+function configurarBotoes(id, prod, preco) {
     
-    grid.innerHTML = "";
-
-    // Filtra: todos menos o atual
-    const related = allProducts.filter(p => p.id != currentId);
-
-    if (related.length === 0) {
-        noRelatedMsg.style.display = 'block';
-        return;
-    }
-
-    // Pega no máximo 4 produtos para mostrar
-    related.slice(0, 4).forEach(p => {
-        const priceNum = parseFloat(p.preco);
-        const card = document.createElement('div');
-        card.className = 'card-item';
+    // A) ADICIONAR AO CARRINHO (Mantém na página)
+    els.btnAdicionar.onclick = () => {
+        const qtd = parseInt(els.qtdInput.value);
         
-        // Ao clicar no relacionado, recarrega a página com o novo ID
-        card.onclick = () => {
-            window.location.href = `produto.html?id=${p.id}`;
-        };
+        // Se a função window.adicionarAoCarrinho do main.js existir (ela espera um elemento HTML),
+        // mas aqui vamos manipular direto o localStorage para ser mais seguro,
+        // e depois chamar o toggleCarrinho.
+        
+        let carrinho = JSON.parse(localStorage.getItem('dispemaq_carrinho')) || [];
+        const existente = carrinho.find(i => i.id === id);
 
-        const imgUrl = p.imagem && p.imagem.length > 5 ? p.imagem : 'https://via.placeholder.com/200?text=AutoParts';
+        if (existente) {
+            existente.qtd += qtd;
+        } else {
+            carrinho.push({
+                id: id,
+                nome: prod.nome,
+                preco: preco,
+                img: prod.img || prod.urlImagem,
+                qtd: qtd
+            });
+        }
+        
+        localStorage.setItem('dispemaq_carrinho', JSON.stringify(carrinho));
+        
+        // Atualiza badge e abre carrinho (funções do main.js)
+        if(window.toggleCarrinho) {
+            window.location.reload(); // Recarrega para atualizar o número no header
+        }
+    };
 
-        card.innerHTML = `
-            <img src="${imgUrl}" class="card-img" alt="${p.nome}">
-            <div class="card-title">${p.nome}</div>
-            <div class="card-price">R$ ${priceNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
-        `;
+    // B) COMPRAR AGORA (Vai pro checkout)
+    els.btnComprar.onclick = () => {
+        const qtd = parseInt(els.qtdInput.value);
+        let carrinho = JSON.parse(localStorage.getItem('dispemaq_carrinho')) || [];
+        
+        // Adiciona e vai
+        const existente = carrinho.find(i => i.id === id);
+        if (existente) existente.qtd += qtd;
+        else carrinho.push({ id, nome: prod.nome, preco, img: prod.img || prod.urlImagem, qtd });
 
-        grid.appendChild(card);
-    });
+        localStorage.setItem('dispemaq_carrinho', JSON.stringify(carrinho));
+        window.location.href = 'checkout.html'; // Crie esta página depois
+    };
 }
 
-// --- FUNÇÕES DE INTERAÇÃO ---
-
-function updateQty(change) {
-    const input = document.getElementById('qty-input');
-    let val = parseInt(input.value);
-    val += change;
-    if (val < 1) val = 1;
-    input.value = val;
-}
-
-function addToCart() {
-    const currentId = document.getElementById('product-content').getAttribute('data-current-id');
-    const qty = document.getElementById('qty-input').value;
-    const prodName = document.getElementById('prod-name').innerText;
-    
-    // Efeito Visual
-    const btn = document.querySelector('.btn-add');
-    const originalText = btn.innerHTML;
-    
-    btn.style.backgroundColor = '#2e7d32'; // Verde sucesso
-    btn.innerHTML = '<span class="material-icons">check</span> ADICIONADO!';
-    
-    // Atualiza badge do carrinho
-    const badge = document.getElementById('cart-badge');
-    badge.innerText = parseInt(badge.innerText) + parseInt(qty);
-
-    alert(`Sucesso!\n\nVocê adicionou ${qty}x "${prodName}" ao seu carrinho.`);
-
-    // Volta botão ao normal após 2 segundos
-    setTimeout(() => {
-        btn.style.backgroundColor = '';
-        btn.innerHTML = originalText;
-    }, 2000);
-}
+document.addEventListener('DOMContentLoaded', carregarProduto);

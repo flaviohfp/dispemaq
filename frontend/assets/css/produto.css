@@ -1,6 +1,5 @@
 /* ============================================================
-   CORREÇÃO 1: DEFINIÇÃO DE VARIÁVEIS (Cores e Padrões)
-   Necessário para que var(--cor) funcione
+   1. VARIÁVEIS E GLOBAIS (Mantido do seu código)
    ============================================================ */
 :root {
     --azul-escuro: #003366;  /* Azul Profissional */
@@ -12,34 +11,21 @@
     --sombra-media: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-/* ============================================================
-   RESET BÁSICO (Para garantir que nada quebre)
-   ============================================================ */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-/* Garante que o fundo da página de produto seja neutro para destaque */
 body {
     background-color: var(--cinza-claro);
     color: var(--cinza-escuro);
-    font-family: Arial, sans-serif; /* Fallback caso a fonte principal falhe */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* ============================================================
-   CONTAINER PRINCIPAL (O Miolo da página)
+   2. CABEÇALHO E RODAPÉ (Mantido do seu código)
    ============================================================ */
-.main-produto {
-    max-width: 1200px;
-    margin: 40px auto; /* Espaço para não grudar no Header/Footer */
-    padding: 0 20px;
-    min-height: 60vh; /* Garante altura mínima se a internet for lenta */
-}
-
-
-/* ===== BARRA DE ANÚNCIO ===== */
 .barra-anuncio {
     background: linear-gradient(135deg, var(--azul-escuro), #1e40af);
     color: var(--branco);
@@ -48,13 +34,8 @@ body {
     font-size: 0.9rem;
     font-weight: 500;
 }
+.barra-anuncio i { margin: 0 5px; color: var(--laranja); }
 
-.barra-anuncio i {
-    margin: 0 5px;
-    color: var(--laranja);
-}
-
-/* ===== CABEÇALHO ===== */
 .cabecalho-principal {
     background: var(--branco);
     box-shadow: var(--sombra-media);
@@ -64,674 +45,266 @@ body {
 }
 
 .topo-cabecalho {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 20px;
-    padding: 15px 20px; /* Ajuste leve para não colar nas bordas */
-    max-width: 1200px;  /* Centraliza o conteúdo do header */
+    padding: 15px 20px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
-
 .logo-empresa img {
-    position: relative;
-    height: 70px;
+    height: 60px;
     width: auto;
-    object-fit: contain;
-    display: block;
-    transition: transform 0.3s ease;
-    z-index: 10;
 }
 
-.logo-empresa img:hover {
-    transform: scale(1.05);
-}
-
-
-/* Ações do Usuário */
-.acoes-usuario {
-    display: flex;
-    gap: 15px;
-}
-
+.acoes-usuario { display: flex; gap: 15px; }
 .item-acao {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    padding: 8px 15px;
-    border-radius: 8px;
-    text-decoration: none;
-    color: var(--cinza-escuro);
-    transition: 0.3s;
-    font-size: 0.85rem;
+    display: flex; flex-direction: column; align-items: center;
+    text-decoration: none; color: var(--cinza-escuro); font-size: 0.85rem;
 }
+.item-acao i { font-size: 1.3rem; margin-bottom: 4px; }
+.destaque-whatsapp { color: #25d366; }
 
-.item-acao i {
-    font-size: 1.3rem;
-}
-
-.item-acao:hover {
-    background: var(--cinza-claro);
-}
-
-.destaque-whatsapp {
-    background: #25d366;
-    color: var(--branco);
-}
-
-.destaque-whatsapp:hover {
-    background: #20ba5a;
-    color: var(--branco);
-}
-
-/* Menu Mobile */
+/* Botão Mobile */
 .botao-menu-mobile {
-    display: none;
-    flex-direction: column;
-    gap: 4px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 10px;
+    display: none; flex-direction: column; gap: 4px;
+    background: none; border: none; cursor: pointer;
 }
-
-.botao-menu-mobile span {
-    width: 25px;
-    height: 3px;
-    background: var(--azul-escuro);
-    transition: 0.3s;
-}
+.botao-menu-mobile span { width: 25px; height: 3px; background: var(--azul-escuro); }
 
 /* ============================================================
-   GRID DE DETALHES (Esquerda: Foto | Direita: Infos)
+   3. LAYOUT DO PRODUTO (ADAPTADO PARA O NOVO HTML)
    ============================================================ */
-.grid-detalhes {
-    display: grid;
-    grid-template-columns: 45% 55%; /* Proporção da tela dividida */
-    gap: 40px;
-    background: #fff;
-    padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05); /* Sombra suave */
+.main-produto {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+    min-height: 60vh;
 }
 
-/* --- COLUNA DA FOTO --- */
+/* Breadcrumb */
+.breadcrumb {
+    font-size: 14px;
+    color: var(--cinza-medio);
+    margin-bottom: 20px;
+}
+.breadcrumb a { text-decoration: none; color: var(--azul-escuro); }
+
+/* Grid Principal (Foto esq | Info dir) */
+.grid-detalhes {
+    display: grid;
+    grid-template-columns: 45% 55%;
+    gap: 40px;
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: var(--sombra-media);
+}
+
+/* --- ÁREA DA FOTO --- */
 .area-foto {
-    position: relative;
-    width: 100%;
-    height: 500px; /* Altura fixa para manter o layout estável */
     display: flex;
     align-items: center;
     justify-content: center;
     border: 1px solid #eee;
     border-radius: 6px;
+    padding: 20px;
     background: #fff;
-    overflow: hidden;
+    max-height: 500px;
 }
-
-.area-foto img {
+.container-imagem img {
     max-width: 100%;
-    max-height: 100%;
-    object-fit: contain; /* A imagem nunca será cortada */
+    max-height: 450px;
+    object-fit: contain;
     transition: transform 0.3s ease;
 }
+.container-imagem img:hover { transform: scale(1.05); }
 
-.area-foto:hover img {
-    transform: scale(1.1); /* Zoom ao passar o mouse */
-    cursor: zoom-in;
-}
-
-/* --- COLUNA DE INFORMAÇÕES --- */
-.area-info {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-}
-
-/* Código do Produto */
-.codigo {
-    font-size: 12px;
-    color: #888;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 10px;
-    font-weight: 600;
-}
-
-/* Título do Produto */
-#nome-produto {
-    font-size: 28px;
-    font-weight: 700;
+/* --- ÁREA DE INFO --- */
+.area-info h1 {
+    font-size: 26px;
     color: #111;
-    margin: 0 0 20px 0;
-    line-height: 1.3;
+    margin-bottom: 10px;
+    line-height: 1.2;
 }
 
-/* Box de Preço */
-.box-preco {
-    background: #f9f9f9;
+.sub-info {
+    font-size: 14px;
+    color: var(--cinza-medio);
+    margin-bottom: 15px;
+}
+.estoque-ok { color: #2ecc71; font-weight: bold; margin-left: 10px; }
+.divisor { border: 0; border-top: 1px solid #eee; margin: 15px 0; }
+
+/* Preço */
+.bloco-preco {
+    background: #f8f9fa;
     padding: 20px;
     border-radius: 6px;
-    border-left: 5px solid var(--laranja); 
-    margin-bottom: 30px;
+    border-left: 4px solid var(--laranja);
+    margin-bottom: 20px;
 }
-
 .preco-destaque {
-    font-size: 42px;
+    font-size: 38px;
+    color: var(--azul-escuro);
     font-weight: 800;
-    color: #333;
     margin: 0;
 }
+.parcelamento { color: var(--cinza-medio); font-size: 14px; margin-top: 5px; }
+.pix-desconto { color: #27ae60; font-weight: bold; font-size: 14px; margin-top: 5px; }
 
-.parcelamento {
-    color: #27ae60;
-    font-weight: 600;
-    font-size: 14px;
-    margin-top: 5px;
+/* Ícones Pagamento */
+.pagamento-icons {
+    display: flex; gap: 10px; font-size: 24px; color: #999; margin-bottom: 25px;
 }
 
-/* --- ÁREA DE COMPRA (Botões) --- */
-.acoes-compra {
+/* --- BOTÕES E AÇÕES (Estilo Profissional) --- */
+.box-compra { margin-bottom: 25px; }
+.box-compra label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
+
+.linha-acoes {
     display: flex;
     gap: 15px;
-    margin-bottom: 30px;
-    height: 55px; /* Altura uniforme para os botões */
+    margin-bottom: 15px;
 }
 
-/* Seletor de Quantidade */
+/* Seletor Qtd */
 .controle-qtd {
     display: flex;
     border: 2px solid #ddd;
     border-radius: 6px;
-    overflow: hidden;
-    width: 140px;
+    width: 110px;
+    height: 50px;
 }
-
 .controle-qtd button {
-    width: 40px;
-    background: #f4f4f4;
-    border: none;
-    font-size: 20px;
-    font-weight: bold;
-    cursor: pointer;
-    color: #555;
-    transition: background 0.2s;
+    width: 35px; background: #f4f4f4; border: none; font-size: 20px; cursor: pointer;
 }
-
-.controle-qtd button:hover {
-    background: #e0e0e0;
-}
-
 .controle-qtd input {
-    width: 100%;
-    border: none;
-    text-align: center;
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
-    -moz-appearance: textfield;
-}
-/* Remove setinhas do input number no Chrome */
-.controle-qtd input::-webkit-outer-spin-button,
-.controle-qtd input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+    width: 100%; border: none; text-align: center; font-size: 18px; font-weight: bold;
 }
 
-/* Botão Comprar */
-.btn-comprar {
-    flex: 1; /* Ocupa o resto do espaço */
-    background-color: var(--laranja);
-    color: #fff;
+/* Botões Genéricos */
+.btn-acao {
     border: none;
     border-radius: 6px;
-    font-size: 18px;
-    font-weight: 700;
+    height: 50px;
+    font-weight: bold;
+    font-size: 16px;
     text-transform: uppercase;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    box-shadow: 0 4px 6px rgba(255, 102, 0, 0.2);
+    gap: 8px;
 }
 
-.btn-comprar:hover {
+/* Botão COMPRAR AGORA (Laranja - Destaque) */
+.btn-primary {
+    flex: 1;
+    background-color: var(--laranja);
+    color: #fff;
+    box-shadow: 0 4px 6px rgba(255, 102, 0, 0.2);
+}
+.btn-primary:hover {
     background-color: #e65c00;
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(255, 102, 0, 0.3);
 }
 
-.btn-comprar:active {
-    transform: translateY(0);
+/* Botão ADICIONAR CARRINHO (Branco/Azul - Secundário) */
+.btn-secondary {
+    width: 100%;
+    background-color: transparent;
+    border: 2px solid var(--azul-escuro);
+    color: var(--azul-escuro);
+}
+.btn-secondary:hover {
+    background-color: #f0f4ff;
 }
 
-/* Descrição Técnica */
-.descricao-container {
-    margin-top: 20px;
+/* Frete */
+.box-frete {
+    border-top: 1px dashed #ddd;
     padding-top: 20px;
-    border-top: 1px solid #eee;
+    margin-bottom: 20px;
 }
+.box-frete p { font-weight: bold; color: var(--cinza-escuro); margin-bottom: 8px; font-size: 14px; }
+.input-frete { display: flex; gap: 5px; max-width: 220px; margin-bottom: 8px; }
+.input-frete input { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+.input-frete button { background: var(--cinza-escuro); color: white; border: none; padding: 0 15px; border-radius: 4px; cursor: pointer; }
+.box-frete a { font-size: 12px; color: var(--cinza-medio); text-decoration: underline; }
 
-.descricao-container h3 {
-    font-size: 18px;
-    color: #333;
-    margin-bottom: 15px;
-}
+.compra-segura { color: #27ae60; font-size: 13px; font-weight: 600; display: flex; gap: 5px; align-items: center; }
 
-#desc-produto {
-    color: #555;
-    line-height: 1.6;
-    font-size: 16px;
+/* Descrição */
+.secao-descricao {
+    margin-top: 40px;
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: var(--sombra-media);
 }
+.secao-descricao h3 { margin-bottom: 15px; color: var(--azul-escuro); border-bottom: 2px solid #eee; padding-bottom: 10px; }
+.conteudo-desc { line-height: 1.6; color: var(--cinza-medio); font-size: 16px; }
 
 /* ============================================================
-   PRODUTOS RELACIONADOS
+   4. PRODUTOS RELACIONADOS
    ============================================================ */
-.relacionados-section {
-    margin-top: 60px;
-    margin-bottom: 40px;
-}
-
-.relacionados-section h3 {
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 25px;
-    border-bottom: 2px solid #ddd;
-    padding-bottom: 10px;
-    display: inline-block;
-}
+.relacionados-section { margin-top: 50px; margin-bottom: 50px; }
+.relacionados-section h3 { font-size: 22px; margin-bottom: 20px; color: var(--cinza-escuro); }
 
 .grid-relacionados {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 20px;
 }
 
-.card-relacionado {
-    background: #fff;
-    border: 1px solid #eee;
-    border-radius: 6px;
-    padding: 15px;
-    text-align: center;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.card-relacionado:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    border-color: var(--laranja);
-}
-
-.card-relacionado img {
-    width: 100%;
-    height: 160px;
-    object-fit: contain;
-    margin-bottom: 10px;
-}
-
-.nome-rel {
-    font-size: 14px;
-    color: #333;
-    font-weight: 600;
-    margin: 5px 0;
-    height: 40px; /* Limita altura */
-    overflow: hidden;
-}
-
-.preco-rel {
-    color: var(--laranja);
-    font-weight: 800;
-    font-size: 16px;
-}
-
-
-
-/* ===== RODAPÉ ===== */
+/* ============================================================
+   5. RODAPÉ (Mantido do seu código)
+   ============================================================ */
 .rodape-principal {
     background: var(--cinza-escuro);
     color: var(--branco);
-    padding: 60px 0 30px;
+    padding: 60px 0 20px;
+    margin-top: auto;
 }
-
 .conteudo-rodape {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 40px;
-    margin-bottom: 40px;
-    max-width: 1200px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 0 20px;
-}
-
-.coluna-rodape h3,
-.coluna-rodape h4 {
-    color: var(--laranja);
-    margin-bottom: 20px;
-}
-
-.redes-sociais {
-    display: flex;
-    gap: 12px;
-    margin-top: 20px;
-}
-
-.redes-sociais a {
-    width: 40px;
-    height: 40px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--branco);
-    transition: 0.3s;
-}
-
-.redes-sociais a:hover {
-    background: var(--laranja);
-    transform: scale(1.1);
-}
-
-.links-rodape,
-.info-rodape {
-    list-style: none;
-}
-
-.links-rodape li,
-.info-rodape li {
-    margin-bottom: 10px;
-}
-
-.links-rodape a {
-    color: rgba(255,255,255,0.7);
-    text-decoration: none;
-    transition: 0.3s;
-}
-
-.links-rodape a:hover {
-    color: var(--laranja);
-    padding-left: 5px;
-}
-
-.info-rodape li {
-    color: rgba(255,255,255,0.7);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.info-rodape i {
-    color: var(--laranja);
-}
-
-.divisor-rodape {
-    height: 1px;
-    background: rgba(255,255,255,0.1);
-    margin: 30px 0;
-}
-
-.rodape-inferior {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
-    color: rgba(255,255,255,0.6);
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
 }
+.coluna-rodape h3, .coluna-rodape h4 { color: var(--laranja); margin-bottom: 20px; }
+.links-rodape { list-style: none; }
+.links-rodape li { margin-bottom: 10px; }
+.links-rodape a { color: rgba(255,255,255,0.7); text-decoration: none; transition: 0.3s; }
+.links-rodape a:hover { color: var(--laranja); padding-left: 5px; }
 
-.links-legais {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}
-
-.links-legais a {
-    color: rgba(255,255,255,0.7);
-    text-decoration: none;
-    transition: 0.3s;
-}
-
-.links-legais a:hover {
-    color: var(--laranja);
-}
-
-/* ===== BOTÕES FLUTUANTES ===== */
-.whatsapp-flutuante {
-    position: fixed;
-    bottom: 25px;
-    right: 25px;
-    width: 60px;
-    height: 60px;
-    background: #25d366;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--branco);
-    font-size: 2rem;
-    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
-    z-index: 999;
-    animation: pulse 2s infinite;
-}
-
-.whatsapp-flutuante:hover {
-    transform: scale(1.1);
-}
-
-.tooltip-whatsapp {
-    position: absolute;
-    right: 70px;
-    background: var(--cinza-escuro);
-    color: var(--branco);
-    padding: 8px 12px;
-    border-radius: 8px;
+.rodape-inferior {
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    margin-top: 40px;
+    padding-top: 20px;
+    color: rgba(255,255,255,0.5);
     font-size: 0.9rem;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: 0.3s;
-}
-
-.whatsapp-flutuante:hover .tooltip-whatsapp {
-    opacity: 1;
-}
-
-.botao-topo {
-    position: fixed;
-    bottom: 95px;
-    right: 25px;
-    width: 50px;
-    height: 50px;
-    background: var(--azul-escuro);
-    color: var(--branco);
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    opacity: 0;
-    visibility: hidden;
-    transition: 0.3s;
-    z-index: 998;
-}
-
-.botao-topo.visivel {
-    opacity: 1;
-    visibility: visible;
-}
-
-.botao-topo:hover {
-    background: var(--laranja);
-    transform: scale(1.1);
-}
-
-/* ===== MODALS ===== */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.7);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-    padding: 20px;
-}
-
-.modal-overlay.ativo {
-    display: flex;
-}
-
-.modal-conteudo {
-    background: var(--branco);
-    max-width: 700px;
-    width: 100%;
-    max-height: 90vh;
-    border-radius: 12px;
-    position: relative;
-    animation: slideDown 0.3s;
-}
-
-.modal-conteudo h2 {
-    background: var(--azul-escuro);
-    color: var(--branco);
-    padding: 25px;
-    border-radius: 12px 12px 0 0;
-}
-
-.conteudo-scroll {
-    padding: 30px;
-    max-height: calc(90vh - 100px);
-    overflow-y: auto;
-}
-
-.conteudo-scroll h3 {
-    color: var(--azul-escuro);
-    margin: 25px 0 15px;
-}
-
-.conteudo-scroll h3:first-child {
-    margin-top: 0;
-}
-
-.conteudo-scroll p {
-    color: var(--cinza-medio);
-    line-height: 1.8;
-    margin-bottom: 15px;
-}
-
-.fechar-modal {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: none;
-    border: none;
-    color: var(--branco);
-    font-size: 2rem;
-    cursor: pointer;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    transition: 0.3s;
-}
-
-.fechar-modal:hover {
-    background: rgba(255,255,255,0.2);
 }
 
 /* ============================================================
-   CORREÇÃO 2: KEYFRAMES DE ANIMAÇÃO
-   Necessário para o WhatsApp piscar e o Modal descer
-   ============================================================ */
-
-@keyframes pulse {
-    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
-    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); }
-    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
-}
-
-@keyframes slideDown {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* ============================================================
-   RESPONSIVIDADE (MOBILE)
+   6. RESPONSIVIDADE (MOBILE)
    ============================================================ */
 @media (max-width: 900px) {
-    .grid-detalhes {
-        grid-template-columns: 1fr; /* Coluna única */
-        padding: 20px;
-        gap: 25px;
-    }
-
-    .area-foto {
-        height: 350px;
-    }
-
-    #nome-produto {
-        font-size: 24px;
-    }
-
-    .preco-destaque {
-        font-size: 32px;
-    }
-
-    .topo-cabecalho {
-        grid-template-columns: 1fr auto; /* Ajuste para mobile */
-        gap: 15px;
-    }
+    .grid-detalhes { grid-template-columns: 1fr; gap: 20px; padding: 20px; }
+    .area-foto { height: 300px; }
     
-    .barra-busca, .acoes-usuario {
-        display: none; /* Em mobile real geralmente esconde-se ou vira menu hamburger */
-    }
-    
-    .botao-menu-mobile {
-        display: flex; /* Aparece o menu hamburger */
-    }
-    
-    .conteudo-rodape {
-        grid-template-columns: 1fr; /* Rodapé em 1 coluna */
-        gap: 30px;
-        text-align: center;
-    }
-    
-    .redes-sociais {
-        justify-content: center;
-    }
-    
-    .info-rodape li {
-        justify-content: center;
-    }
-    
-    .rodape-inferior {
-        flex-direction: column;
-        text-align: center;
-    }
-}
+    .topo-cabecalho { justify-content: space-between; }
+    .acoes-usuario { display: none; } /* Ajuste conforme necessidade do menu */
+    .botao-menu-mobile { display: flex; }
 
-@media (max-width: 480px) {
-    .acoes-compra {
-        flex-direction: column; /* Botões empilhados no celular pequeno */
-        height: auto;
-    }
-
-    .controle-qtd {
-        width: 100%;
-        height: 50px;
-    }
-
-    .btn-comprar {
-        width: 100%;
-        height: 50px;
-    }
+    .linha-acoes { flex-direction: column; }
+    .controle-qtd { width: 100%; justify-content: center; margin-bottom: 10px; }
+    .btn-primary, .btn-secondary { width: 100%; }
 }
