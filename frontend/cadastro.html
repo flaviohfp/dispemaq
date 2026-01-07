@@ -3,52 +3,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criar Conta - Dispemaq</title>
+    <title>Criar Conta Completa - Dispemaq</title>
     <link rel="stylesheet" href="./assets/css/style.css">
+    
     <style>
-        body { display: flex; align-items: center; justify-content: center; height: 100vh; background: #f4f4f4; }
-        .login-box { background: white; padding: 40px; border-radius: 8px; width: 100%; max-width: 400px; text-align: center; }
-        .login-box input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; }
-        .btn-login { width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .btn-login:hover { background: #218838; }
-        .erro { color: red; margin-top: 10px; display: none; }
+        body { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            background: #f4f6f8; 
+            font-family: sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .cadastro-box { 
+            background: white; 
+            padding: 40px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            width: 100%; 
+            max-width: 600px; 
+        }
+
+        .cadastro-box h2 { text-align: center; color: #333; margin-bottom: 5px; }
+        .cadastro-box p { text-align: center; color: #777; margin-bottom: 25px; font-size: 14px; }
+
+        /* Grid para organizar os inputs */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Duas colunas */
+            gap: 15px;
+        }
+        
+        /* Classe para ocupar a linha inteira */
+        .full-width { grid-column: 1 / -1; }
+
+        .campo { display: flex; flex-direction: column; text-align: left; }
+        .campo label { font-size: 12px; font-weight: bold; color: #555; margin-bottom: 5px; }
+
+        input, select { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            box-sizing: border-box; 
+            outline: none;
+            transition: 0.3s;
+        }
+        
+        input:focus, select:focus { border-color: #007bff; }
+
+        .btn-cadastrar { 
+            width: 100%; 
+            padding: 15px; 
+            background: #28a745; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 16px;
+            margin-top: 20px;
+            transition: 0.3s;
+        }
+        .btn-cadastrar:hover { background: #218838; }
+        .btn-cadastrar:disabled { background: #ccc; cursor: not-allowed; }
+
+        .erro { 
+            background-color: #ffe6e6; 
+            color: #d8000c; 
+            padding: 10px; 
+            border-radius: 4px; 
+            font-size: 13px; 
+            margin-bottom: 15px; 
+            display: none; 
+            text-align: center;
+            border: 1px solid #d8000c;
+        }
+
+        /* Mobile: Uma coluna só */
+        @media (max-width: 500px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
-    <div class="login-box">
+
+    <div class="cadastro-box">
         <h2>Criar Nova Conta</h2>
-        <p>Preencha para comprar na loja</p>
+        <p>Preencha seus dados completos para comprar</p>
+
+        <div id="msgErro" class="erro"></div>
+
         <form id="formCadastro">
-            <input type="email" id="emailCad" placeholder="Seu E-mail" required>
-            <input type="password" id="senhaCad" placeholder="Crie uma Senha (min 6 digitos)" required>
-            <button type="submit" class="btn-login" id="btnCad">CADASTRAR</button>
+            <div class="form-grid">
+                
+                <div class="campo full-width">
+                    <label>Nome Completo</label>
+                    <input type="text" id="nome" placeholder="Ex: João da Silva" required>
+                </div>
+
+                <div class="campo">
+                    <label>CPF</label>
+                    <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14" required>
+                </div>
+
+                <div class="campo">
+                    <label>Data de Nascimento</label>
+                    <input type="date" id="nascimento" required>
+                </div>
+
+                <div class="campo">
+                    <label>Celular / WhatsApp</label>
+                    <input type="tel" id="telefone" placeholder="(00) 00000-0000" maxlength="15" required>
+                </div>
+
+                <div class="campo">
+                    <label>Sexo</label>
+                    <select id="sexo" required>
+                        <option value="" disabled selected>Selecione</option>
+                        <option value="Masculino">Masculino</option>
+                        <option value="Feminino">Feminino</option>
+                        <option value="Outro">Outro</option>
+                        <option value="Prefiro não dizer">Prefiro não dizer</option>
+                    </select>
+                </div>
+
+                <div class="campo full-width">
+                    <label>E-mail (Login)</label>
+                    <input type="email" id="email" placeholder="seu@email.com" required>
+                </div>
+
+                <div class="campo">
+                    <label>Senha</label>
+                    <input type="password" id="senha" placeholder="Mínimo 6 caracteres" required>
+                </div>
+
+                <div class="campo">
+                    <label>Confirmar Senha</label>
+                    <input type="password" id="confirmaSenha" placeholder="Repita a senha" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-cadastrar" id="btnSubmit">FINALIZAR CADASTRO</button>
         </form>
-        <p class="erro" id="msgErroCad"></p>
-        <p style="margin-top:15px; font-size:14px;">Já tem conta? <a href="login.html">Fazer Login</a></p>
+
+        <p style="margin-top:20px; font-size:14px; text-align: center;">
+            Já tem conta? <a href="login.html" style="color:#007bff; font-weight:bold; text-decoration:none;">Fazer Login</a>
+        </p>
     </div>
 
+    <script>
+        // 1. Máscara de CPF (Coloca os pontos e traços)
+        document.getElementById('cpf').addEventListener('input', function(e) {
+            let v = e.target.value.replace(/\D/g, "");
+            if (v.length > 11) v = v.slice(0, 11);
+            v = v.replace(/(\d{3})(\d)/, "$1.$2");
+            v = v.replace(/(\d{3})(\d)/, "$1.$2");
+            v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+            e.target.value = v;
+        });
+
+        // 2. Máscara de Telefone
+        document.getElementById('telefone').addEventListener('input', function(e) {
+            let v = e.target.value.replace(/\D/g, "");
+            if (v.length > 11) v = v.slice(0, 11);
+            v = v.replace(/^(\d{2})(\d)/g, "($1) $2");
+            v = v.replace(/(\d)(\d{4})$/, "$1-$2");
+            e.target.value = v;
+        });
+
+        // 3. Validador Matemático de CPF (Receita Federal)
+        function validarCPF(cpf) {
+            cpf = cpf.replace(/[^\d]+/g, '');
+            if (cpf == '') return false;
+            // Elimina CPFs invalidos conhecidos
+            if (cpf.length != 11 || 
+                /^(\d)\1{10}$/.test(cpf)) // Verifica se todos os digitos são iguais
+                    return false;
+            
+            let add = 0;
+            for (let i = 0; i < 9; i++) add += parseInt(cpf.charAt(i)) * (10 - i);
+            let rev = 11 - (add % 11);
+            if (rev == 10 || rev == 11) rev = 0;
+            if (rev != parseInt(cpf.charAt(9))) return false;
+            
+            add = 0;
+            for (let i = 0; i < 10; i++) add += parseInt(cpf.charAt(i)) * (11 - i);
+            rev = 11 - (add % 11);
+            if (rev == 10 || rev == 11) rev = 0;
+            if (rev != parseInt(cpf.charAt(10))) return false;
+            
+            return true;
+        }
+    </script>
+
     <script type="module">
-        import { auth } from './assets/js/firebase-config.js';
-        import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+        // Importe tudo o que precisa do seu arquivo de config
+        import { auth, db, doc, setDoc, createUserWithEmailAndPassword } from './assets/js/firebase-config.js';
 
         document.getElementById('formCadastro').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('emailCad').value;
-            const senha = document.getElementById('senhaCad').value;
-            const msg = document.getElementById('msgErroCad');
 
+            // Pegar valores
+            const nome = document.getElementById('nome').value.trim();
+            const cpf = document.getElementById('cpf').value;
+            const nascimento = document.getElementById('nascimento').value;
+            const telefone = document.getElementById('telefone').value;
+            const sexo = document.getElementById('sexo').value;
+            const email = document.getElementById('email').value.trim();
+            const senha = document.getElementById('senha').value;
+            const confirmaSenha = document.getElementById('confirmaSenha').value;
+            
+            const btn = document.getElementById('btnSubmit');
+            const msgErro = document.getElementById('msgErro');
+
+            // Resetar erros
+            msgErro.style.display = 'none';
+
+            // --- VALIDAÇÕES LOCAIS ---
+
+            // 1. Senhas iguais?
+            if (senha !== confirmaSenha) {
+                mostrarErro("As senhas não coincidem.");
+                return;
+            }
+
+            // 2. Senha forte?
+            if (senha.length < 6) {
+                mostrarErro("A senha precisa ter pelo menos 6 caracteres.");
+                return;
+            }
+
+            // 3. CPF Verdadeiro?
+            if (!validarCPF(cpf)) {
+                mostrarErro("CPF inválido. Por favor verifique os números.");
+                return;
+            }
+
+            // --- CADASTRO NO FIREBASE ---
+            
             try {
-                await createUserWithEmailAndPassword(auth, email, senha);
-                alert("Conta criada com sucesso!");
-                window.location.href = "loja.html"; // Manda de volta pra loja pra ele comprar
+                btn.innerHTML = "Criando conta...";
+                btn.disabled = true;
+
+                // 1. Criar Usuário na Autenticação (Login e Senha)
+                const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
+                const user = userCredential.user;
+
+                // 2. Salvar Dados Pessoais no Firestore
+                // Usamos o UID do usuário como chave para vincular o login aos dados
+                await setDoc(doc(db, "usuarios", user.uid), {
+                    nome: nome,
+                    email: email,
+                    cpf: cpf,
+                    nascimento: nascimento,
+                    telefone: telefone,
+                    sexo: sexo,
+                    criadoEm: new Date().toISOString(),
+                    role: "cliente" // Define que é um cliente
+                });
+
+                // Sucesso
+                alert("Cadastro realizado com sucesso!");
+                window.location.href = "loja.html";
+
             } catch (error) {
-                console.error(error);
-                msg.style.display = "block";
-                if(error.code === 'auth/email-already-in-use') msg.innerText = "Este e-mail já está cadastrado.";
-                else if(error.code === 'auth/weak-password') msg.innerText = "A senha deve ter pelo menos 6 caracteres.";
-                else msg.innerText = "Erro ao cadastrar: " + error.message;
+                console.error("Erro Firebase:", error);
+                btn.innerHTML = "FINALIZAR CADASTRO";
+                btn.disabled = false;
+
+                if(error.code === 'auth/email-already-in-use') {
+                    mostrarErro("Este e-mail já está sendo usado por outra conta.");
+                } else if(error.code === 'auth/invalid-email') {
+                    mostrarErro("O e-mail digitado é inválido.");
+                } else {
+                    mostrarErro("Erro ao cadastrar: " + error.message);
+                }
             }
         });
+
+        function mostrarErro(texto) {
+            const box = document.getElementById('msgErro');
+            box.innerText = texto;
+            box.style.display = 'block';
+            // Rola a tela para cima para ver o erro
+            window.scrollTo(0, 0);
+        }
     </script>
 </body>
 </html>

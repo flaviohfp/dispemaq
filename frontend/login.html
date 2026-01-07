@@ -94,7 +94,7 @@
 
         <div style="margin-top: 25px; font-size: 14px; border-top: 1px solid #eee; padding-top: 20px;">
             Ainda não tem conta? <br>
-            <a href="cadastro.html" style="color: #007bff; font-weight: bold; text-decoration: none;">Criar conta grátis</a>
+            <a href="cadastro.html" style="color: #007bff; font-weight: bold; text-decoration: none;">Criar conta completa</a>
         </div>
         
         <div style="margin-top: 15px;">
@@ -107,7 +107,8 @@
     <script type="module">
         import { auth, signInWithEmailAndPassword } from './assets/js/firebase-config.js';
 
-        const EMAIL_ADMIN = "admin@dispemaq.com"; // O E-mail do Dono
+        // Email do dono para redirecionar para o admin
+        const EMAIL_ADMIN = "admin@dispemaq.com"; 
 
         document.getElementById('formLogin').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -143,7 +144,8 @@
 
                 if(error.code === 'auth/wrong-password') msg.innerText = "Senha incorreta.";
                 else if(error.code === 'auth/user-not-found') msg.innerText = "E-mail não cadastrado.";
-                else msg.innerText = "Erro ao entrar. Verifique seus dados.";
+                else if(error.code === 'auth/invalid-credential') msg.innerText = "Dados inválidos.";
+                else msg.innerText = "Erro ao entrar. Tente novamente.";
             }
         });
     </script>
