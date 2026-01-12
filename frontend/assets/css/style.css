@@ -453,15 +453,6 @@ body {
 }
 
 
-/* --- MENU DE CATEGORIAS FLUTUANTE --- */
-#menuCategoriasFlutuante {
-    display: none; 
-    background: white;
-    margin-top: 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
 
 /* --- CARROSSEL (BANNER) --- */
 .secao-banner {

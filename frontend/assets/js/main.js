@@ -33,13 +33,12 @@ async function carregarProdutosDestaque() {
             return;
         }
 
-        let htmlFinal = ''; // Variável para acumular o HTML (melhora performance)
+        let htmlFinal = ''; 
 
         querySnapshot.forEach((docSnap) => {
             const produto = docSnap.data();
             const id = docSnap.id;
             
-            // Tratamento de imagem e preço
             const imagem = produto.img || produto.urlImagem || './assets/images/placeholder.jpg'; 
             const preco = parseFloat(produto.preco || 0);
             const linkDetalhes = `produto.html?id=${id}`;
@@ -88,7 +87,6 @@ async function carregarProdutosDestaque() {
 
 // B) Carregar Banners
 async function carregarBanners() {
-    // Tenta pegar o slider padrão ou o track novo (garante compatibilidade)
     const slider = document.getElementById('bannerSlider') || document.getElementById('banner-track');
     const indicadores = document.getElementById('bannerIndicadores');
     
@@ -96,8 +94,6 @@ async function carregarBanners() {
 
     try {
         let bannersData = [];
-
-        // 1. Busca configuração no Firebase
         const docRef = doc(db, "configuracoes", "banner_site");
         const docSnap = await getDoc(docRef);
 
@@ -122,10 +118,7 @@ async function carregarBanners() {
 
         bannersData.forEach((banner, index) => {
             const imgSrc = banner.img || banner.imagem;
-
-            // Renderiza Imagem
             if (slider.id === 'banner-track') {
-                // Modo Flex (Novo)
                 const img = document.createElement('img');
                 img.src = imgSrc;
                 img.style.width = '100%';
@@ -134,14 +127,12 @@ async function carregarBanners() {
                 img.style.flexShrink = '0';
                 slider.appendChild(img);
             } else {
-                // Modo Div (Antigo)
                 const div = document.createElement('div');
                 div.className = 'banner-item';
                 div.innerHTML = `<img src="${imgSrc}" alt="Banner ${index + 1}">`;
                 slider.appendChild(div);
             }
 
-            // Indicadores (se existirem)
             if(indicadores) {
                 const bola = document.createElement('div');
                 bola.className = `indicador ${index === 0 ? 'ativo' : ''}`;
@@ -153,7 +144,6 @@ async function carregarBanners() {
         bannerTotalSlides = bannersData.length;
         bannerSlideAtual = 0;
 
-        // Auto-Play
         if (window.intervaloBanner) clearInterval(window.intervaloBanner);
         if (bannerTotalSlides > 1) {
             window.intervaloBanner = setInterval(() => {
@@ -170,7 +160,6 @@ async function carregarBanners() {
    3. FUNÇÕES GLOBAIS (CARRINHO E UI)
    ============================================================ */
 
-// --- CARRINHO ---
 function atualizarBadge() {
     const badges = document.querySelectorAll('.badge-carrinho'); 
     const total = carrinho.reduce((acc, item) => acc + item.qtd, 0);
@@ -220,7 +209,6 @@ function renderizarCarrinho() {
     }
 }
 
-// Funções Globais (window)
 window.adicionarAoCarrinho = function(el) {
     const produto = {
         id: el.getAttribute('data-id'),
@@ -237,7 +225,6 @@ window.adicionarAoCarrinho = function(el) {
     atualizarBadge();
     renderizarCarrinho();
     
-    // Abre o carrinho lateral
     const lateral = document.getElementById("carrinhoLateral");
     const overlay = document.getElementById("overlay");
     if(lateral) lateral.classList.add("aberto");
@@ -282,7 +269,7 @@ window.subirTopo = function() {
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// --- BANNER (CONTROLES) ---
+// --- BANNER CONTROLES ---
 window.mostrarSlide = function(index) {
     const slider = document.getElementById('bannerSlider') || document.getElementById('banner-track');
     if (!slider || bannerTotalSlides <= 1) return;
@@ -293,7 +280,6 @@ window.mostrarSlide = function(index) {
 
     slider.style.transform = `translateX(-${bannerSlideAtual * 100}%)`;
 
-    // Atualiza indicadores se existirem
     const dots = document.querySelectorAll('.indicador');
     if(dots.length > 0) {
         dots.forEach((b, i) => b.classList.toggle('ativo', i === bannerSlideAtual));
@@ -309,7 +295,7 @@ window.irParaSlide = function(index) {
 }
 
 /* ============================================================
-   4. INICIALIZAÇÃO (DOM READY)
+   4. INICIALIZAÇÃO (LÓGICA PRINCIPAL CORRIGIDA)
    ============================================================ */
 document.addEventListener('DOMContentLoaded', function() {
     
@@ -318,95 +304,119 @@ document.addEventListener('DOMContentLoaded', function() {
     carregarBanners(); 
     atualizarBadge();
 
-    // --- CORREÇÃO: VER MAIS MARCAS (LÓGICA DO MENU FIXO) ---
-    const btnVerMais = document.getElementById("btnVerMais") || document.getElementById("btnMarcas");
-    const menuMaisMarcas = document.getElementById("menuMaisMarcas") || document.getElementById("menuMarcas");
-    
-    if (btnVerMais && menuMaisMarcas) {
-        console.log("Sistema Ver Mais Marcas iniciado.");
+    // ==========================================================
+    // ESCUTA DE EVENTOS GERAL (CORREÇÃO DOS MENUS)
+    // ==========================================================
+    document.addEventListener('click', function(e) {
+        
+        // --- 1. LÓGICA DO BOTÃO "VER MAIS MARCAS" ---
+        // Verifica se clicou no botão ou em algo dentro dele (ícone)
+        const btnVerMais = e.target.closest('#btnVerMais') || e.target.closest('#btnMarcas');
+        const menuMaisMarcas = document.getElementById("menuMaisMarcas") || document.getElementById("menuMarcas");
 
-        btnVerMais.addEventListener("click", function(e) {
+        // Se clicou no botão VER MAIS:
+        if (btnVerMais && menuMaisMarcas) {
             e.preventDefault();
-            e.stopPropagation(); 
-            
-            // 1. Calcula onde o botão está na tela AGORA
-            const rect = btnVerMais.getBoundingClientRect();
-            
-            // 2. Posiciona o menu FIXED na tela
-            menuMaisMarcas.style.top = rect.bottom + "px"; // Cola embaixo do botão
-            // Alinha a direita do menu com a direita do botão (assumindo menu 250px)
-            menuMaisMarcas.style.left = (rect.right - 250) + "px"; 
-            
-            // 3. Mostra/Esconde
-            menuMaisMarcas.classList.toggle("ativo");
+            e.stopPropagation();
 
-            // Fecha o menu de categorias flutuante de peças se estiver aberto
+            console.log("Botão Ver Mais Clicado!"); // Debug
+
+            // Fecha outros menus conflitantes
             const menuCat = document.getElementById('menuCategoriasFlutuante');
             if(menuCat) menuCat.style.display = 'none';
 
-            // Alterna Texto e Ícone
+            // Pega posição do botão na tela
+            const rect = btnVerMais.getBoundingClientRect();
+            
+            // Aplica posição ao menu (FIXED requer coordenadas exatas)
+            menuMaisMarcas.style.top = rect.bottom + "px"; 
+            // O menu tem 250px, alinhamos ele à direita do botão
+            menuMaisMarcas.style.left = (rect.right - 250) + "px"; 
+
+            // Alterna visibilidade
+            menuMaisMarcas.classList.toggle("ativo");
+
+            // Muda texto e ícone do botão
             if (menuMaisMarcas.classList.contains("ativo")) {
                 btnVerMais.innerHTML = '<i class="fas fa-minus-circle"></i> Fechar';
             } else {
                 btnVerMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
             }
-        });
+            return; // Para a execução aqui para não cair no "fechar fora"
+        }
 
-        // Fechar menu ao rolar a página (para não ficar voando)
-        window.addEventListener("scroll", () => {
-            if(menuMaisMarcas.classList.contains("ativo")) {
-                menuMaisMarcas.classList.remove("ativo");
-                btnVerMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
-            }
-        });
-    } else {
-        console.warn("Atenção: Botão ou Menu 'Ver Mais Marcas' não encontrado no HTML.");
-    }
-
-    // --- MENU DE CATEGORIAS FLUTUANTE (PEÇAS) ---
-    const menuCategorias = document.getElementById('menuCategoriasFlutuante');
-    const tituloMenuCat = document.getElementById('tituloMarcaDropdown');
-    const todosBotoesMarca = document.querySelectorAll('.item-marca, .marca-item');
-
-    todosBotoesMarca.forEach(botao => {
-        botao.addEventListener('click', function(e) {
+        // --- 2. LÓGICA DAS MARCAS (ABRIR MENU DE PEÇAS) ---
+        const botaoMarca = e.target.closest('.item-marca') || e.target.closest('.marca-item');
+        
+        // Se clicou em uma marca (e não é do menu mobile)
+        if (botaoMarca && !botaoMarca.closest('.menu-mobile-content')) {
             e.preventDefault();
-            e.stopPropagation(); 
-
-            // Reseta visual dos outros botões
-            todosBotoesMarca.forEach(b => {
-                b.classList.remove('selecionada');
-                b.style.backgroundColor = '';
-                b.style.color = '';
-            });
-
-            // Ativa o clicado
-            this.classList.add('selecionada');
             
-            const marcaNome = this.getAttribute('data-marca') || this.innerText.trim();
-            const marcaNomeBonito = this.innerText.trim();
+            const menuCategorias = document.getElementById('menuCategoriasFlutuante');
+            const tituloMenuCat = document.getElementById('tituloMarcaDropdown');
+            
+            // Limpa seleções anteriores
+            document.querySelectorAll('.item-marca, .marca-item').forEach(b => b.classList.remove('selecionada'));
+            botaoMarca.classList.add('selecionada');
+
+            // Pega nome da marca
+            const marcaNome = botaoMarca.getAttribute('data-marca') || botaoMarca.innerText.trim();
             marcaAtualSelecionada = marcaNome;
 
-            if(tituloMenuCat) tituloMenuCat.innerText = "Peças para " + marcaNomeBonito;
+            // Atualiza título
+            if(tituloMenuCat) tituloMenuCat.innerText = "Peças para " + botaoMarca.innerText.trim();
 
             if(menuCategorias) {
-                // Cálculo para o Submenu (Absolute ou Fixed depende do seu CSS)
-                const rect = this.getBoundingClientRect();
-                const top = rect.bottom + window.scrollY; // Absolute usa scrollY
+                // Posiciona o menu de categorias
+                const rect = botaoMarca.getBoundingClientRect();
+                const top = rect.bottom + window.scrollY; // Para position:absolute
                 let left = rect.left + window.scrollX;
 
-                // Ajuste para não estourar a tela
+                // Evita estourar a tela na direita
                 if (left + 280 > window.innerWidth) left = window.innerWidth - 290;
                 if (left < 0) left = 10;
 
                 menuCategorias.style.top = top + 'px';
                 menuCategorias.style.left = left + 'px';
                 menuCategorias.style.display = 'block';
+                e.stopPropagation(); 
             }
-        });
+        }
+
+        // --- 3. CLIQUE FORA (FECHAR MENUS) ---
+        // Verifica se devemos fechar o Menu de Mais Marcas
+        if (menuMaisMarcas && menuMaisMarcas.classList.contains('ativo')) {
+            // Se o clique NÃO foi dentro do menu (já sabemos que não foi no botão)
+            if (!menuMaisMarcas.contains(e.target)) {
+                menuMaisMarcas.classList.remove('ativo');
+                // Reseta botão original
+                const btnOriginal = document.getElementById("btnVerMais") || document.getElementById("btnMarcas");
+                if (btnOriginal) btnOriginal.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
+            }
+        }
+
+        // Verifica se devemos fechar o Menu de Categorias
+        const menuCat = document.getElementById('menuCategoriasFlutuante');
+        if(menuCat && menuCat.style.display === 'block') {
+            if (!menuCat.contains(e.target) && !botaoMarca) {
+                menuCat.style.display = 'none';
+                document.querySelectorAll('.item-marca, .marca-item').forEach(b => b.classList.remove('selecionada'));
+            }
+        }
     });
 
-    // Clique nas categorias dentro do menu flutuante
+    // Fechar menu ao rolar a página (UX melhor)
+    window.addEventListener("scroll", () => {
+        const menuMaisMarcas = document.getElementById("menuMaisMarcas") || document.getElementById("menuMarcas");
+        const btnOriginal = document.getElementById("btnVerMais") || document.getElementById("btnMarcas");
+        
+        if(menuMaisMarcas && menuMaisMarcas.classList.contains("ativo")) {
+            menuMaisMarcas.classList.remove("ativo");
+            if(btnOriginal) btnOriginal.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
+        }
+    });
+
+    // Clique nas categorias dentro do menu flutuante (Redirecionamento)
     const botoesCat = document.querySelectorAll('.item-cat-dropdown');
     botoesCat.forEach(btn => {
         btn.addEventListener('click', function() {
@@ -415,26 +425,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if(categoria !== 'todas') url += `&cat=${encodeURIComponent(categoria)}`;
             window.location.href = url;
         });
-    });
-
-    // FECHAR MENUS AO CLICAR FORA
-    document.addEventListener('click', function(e) {
-        // Fechar Categorias Flutuantes
-        if(menuCategorias && menuCategorias.style.display === 'block') {
-            if (!menuCategorias.contains(e.target)) {
-                menuCategorias.style.display = 'none';
-                todosBotoesMarca.forEach(b => b.classList.remove('selecionada'));
-            }
-        }
-
-        // Fechar Menu Mais Marcas
-        if(menuMaisMarcas && menuMaisMarcas.classList.contains('ativo')) {
-            // Se o clique NÃO foi no menu E NÃO foi no botão
-            if (!menuMaisMarcas.contains(e.target) && !btnVerMais.contains(e.target)) {
-                menuMaisMarcas.classList.remove('ativo');
-                btnVerMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
-            }
-        }
     });
 
     // --- LOGIN / LOGOUT ---
