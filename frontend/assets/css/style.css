@@ -309,37 +309,7 @@ body {
     border-color: #ff6600 !important;
 }
 
-/* --- BOTÃO VER MAIS MARCAS --- */
-.botao-marcas {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    background-color: #fff;
-    color: #ff6600;
-    border: 2px solid #ff6600;
-    padding: 10px 25px;
-    font-size: 1rem;
-    font-weight: 700;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    margin: 20px auto;
-    outline: none;
-}
 
-.botao-marcas:hover {
-    background-color: #ff6600;
-    color: #fff;
-    box-shadow: 0 6px 12px rgba(255, 102, 0, 0.25);
-    transform: translateY(-2px);
-}
-
-.botao-marcas:active {
-    transform: translateY(1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
 
 /* --- MENU DE CATEGORIAS FLUTUANTE --- */
 #menuCategoriasFlutuante {
