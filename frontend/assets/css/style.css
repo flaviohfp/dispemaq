@@ -309,10 +309,12 @@ body {
     border-color: #ff6600 !important;
 }
 
+/* -----------VER MAIS MARCAS BOTAO-----------------------
+
 /* Container do botão 'Ver Mais' (Para ele ficar fixo na direita) */
 .dropdown-marcas {
-    position: sticky; /* O Pulo do gato: fixa o botão na direita */
-    right: 0;
+    position: sticky; /* fixa o botão na direita */
+    right: 5px;
     height: 100%; /* Garante que o container ocupe os 50px da barra */
     display: flex;
     align-items: center;
@@ -330,11 +332,11 @@ body {
     color: var(--branco);
     font-weight: 700; /* Um pouco mais negrito para destaque */
     font-size: 0.95rem;
-    padding: 0 25px;
+    padding: 0 10px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
     white-space: nowrap;
     transition: all 0.3s ease;
     box-shadow: -5px 0 15px rgba(0,0,0,0.1); /* Sombra suave na esquerda */
