@@ -476,3 +476,32 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+
+// --- FUNÇÃO DE EMERGÊNCIA PARA O MENU ---
+window.toggleMenuMarcas = function() {
+    console.log("Função forçada chamada!"); // Isso vai aparecer no F12 se funcionar
+    
+    const menu = document.getElementById("menuMaisMarcas");
+    const btn = document.getElementById("btnVerMais");
+
+    if (!menu) {
+        alert("ERRO: O menu com id='menuMaisMarcas' não foi encontrado no HTML!");
+        return;
+    }
+
+    // Lógica de Posição
+    const rect = btn.getBoundingClientRect();
+    menu.style.top = rect.bottom + "px";
+    menu.style.left = (rect.right - 250) + "px";
+    
+    // Alterna a classe
+    menu.classList.toggle("ativo");
+    
+    // Muda o ícone
+    if (menu.classList.contains("ativo")) {
+        btn.innerHTML = '<i class="fas fa-minus-circle"></i> Fechar';
+    } else {
+        btn.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
+    }
+}
