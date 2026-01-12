@@ -197,7 +197,7 @@ body {
 .item-marca {
     
     flex: 0 0 auto;
-    padding: 15px 25px;
+    padding: 15px 22px;
     background: transparent;
     border: none;
     color: var(--branco);
@@ -274,39 +274,6 @@ body {
     background: #f2f2f2;
 }
 
-/* ============================================================
-   BARRA DE MARCAS (Container Pai)
-   ============================================================ */
-.barra-marcas {
-    display: flex;              /* Alinha os itens lado a lado */
-    align-items: center;        /* Centraliza verticalmente */
-    overflow-x: auto;           /* Permite rolagem horizontal */
-    background-color: #ff6600;  /* Sua cor laranja */
-    padding: 10px 0;
-    position: relative;         /* Necessário para o filho sticky funcionar */
-    
-    /* Esconde a barra de rolagem para ficar mais bonito */
-    scrollbar-width: none;      /* Firefox */
-    -ms-overflow-style: none;   /* IE e Edge */
-}
-
-/* Esconde barra de rolagem no Chrome/Safari */
-.barra-marcas::-webkit-scrollbar {
-    display: none;
-}
-
-/* Itens normais (as marcas que rolam) */
-.item-marca {
-    flex: 0 0 auto;             /* Impede que os botões encolham */
-    margin: 0 10px;             /* Espaçamento entre as marcas */
-    white-space: nowrap;
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-weight: bold;
-    /* ... seus outros estilos de botão ... */
-}
 
 
 /* --- MENU DE MARCAS (DROPDOWN) --- */

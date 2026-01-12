@@ -11,7 +11,7 @@ let bannerSlideAtual = 0;
 let bannerTotalSlides = 0;
 window.intervaloBanner = null; 
 
-// Email do Admin (Deve ser igual ao cadastrado no Firebase Auth)
+// Email do Admin
 const EMAIL_ADMIN = "admin@dispemaq.com"; 
 
 /* ============================================================
@@ -36,39 +36,30 @@ async function carregarProdutosDestaque() {
 
         querySnapshot.forEach((docSnap) => {
             const produto = docSnap.data();
-            const id = docSnap.id; // ID DO FIREBASE
+            const id = docSnap.id;
             
-            // Garante que pega a imagem nova (img) ou antiga (urlImagem)
             const imagem = produto.img || produto.urlImagem || './assets/images/placeholder.jpg'; 
             const preco = parseFloat(produto.preco || 0);
-            
-            // CRIA O LINK COM O ID
             const linkDetalhes = `produto.html?id=${id}`;
             
             const htmlProduto = `
                 <div class="card-produto">
                     <div class="produto-imagem">
                         ${produto.promocao ? '<span class="badge-desconto">Oferta</span>' : ''}
-                        
                         <a href="${linkDetalhes}" style="display:block; width:100%; height:100%;">
                             <img src="${imagem}" alt="${produto.nome}" style="cursor:pointer;">
                         </a>
                     </div>
-
                     <div class="produto-info">
                         <span class="produto-categoria">${produto.categoria || 'Peças'}</span>
-                        
                         <a href="${linkDetalhes}" style="text-decoration:none; color:inherit;">
                             <h3 class="produto-nome">${produto.nome}</h3>
                         </a>
-
                         <span class="produto-codigo">Cód: ${produto.cod || produto.codigo || '--'}</span>
-                        
                         <div class="produto-precos">
                             <span class="preco-atual">R$ ${preco.toFixed(2).replace('.', ',')}</span>
                             <span class="preco-pix"><i class="fas fa-barcode"></i> R$ ${(preco * 0.95).toFixed(2).replace('.', ',')} no PIX</span>
                         </div>
-                        
                         <div class="produto-acoes">
                             <button class="botao-adicionar" 
                                 onclick="adicionarAoCarrinho(this)"
@@ -93,8 +84,10 @@ async function carregarProdutosDestaque() {
 
 // B) Carregar Banners
 async function carregarBanners() {
-    const slider = document.getElementById('bannerSlider');
+    // Tenta pegar o slider padrão ou o track novo (garante compatibilidade)
+    const slider = document.getElementById('bannerSlider') || document.getElementById('banner-track');
     const indicadores = document.getElementById('bannerIndicadores');
+    
     if(!slider) return;
 
     try {
@@ -106,41 +99,45 @@ async function carregarBanners() {
 
         if (docSnap.exists()) {
             const dados = docSnap.data();
-            
-            // VERIFICA SE TEM LISTA (Novo sistema)
             if (dados.listaBanners && Array.isArray(dados.listaBanners) && dados.listaBanners.length > 0) {
                 bannersData = dados.listaBanners;
-            } 
-            // SE NÃO, VERIFICA SE TEM URL ÚNICA (Sistema antigo - compatibilidade)
-            else if (dados.url) {
+            } else if (dados.url) {
                 bannersData = [{ img: dados.url }];
             }
         } 
         
-        // Se não achou nada, usa placeholders
         if (bannersData.length === 0) {
-            console.log("Nenhum banner configurado. Usando padrão.");
             bannersData = [
-                { img: 'https://placehold.co/1920x600/1e3a8a/FFF?text=Banner+1+-+Ofertas+da+Semana' },
-                { img: 'https://placehold.co/1920x600/ff6600/FFF?text=Banner+2+-+Envio+para+todo+Brasil' }
+                { img: 'https://placehold.co/1920x600/1e3a8a/FFF?text=Banner+1+-+Ofertas' },
+                { img: 'https://placehold.co/1920x600/ff6600/FFF?text=Banner+2+-+Entrega' }
             ];
         }
 
-        // Limpa o HTML atual
         slider.innerHTML = '';
         if(indicadores) indicadores.innerHTML = '';
 
-        // Renderiza os Banners
         bannersData.forEach((banner, index) => {
             const imgSrc = banner.img || banner.imagem;
 
-            // Cria a Div da Imagem
-            const div = document.createElement('div');
-            div.className = 'banner-item';
-            div.innerHTML = `<img src="${imgSrc}" alt="Banner ${index + 1}">`;
-            slider.appendChild(div);
+            // Renderiza Imagem
+            if (slider.id === 'banner-track') {
+                // Modo Flex (Novo)
+                const img = document.createElement('img');
+                img.src = imgSrc;
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover';
+                img.style.flexShrink = '0';
+                slider.appendChild(img);
+            } else {
+                // Modo Div (Antigo)
+                const div = document.createElement('div');
+                div.className = 'banner-item';
+                div.innerHTML = `<img src="${imgSrc}" alt="Banner ${index + 1}">`;
+                slider.appendChild(div);
+            }
 
-            // Cria a Bolinha (Indicador)
+            // Indicadores (se existirem)
             if(indicadores) {
                 const bola = document.createElement('div');
                 bola.className = `indicador ${index === 0 ? 'ativo' : ''}`;
@@ -149,13 +146,11 @@ async function carregarBanners() {
             }
         });
 
-        // Configura variáveis de controle
         bannerTotalSlides = bannersData.length;
         bannerSlideAtual = 0;
 
         // Auto-Play
         if (window.intervaloBanner) clearInterval(window.intervaloBanner);
-        
         if (bannerTotalSlides > 1) {
             window.intervaloBanner = setInterval(() => {
                 window.mudarSlide(1);
@@ -164,7 +159,6 @@ async function carregarBanners() {
 
     } catch (error) {
         console.error("Erro banner:", error);
-        slider.innerHTML = '<div class="banner-item"><img src="https://placehold.co/1920x500?text=Erro+ao+carregar" alt="Erro"></div>';
     }
 }
 
@@ -238,8 +232,12 @@ window.adicionarAoCarrinho = function(el) {
 
     atualizarBadge();
     renderizarCarrinho();
-    document.getElementById("carrinhoLateral").classList.add("aberto");
-    document.getElementById("overlay").classList.add("ativo");
+    
+    // Abre o carrinho lateral
+    const lateral = document.getElementById("carrinhoLateral");
+    const overlay = document.getElementById("overlay");
+    if(lateral) lateral.classList.add("aberto");
+    if(overlay) overlay.classList.add("ativo");
 };
 
 window.alterarQuantidade = function(id, acao) {
@@ -264,13 +262,15 @@ window.toggleCarrinho = function(e) {
     if(e) e.preventDefault();
     const car = document.getElementById("carrinhoLateral");
     const over = document.getElementById("overlay");
+    if(!car) return;
+
     if(car.classList.contains("aberto")) {
         car.classList.remove("aberto");
-        over.classList.remove("ativo");
+        if(over) over.classList.remove("ativo");
     } else {
         renderizarCarrinho();
         car.classList.add("aberto");
-        over.classList.add("ativo");
+        if(over) over.classList.add("ativo");
     }
 };
 
@@ -280,7 +280,7 @@ window.subirTopo = function() {
 
 // --- BANNER (CONTROLES) ---
 window.mostrarSlide = function(index) {
-    const slider = document.getElementById('bannerSlider');
+    const slider = document.getElementById('bannerSlider') || document.getElementById('banner-track');
     if (!slider || bannerTotalSlides <= 1) return;
 
     if (index >= bannerTotalSlides) bannerSlideAtual = 0;
@@ -289,9 +289,11 @@ window.mostrarSlide = function(index) {
 
     slider.style.transform = `translateX(-${bannerSlideAtual * 100}%)`;
 
-    document.querySelectorAll('.indicador').forEach((b, i) => {
-        b.classList.toggle('ativo', i === bannerSlideAtual);
-    });
+    // Atualiza indicadores se existirem
+    const dots = document.querySelectorAll('.indicador');
+    if(dots.length > 0) {
+        dots.forEach((b, i) => b.classList.toggle('ativo', i === bannerSlideAtual));
+    }
 }
 
 window.mudarSlide = function(direcao) {
@@ -312,44 +314,60 @@ document.addEventListener('DOMContentLoaded', function() {
     carregarBanners(); 
     atualizarBadge();
 
-    // --- MENUS E INTERFACE ---
-    const btnVerMais = document.getElementById("btnMarcas");
-    const menuMaisMarcas = document.getElementById("menuMarcas");
+    // --- CORREÇÃO: VER MAIS MARCAS ---
+    // Procura por ID "btnVerMais" (novo) OU "btnMarcas" (antigo)
+    const btnVerMais = document.getElementById("btnVerMais") || document.getElementById("btnMarcas");
+    const menuMaisMarcas = document.getElementById("menuMaisMarcas") || document.getElementById("menuMarcas");
     
     if (btnVerMais && menuMaisMarcas) {
+        console.log("Sistema Ver Mais Marcas iniciado."); // Debug
+
         btnVerMais.addEventListener("click", function(e) {
-            e.stopPropagation();
+            e.preventDefault();
+            e.stopPropagation(); // Impede que o clique feche imediatamente
+            
             menuMaisMarcas.classList.toggle("ativo");
+
+            // Fecha o menu de categorias flutuante se estiver aberto
             const menuCat = document.getElementById('menuCategoriasFlutuante');
             if(menuCat) menuCat.style.display = 'none';
 
+            // Alterna Texto e Ícone
             if (menuMaisMarcas.classList.contains("ativo")) {
                 btnVerMais.innerHTML = '<i class="fas fa-minus-circle"></i> Ver menos';
             } else {
                 btnVerMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
             }
         });
+    } else {
+        console.warn("Atenção: Botão ou Menu 'Ver Mais Marcas' não encontrado no HTML.");
     }
 
     // --- MENU DE CATEGORIAS FLUTUANTE ---
     const menuCategorias = document.getElementById('menuCategoriasFlutuante');
     const tituloMenuCat = document.getElementById('tituloMarcaDropdown');
+    
+    // Seleciona marcas da barra laranja E do menu dropdown "Ver Mais"
+    // Use delegation ou selecione todos agora
     const todosBotoesMarca = document.querySelectorAll('.item-marca, .marca-item');
 
     todosBotoesMarca.forEach(botao => {
         botao.addEventListener('click', function(e) {
             e.preventDefault();
-            e.stopPropagation();
+            e.stopPropagation(); // Impede propagação
 
+            // Reseta visual dos outros botões
             todosBotoesMarca.forEach(b => {
                 b.classList.remove('selecionada');
                 b.style.backgroundColor = '';
                 b.style.color = '';
             });
 
+            // Ativa o clicado
             this.classList.add('selecionada');
-            this.style.backgroundColor = '#ff6600';
-            this.style.color = 'white';
+            // Só aplica estilo inline se não for classe CSS
+            // this.style.backgroundColor = '#ff6600'; 
+            // this.style.color = 'white';
 
             const marcaNome = this.getAttribute('data-marca') || this.innerText.trim();
             const marcaNomeBonito = this.innerText.trim();
@@ -362,6 +380,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const top = rect.bottom + window.scrollY;
                 let left = rect.left + window.scrollX;
 
+                // Ajuste para não estourar a tela
                 if (left + 280 > window.innerWidth) left = window.innerWidth - 290;
                 if (left < 0) left = 10;
 
@@ -372,6 +391,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Clique nas categorias dentro do menu flutuante
     const botoesCat = document.querySelectorAll('.item-cat-dropdown');
     botoesCat.forEach(btn => {
         btn.addEventListener('click', function() {
@@ -382,29 +402,35 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Fechar menus ao clicar fora
+    // FECHAR MENUS AO CLICAR FORA
     document.addEventListener('click', function(e) {
+        // Fechar Categorias Flutuantes
         if(menuCategorias && menuCategorias.style.display === 'block') {
-            if (!menuCategorias.contains(e.target)) menuCategorias.style.display = 'none';
+            if (!menuCategorias.contains(e.target)) {
+                menuCategorias.style.display = 'none';
+                // Remove seleção visual das marcas
+                todosBotoesMarca.forEach(b => b.classList.remove('selecionada'));
+            }
         }
+
+        // Fechar Menu Mais Marcas
         if(menuMaisMarcas && menuMaisMarcas.classList.contains('ativo')) {
-            if (!menuMaisMarcas.contains(e.target) && e.target !== btnVerMais) {
+            // Se o clique NÃO foi no menu E NÃO foi no botão
+            if (!menuMaisMarcas.contains(e.target) && !btnVerMais.contains(e.target)) {
                 menuMaisMarcas.classList.remove('ativo');
                 btnVerMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
             }
         }
     });
 
-    // --- LOGIN / LOGOUT / ADMIN BTN ---
+    // --- LOGIN / LOGOUT ---
     const btnAuth = document.getElementById('btnAuth');
     const txtAuth = document.getElementById('txtAuth');
     const btnLinkAdmin = document.getElementById('btnLinkAdmin'); 
     
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            // -- LOGADO --
             if(txtAuth) txtAuth.innerText = "Sair";
-            
             if(btnAuth) {
                 btnAuth.href = "#";
                 btnAuth.onclick = (e) => {
@@ -412,19 +438,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     if(confirm("Sair da conta?")) signOut(auth).then(() => window.location.reload());
                 };
             }
-
-            // MOSTRAR BOTÃO ADMIN
-            if (user.email === EMAIL_ADMIN) {
-                if(btnLinkAdmin) btnLinkAdmin.style.display = 'inline-flex';
-            } else {
-                if(btnLinkAdmin) btnLinkAdmin.style.display = 'none';
+            if (user.email === EMAIL_ADMIN && btnLinkAdmin) {
+                btnLinkAdmin.style.display = 'inline-flex';
+            } else if (btnLinkAdmin) {
+                btnLinkAdmin.style.display = 'none';
             }
-
             const popup = document.getElementById('popupAvisoLogin');
             if(popup) popup.style.display = 'none';
-
         } else {
-            // -- DESLOGADO --
             if(txtAuth) txtAuth.innerText = "Entrar";
             if(btnAuth) {
                 btnAuth.href = "login.html";
