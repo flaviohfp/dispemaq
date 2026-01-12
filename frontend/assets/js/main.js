@@ -314,28 +314,44 @@ document.addEventListener('DOMContentLoaded', function() {
     carregarBanners(); 
     atualizarBadge();
 
-    // --- CORREÇÃO: VER MAIS MARCAS ---
-    // Procura por ID "btnVerMais" (novo) OU "btnMarcas" (antigo)
+    // --- CORREÇÃO: VER MAIS MARCAS (LÓGICA DO MENU FIXO) ---
     const btnVerMais = document.getElementById("btnVerMais") || document.getElementById("btnMarcas");
     const menuMaisMarcas = document.getElementById("menuMaisMarcas") || document.getElementById("menuMarcas");
     
     if (btnVerMais && menuMaisMarcas) {
-        console.log("Sistema Ver Mais Marcas iniciado."); // Debug
+        console.log("Sistema Ver Mais Marcas iniciado.");
 
         btnVerMais.addEventListener("click", function(e) {
             e.preventDefault();
-            e.stopPropagation(); // Impede que o clique feche imediatamente
+            e.stopPropagation(); 
             
+            // 1. Calcula onde o botão está na tela AGORA
+            const rect = btnVerMais.getBoundingClientRect();
+            
+            // 2. Posiciona o menu FIXED na tela
+            menuMaisMarcas.style.top = rect.bottom + "px"; // Cola embaixo do botão
+            // Alinha a direita do menu com a direita do botão (assumindo menu 250px)
+            menuMaisMarcas.style.left = (rect.right - 250) + "px"; 
+            
+            // 3. Mostra/Esconde
             menuMaisMarcas.classList.toggle("ativo");
 
-            // Fecha o menu de categorias flutuante se estiver aberto
+            // Fecha o menu de categorias flutuante de peças se estiver aberto
             const menuCat = document.getElementById('menuCategoriasFlutuante');
             if(menuCat) menuCat.style.display = 'none';
 
             // Alterna Texto e Ícone
             if (menuMaisMarcas.classList.contains("ativo")) {
-                btnVerMais.innerHTML = '<i class="fas fa-minus-circle"></i> Ver menos';
+                btnVerMais.innerHTML = '<i class="fas fa-minus-circle"></i> Fechar';
             } else {
+                btnVerMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
+            }
+        });
+
+        // Fechar menu ao rolar a página (para não ficar voando)
+        window.addEventListener("scroll", () => {
+            if(menuMaisMarcas.classList.contains("ativo")) {
+                menuMaisMarcas.classList.remove("ativo");
                 btnVerMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
             }
         });
@@ -343,18 +359,15 @@ document.addEventListener('DOMContentLoaded', function() {
         console.warn("Atenção: Botão ou Menu 'Ver Mais Marcas' não encontrado no HTML.");
     }
 
-    // --- MENU DE CATEGORIAS FLUTUANTE ---
+    // --- MENU DE CATEGORIAS FLUTUANTE (PEÇAS) ---
     const menuCategorias = document.getElementById('menuCategoriasFlutuante');
     const tituloMenuCat = document.getElementById('tituloMarcaDropdown');
-    
-    // Seleciona marcas da barra laranja E do menu dropdown "Ver Mais"
-    // Use delegation ou selecione todos agora
     const todosBotoesMarca = document.querySelectorAll('.item-marca, .marca-item');
 
     todosBotoesMarca.forEach(botao => {
         botao.addEventListener('click', function(e) {
             e.preventDefault();
-            e.stopPropagation(); // Impede propagação
+            e.stopPropagation(); 
 
             // Reseta visual dos outros botões
             todosBotoesMarca.forEach(b => {
@@ -365,10 +378,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Ativa o clicado
             this.classList.add('selecionada');
-            // Só aplica estilo inline se não for classe CSS
-            // this.style.backgroundColor = '#ff6600'; 
-            // this.style.color = 'white';
-
+            
             const marcaNome = this.getAttribute('data-marca') || this.innerText.trim();
             const marcaNomeBonito = this.innerText.trim();
             marcaAtualSelecionada = marcaNome;
@@ -376,8 +386,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if(tituloMenuCat) tituloMenuCat.innerText = "Peças para " + marcaNomeBonito;
 
             if(menuCategorias) {
+                // Cálculo para o Submenu (Absolute ou Fixed depende do seu CSS)
+                // Aqui mantemos a lógica original que funcionava para o submenu
                 const rect = this.getBoundingClientRect();
-                const top = rect.bottom + window.scrollY;
+                const top = rect.bottom + window.scrollY; // Absolute usa scrollY
                 let left = rect.left + window.scrollX;
 
                 // Ajuste para não estourar a tela
@@ -408,7 +420,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if(menuCategorias && menuCategorias.style.display === 'block') {
             if (!menuCategorias.contains(e.target)) {
                 menuCategorias.style.display = 'none';
-                // Remove seleção visual das marcas
                 todosBotoesMarca.forEach(b => b.classList.remove('selecionada'));
             }
         }

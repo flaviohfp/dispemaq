@@ -309,81 +309,73 @@ body {
     border-color: #ff6600 !important;
 }
 
-/* -----------VER MAIS MARCAS BOTAO-----------------------
 
-/* Container do botão 'Ver Mais' (Para ele ficar fixo na direita) */
+
+/* ----------- VER MAIS MARCAS (CORRIGIDO) ----------------------- */
+
+/* Container do botão (Mantém o botão preso na direita ao rolar) */
 .dropdown-marcas {
-    position: sticky; /* fixa o botão na direita */
-    right: 5px;
-    height: 100%; /* Garante que o container ocupe os 50px da barra */
+    position: sticky; 
+    right: 0;
+    height: 100%; 
     display: flex;
     align-items: center;
-    z-index: 15; /* Fica acima das marcas que rolam */
-    margin-left: auto; /* Empurra para o final se sobrar espaço */
+    z-index: 20; 
+    margin-left: auto; 
 }
 
-/* O Botão em si (Estilo idêntico ao .item-marca, mas com destaque) */
-#btnMarcas, /* ID que usamos no JS */
+/* Estilo do Botão */
+#btnVerMais, /* ID usado no HTML */
 .botao-marcas {
-    height: 100%; /* Ocupa toda a altura da barra */
-    background: #ea580c; /* Cor sólida igual ao final do gradiente para cobrir itens atrás */
+    height: 100%; 
+    background: #ea580c; 
     border: none;
-    border-left: 1px solid rgba(255,255,255,0.2); /* Separador sutil */
+    border-left: 1px solid rgba(255,255,255,0.2); 
     color: var(--branco);
-    font-weight: 700; /* Um pouco mais negrito para destaque */
+    font-weight: 700; 
     font-size: 0.95rem;
-    padding: 0 10px;
+    padding: 0 15px; /* Ajustei padding para não ficar muito largo */
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     white-space: nowrap;
     transition: all 0.3s ease;
-    box-shadow: -5px 0 15px rgba(0,0,0,0.1); /* Sombra suave na esquerda */
+    box-shadow: -5px 0 15px rgba(0,0,0,0.15); 
 }
 
-/* Hover igual aos outros itens */
-#btnMarcas:hover,
+#btnVerMais:hover,
 .botao-marcas:hover {
-    background: #c2410c; /* Um tom levemente mais escuro do laranja */
+    background: #c2410c; 
 }
 
-/* Ícone dentro do botão */
-#btnMarcas i,
-.botao-marcas i {
-    font-size: 1.1rem;
-}
-
-/* O MENU QUE ABRE (Ajustado para alinhar perfeitamente) */
+/* O MENU FLUTUANTE (A Mágica acontece aqui) */
 .menu-marcas-dropdown {
-    display: none; /* JS vai trocar para block ou flex */
-    position: absolute;
-    top: 100%; /* Cola exatamente embaixo da barra */
-    right: 0; /* Alinha à direita do botão */
-    width: 280px;
+    display: none; 
+    position: fixed; /* ISSO TIRA ELE DE DENTRO DA BARRA */
+    width: 250px; /* Largura fixa do menu */
     background: #fff;
     border-radius: 0 0 8px 8px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3); /* Sombra forte para destacar */
     padding: 10px 0;
     flex-direction: column;
-    z-index: 100;
-    max-height: 400px; /* Evita menu gigante */
-    overflow-y: auto; /* Scroll dentro do menu se tiver muita marca */
-    border-top: 3px solid #ea580c; /* Detalhe laranja no topo */
+    z-index: 9999; /* Garante que fique acima de TUDO no site */
+    max-height: 400px;
+    overflow-y: auto;
+    border-top: 3px solid #ea580c;
 }
 
 .menu-marcas-dropdown.ativo {
     display: flex;
-    animation: slideDown 0.2s ease-out;
+    animation: fadeIn 0.2s ease-out;
 }
 
-/* Animação suave de entrada */
-@keyframes slideDown {
+@keyframes fadeIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Itens dentro do menu (Estilo limpo) */
+/* Itens do Menu */
 .menu-marcas-dropdown .marca-item {
     width: 100%;
     padding: 12px 20px;
@@ -394,21 +386,18 @@ body {
     color: #333;
     font-size: 0.95rem;
     cursor: pointer;
-    transition: 0.2s;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-}
-
-.menu-marcas-dropdown .marca-item:last-child {
-    border-bottom: none;
+    align-items: center;
+    transition: 0.2s;
 }
 
 .menu-marcas-dropdown .marca-item:hover {
-    background-color: #fff3e0; /* Laranja bem clarinho no hover */
+    background-color: #fff3e0;
     color: #ea580c;
-    padding-left: 25px; /* Pequeno movimento para direita */
+    padding-left: 25px;
 }
+
 
 
 /* --- MENU DE CATEGORIAS FLUTUANTE --- */
