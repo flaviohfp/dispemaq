@@ -194,7 +194,7 @@ body {
     border-radius: 4px;
 }
 
-.item-marca {
+.item-marca{
     
     flex: 0 0 auto;
     padding: 15px 22px;
@@ -259,7 +259,7 @@ body {
     z-index: 20;
 }
 
-.marca-item {
+.marca-item{
     width: 100%;
     padding: 10px 16px;
     background: none;
@@ -309,6 +309,104 @@ body {
     border-color: #ff6600 !important;
 }
 
+/* Container do botão 'Ver Mais' (Para ele ficar fixo na direita) */
+.dropdown-marcas {
+    position: sticky; /* O Pulo do gato: fixa o botão na direita */
+    right: 0;
+    height: 100%; /* Garante que o container ocupe os 50px da barra */
+    display: flex;
+    align-items: center;
+    z-index: 15; /* Fica acima das marcas que rolam */
+    margin-left: auto; /* Empurra para o final se sobrar espaço */
+}
+
+/* O Botão em si (Estilo idêntico ao .item-marca, mas com destaque) */
+#btnMarcas, /* ID que usamos no JS */
+.botao-marcas {
+    height: 100%; /* Ocupa toda a altura da barra */
+    background: #ea580c; /* Cor sólida igual ao final do gradiente para cobrir itens atrás */
+    border: none;
+    border-left: 1px solid rgba(255,255,255,0.2); /* Separador sutil */
+    color: var(--branco);
+    font-weight: 700; /* Um pouco mais negrito para destaque */
+    font-size: 0.95rem;
+    padding: 0 25px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.1); /* Sombra suave na esquerda */
+}
+
+/* Hover igual aos outros itens */
+#btnMarcas:hover,
+.botao-marcas:hover {
+    background: #c2410c; /* Um tom levemente mais escuro do laranja */
+}
+
+/* Ícone dentro do botão */
+#btnMarcas i,
+.botao-marcas i {
+    font-size: 1.1rem;
+}
+
+/* O MENU QUE ABRE (Ajustado para alinhar perfeitamente) */
+.menu-marcas-dropdown {
+    display: none; /* JS vai trocar para block ou flex */
+    position: absolute;
+    top: 100%; /* Cola exatamente embaixo da barra */
+    right: 0; /* Alinha à direita do botão */
+    width: 280px;
+    background: #fff;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    padding: 10px 0;
+    flex-direction: column;
+    z-index: 100;
+    max-height: 400px; /* Evita menu gigante */
+    overflow-y: auto; /* Scroll dentro do menu se tiver muita marca */
+    border-top: 3px solid #ea580c; /* Detalhe laranja no topo */
+}
+
+.menu-marcas-dropdown.ativo {
+    display: flex;
+    animation: slideDown 0.2s ease-out;
+}
+
+/* Animação suave de entrada */
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Itens dentro do menu (Estilo limpo) */
+.menu-marcas-dropdown .marca-item {
+    width: 100%;
+    padding: 12px 20px;
+    text-align: left;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #f0f0f0;
+    color: #333;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.menu-marcas-dropdown .marca-item:last-child {
+    border-bottom: none;
+}
+
+.menu-marcas-dropdown .marca-item:hover {
+    background-color: #fff3e0; /* Laranja bem clarinho no hover */
+    color: #ea580c;
+    padding-left: 25px; /* Pequeno movimento para direita */
+}
 
 
 /* --- MENU DE CATEGORIAS FLUTUANTE --- */
@@ -384,44 +482,6 @@ body {
     }
 }
 
-/* --- CSS DO BOTÃO "VER MAIS MARCAS" --- */
-.botao-marcas {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px; /* Espaço entre o ícone e o texto */
-    background-color: #fff; /* Fundo branco limpo */
-    color: #ff6600; /* Cor do texto e ícone (laranja da sua marca) */
-    border: 2px solid #ff6600; /* Borda laranja para destaque */
-    padding: 8px 6px; /* Tamanho confortável */
-    font-size: 1rem;
-    font-weight: 700; /* Negrito para chamar atenção */
-    border-radius: 5px; /* Bordas bem arredondadas (estilo pílula) */
-    cursor: pointer; /* Cursor de mãozinha */
-    transition: all 0.3s ease; /* Efeito suave ao passar o mouse */
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* Sombra leve para dar profundidade */
-    margin: 15px auto; /* Centraliza se estiver em um container flex/grid */
-    outline: none; /* Remove contorno padrão do navegador */
-}
-
-/* Efeito ao passar o mouse (Hover) */
-.botao-marcas:hover {
-    background-color: #ff6600; /* Preenche o fundo de laranja */
-    color: #fff; /* Muda o texto para branco */
-    box-shadow: 0 6px 12px rgba(255, 102, 0, 0.25); /* Sombra laranja mais forte */
-    transform: translateY(-2px); /* Leve elevação para efeito 3D */
-}
-
-/* Efeito ao clicar */
-.botao-marcas:active {
-    transform: translateY(1px); /* Leve afundamento ao clicar */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-/* Ajuste para o ícone ficar do tamanho certo */
-.botao-marcas i {
-    font-size: 1.2rem;
-}
 
 
 /* --- CSS DO MENU DE CATEGORIAS (FLUTUANTE) --- */
