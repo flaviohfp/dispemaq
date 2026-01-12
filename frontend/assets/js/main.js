@@ -27,17 +27,19 @@ async function carregarProdutosDestaque() {
 
     try {
         const querySnapshot = await getDocs(collection(db, "produtos"));
-        container.innerHTML = ''; 
-
+        
         if (querySnapshot.empty) {
             container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Nenhum produto cadastrado.</p>';
             return;
         }
 
+        let htmlFinal = ''; // Variável para acumular o HTML (melhora performance)
+
         querySnapshot.forEach((docSnap) => {
             const produto = docSnap.data();
             const id = docSnap.id;
             
+            // Tratamento de imagem e preço
             const imagem = produto.img || produto.urlImagem || './assets/images/placeholder.jpg'; 
             const preco = parseFloat(produto.preco || 0);
             const linkDetalhes = `produto.html?id=${id}`;
@@ -73,8 +75,10 @@ async function carregarProdutosDestaque() {
                     </div>
                 </div>
             `;
-            container.innerHTML += htmlProduto;
+            htmlFinal += htmlProduto;
         });
+
+        container.innerHTML = htmlFinal;
 
     } catch (error) {
         console.error("Erro ao carregar produtos:", error);
@@ -387,7 +391,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if(menuCategorias) {
                 // Cálculo para o Submenu (Absolute ou Fixed depende do seu CSS)
-                // Aqui mantemos a lógica original que funcionava para o submenu
                 const rect = this.getBoundingClientRect();
                 const top = rect.bottom + window.scrollY; // Absolute usa scrollY
                 let left = rect.left + window.scrollX;

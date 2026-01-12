@@ -310,94 +310,147 @@ body {
 }
 
 
+/* ============================================================
+   ESTILOS DO MENU "VER MAIS MARCAS" (DROPDOWN)
+   ============================================================ */
 
-/* ----------- VER MAIS MARCAS (CORRIGIDO) ----------------------- */
-
-/* Container do botão (Mantém o botão preso na direita ao rolar) */
+/* 1. Container do botão 
+   (Mantém o botão preso na direita ao rolar a barra de marcas) */
 .dropdown-marcas {
     position: sticky; 
     right: 0;
+    top: 0;
     height: 100%; 
     display: flex;
     align-items: center;
-    z-index: 20; 
+    z-index: 50; /* Aumentado para garantir prioridade na barra */
     margin-left: auto; 
+    background: transparent; /* Garante que não tape o fundo */
 }
 
-/* Estilo do Botão */
-#btnVerMais, /* ID usado no HTML */
+/* 2. Estilo do Botão */
+#btnVerMais, 
 .botao-marcas {
     height: 100%; 
+    min-height: 50px; /* Garante altura mínima clicável */
     background: #ea580c; 
     border: none;
     border-left: 1px solid rgba(255,255,255,0.2); 
-    color: var(--branco);
+    color: #ffffff; /* Usei hex direto caso a var(--branco) falhe */
     font-weight: 700; 
     font-size: 0.95rem;
-    padding: 0 15px; /* Ajustei padding para não ficar muito largo */
+    padding: 0 20px; 
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     white-space: nowrap;
     transition: all 0.3s ease;
-    box-shadow: -5px 0 15px rgba(0,0,0,0.15); 
+    box-shadow: -5px 0 15px rgba(0,0,0,0.1); 
 }
 
 #btnVerMais:hover,
 .botao-marcas:hover {
     background: #c2410c; 
+    padding-right: 25px; /* Efeito visual de movimento */
 }
 
-/* O MENU FLUTUANTE (A Mágica acontece aqui) */
+/* 3. O MENU FLUTUANTE (Aparece via Javascript) */
 .menu-marcas-dropdown {
     display: none; 
-    position: fixed; /* ISSO TIRA ELE DE DENTRO DA BARRA */
-    width: 250px; /* Largura fixa do menu */
+    position: fixed; /* OBRIGATÓRIO: O JS calcula a posição na tela */
+    width: 250px;
+    max-width: 90vw; /* Segurança para telas pequenas */
     background: #fff;
     border-radius: 0 0 8px 8px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.3); /* Sombra forte para destacar */
-    padding: 10px 0;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.25); 
+    padding: 0;
     flex-direction: column;
-    z-index: 9999; /* Garante que fique acima de TUDO no site */
+    z-index: 9999; /* Garante que fique acima de TUDO (banners, chat, etc) */
     max-height: 400px;
-    overflow-y: auto;
-    border-top: 3px solid #ea580c;
+    overflow-y: auto; /* Permite rolagem se a lista for grande */
+    border-top: 4px solid #ea580c;
 }
 
+/* Animação de entrada */
 .menu-marcas-dropdown.ativo {
     display: flex;
-    animation: fadeIn 0.2s ease-out;
+    animation: slideDownFade 0.25s ease-out forwards;
 }
 
-@keyframes fadeIn {
+@keyframes slideDownFade {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Itens do Menu */
+/* 4. Estilização da Barra de Rolagem (Scrollbar) */
+.menu-marcas-dropdown::-webkit-scrollbar {
+    width: 6px;
+}
+.menu-marcas-dropdown::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+.menu-marcas-dropdown::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+.menu-marcas-dropdown::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* 5. Itens do Menu */
 .menu-marcas-dropdown .marca-item {
     width: 100%;
-    padding: 12px 20px;
+    padding: 14px 20px;
     text-align: left;
-    background: transparent;
+    background: #fff;
     border: none;
     border-bottom: 1px solid #f0f0f0;
-    color: #333;
+    color: #475569;
     font-size: 0.95rem;
+    font-weight: 500;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: 0.2s;
+    transition: all 0.2s ease;
+    text-decoration: none; /* Caso seja tag <a> */
 }
 
+/* Ícone de seta implícito (opcional) */
+.menu-marcas-dropdown .marca-item::after {
+    content: '\f054'; /* Código FontAwesome chevron-right */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    font-size: 0.7rem;
+    opacity: 0;
+    transition: 0.2s;
+    transform: translateX(-5px);
+}
+
+/* Hover no item */
 .menu-marcas-dropdown .marca-item:hover {
-    background-color: #fff3e0;
+    background-color: #fff7ed; /* Laranja bem clarinho */
     color: #ea580c;
     padding-left: 25px;
 }
 
+.menu-marcas-dropdown .marca-item:hover::after {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* ESTADO SELECIONADO (Importante para o JS funcionar visualmente) */
+.menu-marcas-dropdown .marca-item.selecionada {
+    background-color: #ea580c;
+    color: #fff;
+    border-color: #ea580c;
+}
+
+.menu-marcas-dropdown .marca-item.selecionada::after {
+    color: #fff;
+    opacity: 1;
+}
 
 
 /* --- MENU DE CATEGORIAS FLUTUANTE --- */
