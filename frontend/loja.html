@@ -10,6 +10,45 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <link rel="stylesheet" href="./assets/css/style.css" />
+
+    <style>
+      
+      /* --- ESTILOS EXTRAS PARA FILTROS --- */
+      .filtro-item {
+          cursor: pointer;
+          transition: color 0.2s, background 0.2s;
+          padding: 5px 0;
+      }
+      .filtro-item:hover {
+          color: #ff6600;
+          padding-left: 5px;
+      }
+      .filtro-item.ativo {
+          font-weight: bold;
+          color: #ff6600;
+      }
+
+      /* Popup Styles */
+      .overlay-popup {
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+          background: rgba(0,0,0,0.6); z-index: 9999;
+          display: none; 
+          align-items: center; justify-content: center;
+      }
+      .box-popup {
+          background: white; padding: 30px; border-radius: 10px;
+          text-align: center; max-width: 400px; width: 90%; position: relative;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      }
+      .fechar-popup {
+          position: absolute; top: 10px; right: 15px; font-size: 28px;
+          background: none; border: none; cursor: pointer; color: #666;
+      }
+      .botoes-popup { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+      .texto-pequeno { font-size: 12px; color: #999; margin-top: 15px; }
+      .botao-secundario { background-color: #666; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;}
+      .botao-primario { background-color: #ff6600; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;}
+    </style>
   </head>
   <body>
     <div class="barra-anuncio">
@@ -43,28 +82,52 @@
           </div>
 
           <div class="acoes-usuario">
-            <a href="index.html" class="item-acao">
-              <i class="fas fa-home"></i>
-              <span>Início</span>
-            </a>
+            
+            <div class="header-btn-container">
+              <a href="cadastro.html" class="header-btn-trigger" id="btnAuth">
+                <div class="header-icon-svg">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#000000" viewBox="0 0 256 256"><path d="M230.93,220a8,8,0,0,1-6.93,4H32a8,8,0,0,1-6.92-12c15.23-26.33,38.7-45.21,66.09-54.16a72,72,0,1,1,73.66,0c27.39,8.95,50.86,27.83,66.09,54.16A8,8,0,0,1,230.93,220Z"></path></svg>
+                </div>
+                <div class="header-text" id="txtAuth">
+                  <strong>Entre</strong> ou<br><strong>Cadastre-se</strong>
+                </div>
+              </a>
 
-            <a href="login.html" class="item-acao" id="btnAuth">
-              <i class="fas fa-user-circle" id="iconAuth"></i>
-              <span id="txtAuth">Entrar</span>
-            </a>
-
-            <a href="#" class="item-acao" onclick="toggleCarrinho(event)">
-              <div class="carrinho-botao">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="badge-carrinho" id="badgeCarrinhoLoja">0</span>
+              <div class="login-dropdown-content" id="loginDropdown">
+                <div class="dropdown-arrow">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#fff" viewBox="0 0 256 256"><path d="M215.39,163.06A8,8,0,0,1,208,168H48a8,8,0,0,1-5.66-13.66l80-80a8,8,0,0,1,11.32,0l80,80A8,8,0,0,1,215.39,163.06Z"></path></svg>
+                </div>
+                <div class="dropdown-box-inner">
+                  <span class="dropdown-title">Já possui cadastro?<br>Acesse sua conta</span>
+                  <a href="login.html" class="btn-entrar-full">ENTRAR</a>
+                  <div class="dropdown-bottom-links">
+                    <a href="cadastro.html" title="Cadastrar">Cliente novo? <strong>Cadastrar</strong></a>
+                    <a href="login.html?pedidos=true" title="Consultar pedido">Consulte seu pedido <strong>acompanhe aqui</strong></a>
+                  </div>
+                </div>
               </div>
-              <span>Carrinho</span>
+            </div>
+
+            <div class="header-btn-container">
+                <a href="#" class="header-btn-trigger" onclick="toggleCarrinho(event)">
+                  <div class="header-icon-svg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#000000" viewBox="0 0 256 256"><path d="M222.14,58.87A8,8,0,0,0,216,56H54.68L49.79,29.14A16,16,0,0,0,34.05,16H16a8,8,0,0,0,0,16h18L59.56,172.29a24,24,0,0,0,5.33,11.27,28,28,0,1,0,44.4,8.44h45.42A27.75,27.75,0,0,0,152,204a28,28,0,1,0,28-28H83.17a8,8,0,0,1-7.87-6.57L72.13,152h116a24,24,0,0,0,23.61-19.71l12.16-66.86A8,8,0,0,0,222.14,58.87ZM96,204a12,12,0,1,1-12-12A12,12,0,0,1,96,204Zm96,0a12,12,0,1,1-12-12A12,12,0,0,1,192,204Zm4-74.57A8,8,0,0,1,188.1,136H69.22L57.59,72H206.41Z"></path></svg>
+                    <span class="badge-carrinho" id="badgeCarrinhoLoja">0</span>
+                  </div>
+                  <div class="header-text">
+                    <strong>Meu</strong><br>Carrinho
+                  </div>
+                </a>
+            </div>
+
+            <a href="https://wa.me/554984276503" class="header-btn-container" style="text-decoration: none; color: inherit;">
+               <div class="header-btn-trigger">
+                   <div class="header-icon-svg">
+                       <i class="fab fa-whatsapp" style="font-size: 26px; color: #25D366;"></i>
+                   </div>
+               </div>
             </a>
 
-            <a href="https://wa.me/" class="item-acao destaque-whatsapp">
-              <i class="fab fa-whatsapp"></i>
-              <span>Vendas</span>
-            </a>
           </div>
         </div>
       </div>
@@ -88,7 +151,7 @@
                 
                 <div class="grupo-filtro">
                     <h4>Categorias</h4>
-                    <ul>
+                    <ul id="listaCategorias">
                         <li class="filtro-item" data-cat="todas">Ver Todas</li>
                         <li class="filtro-item" data-cat="motor">Motor</li>
                         <li class="filtro-item" data-cat="hidraulica">Hidráulica</li>
@@ -102,7 +165,7 @@
 
                 <div class="grupo-filtro">
                     <h4>Marcas</h4>
-                    <ul>
+                    <ul id="listaMarcas">
                         <li class="filtro-item" data-marca="todas">Todas as Marcas</li>
                         <li class="filtro-item" data-marca="caterpillar">Caterpillar</li>
                         <li class="filtro-item" data-marca="komatsu">Komatsu</li>
@@ -146,13 +209,13 @@
           <div class="coluna-rodape">
             <h4>Contato</h4>
             <ul class="info-rodape">
-              <li><i class="fas fa-phone-alt"></i> (00) 0000-0000</li>
-              <li><i class="fab fa-whatsapp"></i> (00) 90000-0000</li>
+              <li><i class="fas fa-phone-alt"></i> (49) 8427-6503</li>
+              <li><i class="fab fa-whatsapp"></i> (49) 8427-6503</li>
             </ul>
           </div>
         </div>
         <div class="rodape-inferior">
-          <p>&copy; 2024 Dispemaq. Todos os direitos reservados.</p>
+          <p>&copy; 2026 Dispemaq. Todos os direitos reservados.</p>
         </div>
       </div>
     </footer>
@@ -165,11 +228,14 @@
         </div>
         <div class="carrinho-conteudo" id="itensCarrinhoHtml"></div>
         <div class="carrinho-footer">
+            <div class="carrinho-total">
+               <span>Total:</span> <strong id="totalCarrinhoLateral">R$ 0,00</strong>
+            </div>
             <button class="botao botao-primario botao-block">Finalizar Compra</button>
         </div>
     </div>
 
-    <a href="#" class="whatsapp-flutuante"><i class="fab fa-whatsapp"></i></a>
+    <a href="https://wa.me/554984276503" class="whatsapp-flutuante"><i class="fab fa-whatsapp"></i></a>
 
     <div id="popupAvisoLogin" class="overlay-popup">
         <div class="box-popup">
@@ -184,32 +250,10 @@
         </div>
     </div>
 
-    <style>
-        .overlay-popup {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 9999;
-            display: none; /* JS controla isso */
-            align-items: center; justify-content: center;
-        }
-        .box-popup {
-            background: white; padding: 30px; border-radius: 10px;
-            text-align: center; max-width: 400px; width: 90%; position: relative;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-        .fechar-popup {
-            position: absolute; top: 10px; right: 15px; font-size: 28px;
-            background: none; border: none; cursor: pointer; color: #666;
-        }
-        .botoes-popup { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
-        .texto-pequeno { font-size: 12px; color: #999; margin-top: 15px; }
-        .botao-secundario { background-color: #666; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;}
-        .botao-primario { background-color: #ff6600; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;}
-    </style>
-
     <script type="module" src="./assets/js/loja.js"></script>
     
     <script>
-        // Função visual do Carrinho
+        // --- FUNÇÕES DE INTERFACE (Carrinho e Popup) ---
         function toggleCarrinho(e) {
             if(e) e.preventDefault();
             const sidebar = document.getElementById('carrinhoLateral');
@@ -224,56 +268,95 @@
             overlay.addEventListener('click', () => toggleCarrinho());
         }
 
-        // Função para fechar o popup e lembrar
         window.fecharPopupLogin = function() {
             document.getElementById('popupAvisoLogin').style.display = 'none';
             sessionStorage.setItem('popupFechado', 'true');
         }
+
+        // --- SCRIPT DE CORREÇÃO DA FILTRAGEM ---
+        // Lê os parâmetros da URL (ex: ?marca=caterpillar) e simula o clique no filtro
+        document.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const marcaParam = urlParams.get('marca');
+            const catParam = urlParams.get('cat');
+            
+            // Se houver parâmetro de marca na URL
+            if (marcaParam) {
+                const btnMarca = document.querySelector(`.filtro-item[data-marca="${marcaParam}"]`);
+                if (btnMarca) {
+                    console.log("Aplicando filtro automático de marca:", marcaParam);
+                    // Adiciona classe ativa visualmente
+                    document.querySelectorAll('.filtro-item[data-marca]').forEach(b => b.classList.remove('ativo'));
+                    btnMarca.classList.add('ativo');
+                    
+                    // Simula o clique para disparar o JS da loja (loja.js)
+                    // Pequeno delay para garantir que o loja.js carregou os eventos
+                    setTimeout(() => btnMarca.click(), 500); 
+                }
+            }
+            
+            // Se houver parâmetro de categoria na URL
+            if (catParam) {
+                const btnCat = document.querySelector(`.filtro-item[data-cat="${catParam}"]`);
+                if (btnCat) {
+                    console.log("Aplicando filtro automático de categoria:", catParam);
+                    document.querySelectorAll('.filtro-item[data-cat]').forEach(b => b.classList.remove('ativo'));
+                    btnCat.classList.add('ativo');
+                    setTimeout(() => btnCat.click(), 500);
+                }
+            }
+        });
     </script>
 
     <script type="module">
+        // --- SCRIPT DE AUTENTICAÇÃO E LÓGICA DO HEADER ---
         import { auth, onAuthStateChanged, signOut } from './assets/js/firebase-config.js';
 
         const btnAuth = document.getElementById('btnAuth');
         const txtAuth = document.getElementById('txtAuth');
-        const iconAuth = document.getElementById('iconAuth');
+        const dropdown = document.getElementById('loginDropdown'); // Dropdown flutuante
         const popup = document.getElementById('popupAvisoLogin');
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // --- USUÁRIO ESTÁ LOGADO ---
+                // --- USUÁRIO LOGADO ---
                 console.log("Usuário logado:", user.email);
                 
-                // Muda botão para "SAIR"
-                txtAuth.innerText = "Sair";
-                iconAuth.className = "fas fa-sign-out-alt"; // Ícone de saída
-                btnAuth.href = "#"; // Não vai pra login.html
+                // Altera o texto do botão
+                txtAuth.innerHTML = "<strong>Sair</strong><br>da conta";
                 
-                // Quando clicar em Sair, desloga do Firebase
+                // Esconde o dropdown de login (pois já está logado)
+                // Ou podemos manter para mostrar "Meus Pedidos", mas vamos simplificar:
+                if(dropdown) dropdown.style.display = 'none'; 
+
+                // Ação do botão vira Logout
+                btnAuth.removeAttribute('href');
                 btnAuth.onclick = (e) => {
                     e.preventDefault();
                     if(confirm("Deseja realmente sair da conta?")) {
                         signOut(auth).then(() => {
-                            window.location.reload(); // Recarrega a página
+                            window.location.reload();
                         });
                     }
                 };
 
                 // Garante que o popup não apareça
-                popup.style.display = 'none';
+                if(popup) popup.style.display = 'none';
 
             } else {
-                // --- USUÁRIO NÃO ESTÁ LOGADO ---
+                // --- USUÁRIO NÃO LOGADO ---
                 console.log("Ninguém logado.");
 
-                // Muda botão para "ENTRAR"
-                txtAuth.innerText = "Entrar";
-                iconAuth.className = "fas fa-user-circle";
-                btnAuth.href = "login.html";
-                btnAuth.onclick = null; // Remove a função de sair
+                // Restaura o texto original
+                txtAuth.innerHTML = "<strong>Entre</strong> ou<br><strong>Cadastre-se</strong>";
+                
+                // Restaura links e hover
+                if(dropdown) dropdown.style.display = ''; // Volta ao padrão do CSS
+                btnAuth.href = "cadastro.html";
+                btnAuth.onclick = null; 
 
-                // Mostra popup se a pessoa ainda não fechou
-                if (!sessionStorage.getItem('popupFechado')) {
+                // Popup de aviso
+                if (popup && !sessionStorage.getItem('popupFechado')) {
                     popup.style.display = 'flex';
                 }
             }
