@@ -11,6 +11,49 @@
     />
 
     <link rel="stylesheet" href="./assets/css/style.css" />
+
+    <style>
+      .menu-marcas-superposto {
+          display: none; /* Começa escondido */
+          position: absolute; /* Ignora o layout e flutua */
+          width: 220px;
+          background-color: white;
+          border: 1px solid #ddd;
+          box-shadow: 0px 10px 25px rgba(0,0,0,0.5); /* Sombra forte */
+          z-index: 10000 !important; /* Força ficar em cima de tudo */
+          border-radius: 6px;
+          padding: 10px;
+          flex-direction: column;
+          gap: 5px;
+      }
+      
+      .menu-marcas-superposto.ativo {
+          display: flex; /* Aparece quando tem a classe ativo */
+      }
+
+      .marca-item-extra {
+          padding: 12px;
+          border: none;
+          background: white;
+          text-align: left;
+          cursor: pointer;
+          border-bottom: 1px solid #eee;
+          width: 100%;
+          font-size: 14px;
+          color: #333;
+          transition: 0.2s;
+      }
+
+      .marca-item-extra:hover {
+          background-color: #ff6600;
+          color: white;
+          padding-left: 15px; /* Efeito visual */
+      }
+      
+      .marca-item-extra:last-child {
+          border-bottom: none;
+      }
+    </style>
   </head>
 
   <body>
@@ -109,31 +152,25 @@
       <button class="item-marca" data-marca="bobcat"><i></i> BOBCAT</button>
       <button class="item-marca" data-marca="cummins"><i></i> CUMMINS</button>
     
-     
-      <button id="item-marca" class="botao-marcas">
-        <i class="fas fa-plus-circle"></i> Ver mais marcas
-      </button>
-
-      <div id="menuMarcas">
-        <button class="marca-item" data-marca="isuzu"><i></i> ISUZU</button>
-          <button class="marca-item" data-marca="doosan">
-        <i></i> DOOSAN – DEVELON
-      </button>
-        <button class="marca-item" data-marca="kubota">Kubota</button>
-        <button class="marca-item" data-marca="link-belt">Link-Belt</button>
-        <button class="marca-item" data-marca="massey">
-          Massey Ferguson – Maxion
-        </button>
-        <button class="marca-item" data-marca="muller">Muller – Randon</button>
-        <button class="marca-item" data-marca="perkins">Perkins</button>
-        <button class="marca-item" data-marca="sany">SANY</button>
-        <button class="marca-item" data-marca="sdlg">SDLG</button>
-        <button class="marca-item" data-marca="xcmg">XCMG</button>
+      <div class="dropdown-marcas">
+          <button id="btnVerMais" class="botao-marcas" onclick="abrirMenuMarcas(event)">
+            <i class="fas fa-plus-circle"></i> Ver mais marcas
+          </button>
       </div>
     </div>
    
-
-    
+    <div id="menuMaisMarcas" class="menu-marcas-superposto">
+        <button class="marca-item-extra" data-marca="isuzu">ISUZU</button>
+        <button class="marca-item-extra" data-marca="doosan">DOOSAN – DEVELON</button>
+        <button class="marca-item-extra" data-marca="kubota">KUBOTA</button>
+        <button class="marca-item-extra" data-marca="link-belt">LINK-BELT</button>
+        <button class="marca-item-extra" data-marca="massey">MASSEY FERGUSON</button>
+        <button class="marca-item-extra" data-marca="muller">MULLER – RANDON</button>
+        <button class="marca-item-extra" data-marca="perkins">PERKINS</button>
+        <button class="marca-item-extra" data-marca="sany">SANY</button>
+        <button class="marca-item-extra" data-marca="sdlg">SDLG</button>
+        <button class="marca-item-extra" data-marca="xcmg">XCMG</button>
+    </div>
 
     <div id="menuCategoriasFlutuante" class="menu-cat-dropdown">
       <div class="menu-cat-header" id="tituloMarcaDropdown">Categorias</div>
@@ -229,7 +266,7 @@
           z-index: 10;
         "
       >
-        &#10094;
+        ❮
       </button>
       <button
         id="btnNext"
@@ -248,7 +285,7 @@
           z-index: 10;
         "
       >
-        &#10095;
+        ❯
       </button>
     </section>
     <section class="secao-loja">
@@ -530,7 +567,7 @@
         <div class="divisor-rodape"></div>
 
         <div class="rodape-inferior">
-          <p>&copy; 2026 Dispemaq. Todos os direitos reservados.</p>
+          <p>© 2026 Dispemaq. Todos os direitos reservados.</p>
           <div class="formas-pagamento">
             <i class="fab fa-cc-visa"></i>
             <i class="fab fa-cc-mastercard"></i>
@@ -551,7 +588,7 @@
       <div class="carrinho-header">
         <h3><i class="fas fa-shopping-bag"></i> Seu Carrinho</h3>
         <button class="fechar-carrinho" onclick="toggleCarrinho(event)">
-          &times;
+          ×
         </button>
       </div>
       <div class="carrinho-conteudo"></div>
@@ -615,7 +652,7 @@
             cursor: pointer;
           "
         >
-          &times;
+          ×
         </button>
         <h3 style="color: #333; margin-bottom: 10px">Bem-vindo à Dispemaq!</h3>
         <p style="color: #666; margin-bottom: 20px">

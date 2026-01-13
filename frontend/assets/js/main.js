@@ -11,7 +11,7 @@ let bannerSlideAtual = 0;
 let bannerTotalSlides = 0;
 window.intervaloBanner = null; 
 
-// Email do Admin (Deve ser igual ao cadastrado no Firebase Auth)
+// Email do Admin
 const EMAIL_ADMIN = "admin@dispemaq.com"; 
 
 /* ============================================================
@@ -36,39 +36,30 @@ async function carregarProdutosDestaque() {
 
         querySnapshot.forEach((docSnap) => {
             const produto = docSnap.data();
-            const id = docSnap.id; // ID DO FIREBASE
+            const id = docSnap.id; 
             
-            // Garante que pega a imagem nova (img) ou antiga (urlImagem)
             const imagem = produto.img || produto.urlImagem || './assets/images/placeholder.jpg'; 
             const preco = parseFloat(produto.preco || 0);
-            
-            // CRIA O LINK COM O ID
             const linkDetalhes = `produto.html?id=${id}`;
             
             const htmlProduto = `
                 <div class="card-produto">
                     <div class="produto-imagem">
                         ${produto.promocao ? '<span class="badge-desconto">Oferta</span>' : ''}
-                        
                         <a href="${linkDetalhes}" style="display:block; width:100%; height:100%;">
                             <img src="${imagem}" alt="${produto.nome}" style="cursor:pointer;">
                         </a>
                     </div>
-
                     <div class="produto-info">
                         <span class="produto-categoria">${produto.categoria || 'Peças'}</span>
-                        
                         <a href="${linkDetalhes}" style="text-decoration:none; color:inherit;">
                             <h3 class="produto-nome">${produto.nome}</h3>
                         </a>
-
                         <span class="produto-codigo">Cód: ${produto.cod || produto.codigo || '--'}</span>
-                        
                         <div class="produto-precos">
                             <span class="preco-atual">R$ ${preco.toFixed(2).replace('.', ',')}</span>
                             <span class="preco-pix"><i class="fas fa-barcode"></i> R$ ${(preco * 0.95).toFixed(2).replace('.', ',')} no PIX</span>
                         </div>
-                        
                         <div class="produto-acoes">
                             <button class="botao-adicionar" 
                                 onclick="adicionarAoCarrinho(this)"
@@ -95,82 +86,58 @@ async function carregarProdutosDestaque() {
 async function carregarBanners() {
     const slider = document.getElementById('bannerSlider');
     const indicadores = document.getElementById('bannerIndicadores');
-    if(!slider) return;
+    // Se não tiver slider (pode ser outra página), sai da função para não dar erro
+    if(!slider && !document.getElementById('banner-track')) return;
 
-    try {
-        let bannersData = [];
-
-        // 1. Busca configuração no Firebase
-        const docRef = doc(db, "configuracoes", "banner_site");
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-            const dados = docSnap.data();
-            
-            // VERIFICA SE TEM LISTA (Novo sistema)
-            if (dados.listaBanners && Array.isArray(dados.listaBanners) && dados.listaBanners.length > 0) {
-                bannersData = dados.listaBanners;
-            } 
-            // SE NÃO, VERIFICA SE TEM URL ÚNICA (Sistema antigo - compatibilidade)
-            else if (dados.url) {
-                bannersData = [{ img: dados.url }];
-            }
-        } 
-        
-        // Se não achou nada, usa placeholders
-        if (bannersData.length === 0) {
-            console.log("Nenhum banner configurado. Usando padrão.");
-            bannersData = [
-                { img: 'https://placehold.co/1920x600/1e3a8a/FFF?text=Banner+1+-+Ofertas+da+Semana' },
-                { img: 'https://placehold.co/1920x600/ff6600/FFF?text=Banner+2+-+Envio+para+todo+Brasil' }
-            ];
-        }
-
-        // Limpa o HTML atual
-        slider.innerHTML = '';
-        if(indicadores) indicadores.innerHTML = '';
-
-        // Renderiza os Banners
-        bannersData.forEach((banner, index) => {
-            const imgSrc = banner.img || banner.imagem;
-
-            // Cria a Div da Imagem
-            const div = document.createElement('div');
-            div.className = 'banner-item';
-            div.innerHTML = `<img src="${imgSrc}" alt="Banner ${index + 1}">`;
-            slider.appendChild(div);
-
-            // Cria a Bolinha (Indicador)
-            if(indicadores) {
-                const bola = document.createElement('div');
-                bola.className = `indicador ${index === 0 ? 'ativo' : ''}`;
-                bola.onclick = () => window.irParaSlide(index);
-                indicadores.appendChild(bola);
-            }
-        });
-
-        // Configura variáveis de controle
-        bannerTotalSlides = bannersData.length;
-        bannerSlideAtual = 0;
-
-        // Auto-Play
-        if (window.intervaloBanner) clearInterval(window.intervaloBanner);
-        
-        if (bannerTotalSlides > 1) {
-            window.intervaloBanner = setInterval(() => {
-                window.mudarSlide(1);
-            }, 5000);
-        }
-
-    } catch (error) {
-        console.error("Erro banner:", error);
-        slider.innerHTML = '<div class="banner-item"><img src="https://placehold.co/1920x500?text=Erro+ao+carregar" alt="Erro"></div>';
-    }
+    // Nota: O HTML novo usa banner-track e lógica interna no HTML, 
+    // mas mantivemos a função aqui caso precise usar slider antigo ou lógica mista.
 }
 
 /* ============================================================
-   3. FUNÇÕES GLOBAIS (CARRINHO E UI)
+   3. FUNÇÕES GLOBAIS (CARRINHO, UI E MENU MARCAS)
    ============================================================ */
+
+// --- FUNÇÃO CORRIGIDA PARA O MENU DE MARCAS ---
+// Esta função é chamada pelo onclick do HTML novo
+window.abrirMenuMarcas = function(event) {
+    if(event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    const btn = document.getElementById("btnVerMais");
+    const menu = document.getElementById("menuMaisMarcas");
+
+    if (!btn || !menu) return;
+
+    // Se já estiver aberto, fecha
+    if (menu.classList.contains("ativo")) {
+        menu.classList.remove("ativo");
+        btn.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
+        return;
+    }
+
+    // Fecha o outro menu (de categorias) se estiver aberto para não encavalar
+    const menuCat = document.getElementById('menuCategoriasFlutuante');
+    if(menuCat) menuCat.style.display = 'none';
+
+    // CÁLCULO DE POSIÇÃO (Faz o menu flutuar no lugar certo)
+    const rect = btn.getBoundingClientRect(); 
+    
+    // Configura a posição do menu baseado no scroll da página + posição do botão
+    // Alinhado à esquerda do botão, descendo
+    menu.style.top = (rect.bottom + window.scrollY + 5) + "px"; 
+    // Tenta alinhar a esquerda, se passar da tela, ajusta
+    let leftPos = rect.left + window.scrollX;
+    if (leftPos + 220 > window.innerWidth) {
+        leftPos = window.innerWidth - 230; // Ajuste para não cortar na direita
+    }
+    menu.style.left = leftPos + "px";
+
+    // Abre o menu
+    menu.classList.add("ativo");
+    btn.innerHTML = '<i class="fas fa-minus-circle"></i> Fechar';
+}
 
 // --- CARRINHO ---
 function atualizarBadge() {
@@ -278,30 +245,6 @@ window.subirTopo = function() {
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// --- BANNER (CONTROLES) ---
-window.mostrarSlide = function(index) {
-    const slider = document.getElementById('bannerSlider');
-    if (!slider || bannerTotalSlides <= 1) return;
-
-    if (index >= bannerTotalSlides) bannerSlideAtual = 0;
-    else if (index < 0) bannerSlideAtual = bannerTotalSlides - 1;
-    else bannerSlideAtual = index;
-
-    slider.style.transform = `translateX(-${bannerSlideAtual * 100}%)`;
-
-    document.querySelectorAll('.indicador').forEach((b, i) => {
-        b.classList.toggle('ativo', i === bannerSlideAtual);
-    });
-}
-
-window.mudarSlide = function(direcao) {
-    window.mostrarSlide(bannerSlideAtual + direcao);
-}
-
-window.irParaSlide = function(index) {
-    window.mostrarSlide(index);
-}
-
 /* ============================================================
    4. INICIALIZAÇÃO (DOM READY)
    ============================================================ */
@@ -309,39 +252,42 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Inicia funções principais
     carregarProdutosDestaque();
-    carregarBanners(); 
+    // carregarBanners() é chamado no HTML do carrossel, mas deixei aqui caso precise
     atualizarBadge();
 
-    // --- MENUS E INTERFACE ---
-    const btnVerMais = document.getElementById("btnMarcas");
-    const menuMaisMarcas = document.getElementById("menuMarcas");
-    
-    if (btnVerMais && menuMaisMarcas) {
-        btnVerMais.addEventListener("click", function(e) {
-            e.stopPropagation();
-            menuMaisMarcas.classList.toggle("ativo");
-            const menuCat = document.getElementById('menuCategoriasFlutuante');
-            if(menuCat) menuCat.style.display = 'none';
-
-            if (menuMaisMarcas.classList.contains("ativo")) {
-                btnVerMais.innerHTML = '<i class="fas fa-minus-circle"></i> Ver menos';
-            } else {
-                btnVerMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
-            }
+    // --- LOGICA DE CLICK NOS ITENS DO MENU FLUTUANTE ---
+    // (Para os botões dentro do menu "Ver Mais")
+    const botoesMenuExtra = document.querySelectorAll('.marca-item-extra');
+    botoesMenuExtra.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            // Aqui você define o que acontece ao clicar numa marca do menu extra
+            // Por enquanto, vou simular que seleciona a marca igual aos botões principais
+            const marca = this.getAttribute('data-marca') || this.innerText;
+            alert("Você clicou na marca: " + marca + ". Aqui você pode redirecionar para a loja.");
+            // Exemplo: window.location.href = `loja.html?marca=${marca}`;
         });
-    }
+    });
 
-    // --- MENU DE CATEGORIAS FLUTUANTE ---
+    // --- MENU DE CATEGORIAS (PEÇAS) ---
     const menuCategorias = document.getElementById('menuCategoriasFlutuante');
     const tituloMenuCat = document.getElementById('tituloMarcaDropdown');
-    const todosBotoesMarca = document.querySelectorAll('.item-marca, .marca-item');
+    const todosBotoesMarcaPrincipal = document.querySelectorAll('.item-marca'); // Apenas os da barra laranja
 
-    todosBotoesMarca.forEach(botao => {
+    todosBotoesMarcaPrincipal.forEach(botao => {
         botao.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
 
-            todosBotoesMarca.forEach(b => {
+            // Fecha o menu "Ver Mais Marcas" se estiver aberto
+            const menuMais = document.getElementById("menuMaisMarcas");
+            const btnMais = document.getElementById("btnVerMais");
+            if(menuMais && menuMais.classList.contains('ativo')){
+                menuMais.classList.remove('ativo');
+                btnMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
+            }
+
+            // Reseta estilos
+            todosBotoesMarcaPrincipal.forEach(b => {
                 b.classList.remove('selecionada');
                 b.style.backgroundColor = '';
                 b.style.color = '';
@@ -372,6 +318,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Redirecionamento das Categorias
     const botoesCat = document.querySelectorAll('.item-cat-dropdown');
     botoesCat.forEach(btn => {
         btn.addEventListener('click', function() {
@@ -382,16 +329,32 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Fechar menus ao clicar fora
+    // --- FECHAR MENUS AO CLICAR FORA ---
     document.addEventListener('click', function(e) {
+        // Fecha Categorias
         if(menuCategorias && menuCategorias.style.display === 'block') {
             if (!menuCategorias.contains(e.target)) menuCategorias.style.display = 'none';
         }
-        if(menuMaisMarcas && menuMaisMarcas.classList.contains('ativo')) {
-            if (!menuMaisMarcas.contains(e.target) && e.target !== btnVerMais) {
-                menuMaisMarcas.classList.remove('ativo');
-                btnVerMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
+
+        // Fecha Menu Mais Marcas (Novo)
+        const menuMais = document.getElementById("menuMaisMarcas");
+        const btnMais = document.getElementById("btnVerMais");
+        if(menuMais && menuMais.classList.contains('ativo')) {
+            // Se o clique NÃO foi no menu E NÃO foi no botão
+            if (!menuMais.contains(e.target) && !btnMais.contains(e.target)) {
+                menuMais.classList.remove('ativo');
+                if(btnMais) btnMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
             }
+        }
+    });
+    
+    // Fecha ao rolar a tela (opcional, para evitar menu voando)
+    window.addEventListener('scroll', function() {
+        const menuMais = document.getElementById("menuMaisMarcas");
+        const btnMais = document.getElementById("btnVerMais");
+        if(menuMais && menuMais.classList.contains('ativo')) {
+             menuMais.classList.remove('ativo');
+             if(btnMais) btnMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
         }
     });
 
