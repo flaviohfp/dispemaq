@@ -6,6 +6,10 @@ import { db, collection, getDocs, doc, getDoc, auth, onAuthStateChanged, signOut
 let carrinho = JSON.parse(localStorage.getItem('dispemaq_carrinho')) || [];
 let marcaAtualSelecionada = ""; 
 
+// --- NOVAS VARIÁVEIS PARA O HOVER (Delay) ---
+let timeoutMenuCat = null;  // Timer para o menu de peças
+let timeoutMenuMais = null; // Timer para o menu de "Ver Mais"
+
 // Variáveis do Banner
 let bannerSlideAtual = 0;
 let bannerTotalSlides = 0;
@@ -92,42 +96,28 @@ async function carregarBanners() {
    3. FUNÇÕES GLOBAIS (UI, MENUS, CARRINHO)
    ============================================================ */
 
-// --- ABRIR MENU "VER MAIS MARCAS" ---
+// --- MANTIVE A FUNÇÃO ORIGINAL, MAS O HOVER VAI CUIDAR DISSO AGORA ---
 window.abrirMenuMarcas = function(event) {
-    if(event) {
-        event.preventDefault();
-        event.stopPropagation();
-    }
-
+    if(event) { event.preventDefault(); event.stopPropagation(); }
     const btn = document.getElementById("btnVerMais");
     const menu = document.getElementById("menuMaisMarcas");
-
     if (!btn || !menu) return;
-
-    // Se já estiver aberto, fecha
+    
+    // Lógica manual de clique (caso use em mobile)
     if (menu.classList.contains("ativo")) {
         menu.classList.remove("ativo");
         btn.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
-        return;
+    } else {
+        const menuCat = document.getElementById('menuCategoriasFlutuante');
+        if(menuCat) menuCat.style.display = 'none';
+        const rect = btn.getBoundingClientRect(); 
+        menu.style.top = (rect.bottom + window.scrollY + 5) + "px"; 
+        let leftPos = rect.left + window.scrollX;
+        if (leftPos + 220 > window.innerWidth) leftPos = window.innerWidth - 230;
+        menu.style.left = leftPos + "px";
+        menu.classList.add("ativo");
+        btn.innerHTML = '<i class="fas fa-minus-circle"></i> Fechar';
     }
-
-    // Fecha o menu de categorias se estiver aberto
-    const menuCat = document.getElementById('menuCategoriasFlutuante');
-    if(menuCat) menuCat.style.display = 'none';
-
-    // Posiciona o menu abaixo do botão
-    const rect = btn.getBoundingClientRect(); 
-    menu.style.top = (rect.bottom + window.scrollY + 5) + "px"; 
-    
-    let leftPos = rect.left + window.scrollX;
-    // Ajuste para não sair da tela à direita
-    if (leftPos + 220 > window.innerWidth) {
-        leftPos = window.innerWidth - 230;
-    }
-    menu.style.left = leftPos + "px";
-
-    menu.classList.add("ativo");
-    btn.innerHTML = '<i class="fas fa-minus-circle"></i> Fechar';
 }
 
 // --- CARRINHO ---
@@ -234,91 +224,124 @@ window.subirTopo = function() {
 }
 
 /* ============================================================
-   4. INICIALIZAÇÃO E LÓGICA DE MENUS (DOM READY)
+   4. INICIALIZAÇÃO E LÓGICA DE MENUS (HOVER - MOUSE)
    ============================================================ */
 document.addEventListener('DOMContentLoaded', function() {
     
     carregarProdutosDestaque();
     atualizarBadge();
 
-    // -------------------------------------------------------------
-    // LÓGICA UNIFICADA PARA ABRIR O MENU DE CATEGORIAS
-    // -------------------------------------------------------------
     const menuCategorias = document.getElementById('menuCategoriasFlutuante');
     const tituloMenuCat = document.getElementById('tituloMarcaDropdown');
-    
-    // Seleciona TODOS os botões que representam marcas (Principal + Extra)
     const todosBotoesMarca = document.querySelectorAll('.item-marca, .marca-item-extra');
 
+    // Funções auxiliares para abrir e fechar com delay
+    function agendarFechamentoCategorias() {
+        timeoutMenuCat = setTimeout(() => {
+            if(menuCategorias) menuCategorias.style.display = 'none';
+        }, 200); // 200ms de tolerância
+    }
+
+    // -------------------------------------------------------------
+    // LÓGICA DO MENU "VER MAIS MARCAS" (HOVER)
+    // -------------------------------------------------------------
+    const btnVerMais = document.getElementById("btnVerMais");
+    const menuMaisMarcas = document.getElementById("menuMaisMarcas");
+
+    if (btnVerMais && menuMaisMarcas) {
+        
+        // Quando o mouse ENTRA no botão "Ver Mais"
+        btnVerMais.addEventListener('mouseenter', function() {
+            clearTimeout(timeoutMenuMais); // Cancela fechamento se houver
+            
+            const rect = btnVerMais.getBoundingClientRect(); 
+            menuMaisMarcas.style.top = (rect.bottom + window.scrollY + 5) + "px"; 
+            
+            let leftPos = rect.left + window.scrollX;
+            if (leftPos + 220 > window.innerWidth) leftPos = window.innerWidth - 230;
+            menuMaisMarcas.style.left = leftPos + "px";
+
+            menuMaisMarcas.classList.add("ativo");
+            btnVerMais.innerHTML = '<i class="fas fa-minus-circle"></i> Fechar';
+        });
+
+        // Quando o mouse SAI do botão "Ver Mais"
+        btnVerMais.addEventListener('mouseleave', function() {
+            timeoutMenuMais = setTimeout(() => {
+                menuMaisMarcas.classList.remove("ativo");
+                btnVerMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
+            }, 200);
+        });
+
+        // Quando o mouse ENTRA no MENU "Ver Mais" (para ele não fechar)
+        menuMaisMarcas.addEventListener('mouseenter', function() {
+            clearTimeout(timeoutMenuMais);
+        });
+
+        // Quando o mouse SAI do MENU "Ver Mais"
+        menuMaisMarcas.addEventListener('mouseleave', function() {
+            timeoutMenuMais = setTimeout(() => {
+                menuMaisMarcas.classList.remove("ativo");
+                btnVerMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
+            }, 200);
+        });
+    }
+
+    // -------------------------------------------------------------
+    // LÓGICA DAS MARCAS (ABRIR CATEGORIAS NO HOVER)
+    // -------------------------------------------------------------
     todosBotoesMarca.forEach(botao => {
-        botao.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation(); 
+        // MUDANÇA: 'mouseenter' em vez de 'click'
+        botao.addEventListener('mouseenter', function(e) {
+            
+            // Cancela o fechamento agendado (se o usuário veio de outro botão)
+            clearTimeout(timeoutMenuCat);
 
-            // Verifica se o clique veio do menu "Ver Mais" (vertical)
-            const ehMenuExtra = this.classList.contains('marca-item-extra');
-            const menuMais = document.getElementById("menuMaisMarcas");
-            const btnMais = document.getElementById("btnVerMais");
-
-            // SE for clique na barra laranja principal, fecha o menu "Ver Mais" se estiver aberto
-            // SE for clique dentro do menu "Ver Mais", MANTÉM ele aberto (para ficar lado a lado)
-            if (!ehMenuExtra) {
-                if(menuMais && menuMais.classList.contains('ativo')){
-                    menuMais.classList.remove('ativo');
-                    if(btnMais) btnMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
-                }
+            // Se for um item dentro do menu "Ver Mais", impede que o menu pai feche
+            if(this.classList.contains('marca-item-extra')) {
+                clearTimeout(timeoutMenuMais);
             }
 
-            // Limpa seleção visual de todos
+            // Limpa visual dos outros
             todosBotoesMarca.forEach(b => {
                 b.classList.remove('selecionada');
                 b.style.backgroundColor = ''; 
                 b.style.color = '';
             });
 
-            // Marca o atual visualmente
+            // Marca este
             this.classList.add('selecionada');
             this.style.backgroundColor = '#ff6600';
             this.style.color = 'white';
 
-            // Dados da Marca
+            // Dados
             const marcaNome = this.getAttribute('data-marca') || this.innerText.trim();
             const marcaNomeBonito = this.innerText.trim();
             marcaAtualSelecionada = marcaNome;
 
             if(tituloMenuCat) tituloMenuCat.innerText = "Peças para " + marcaNomeBonito;
 
-            // POSICIONAMENTO DO MENU DE CATEGORIAS
+            // Posiciona e Mostra
             if(menuCategorias) {
                 const rect = this.getBoundingClientRect();
-                
+                const ehMenuExtra = this.classList.contains('marca-item-extra');
                 let top, left;
 
                 if (ehMenuExtra) {
-                    // --- LÓGICA PARA MENU LATERAL (Abre ao lado direito) ---
-                    // O topo alinha com o topo do item clicado
+                    // Lateral
                     top = rect.top + window.scrollY; 
-                    // A esquerda alinha com a direita do item clicado (+ 5px de margem)
                     left = rect.right + window.scrollX + 5; 
                 } else {
-                    // --- LÓGICA PARA BARRA PRINCIPAL (Abre embaixo) ---
+                    // Baixo
                     top = rect.bottom + window.scrollY;
                     left = rect.left + window.scrollX;
                 }
 
-                // Ajuste para não estourar a tela na direita (Mobile ou telas pequenas)
-                // Se a posição left + largura do menu (aprox 280px) for maior que a tela...
+                // Ajuste de tela
                 if (left + 280 > window.innerWidth) {
-                    if (ehMenuExtra) {
-                        // Se for menu extra e não couber na direita, joga para a ESQUERDA do menu de marcas
-                        left = rect.left + window.scrollX - 290; 
-                    } else {
-                        // Se for barra principal, alinha à direita da tela
-                        left = window.innerWidth - 290;
-                    }
+                    if (ehMenuExtra) left = rect.left + window.scrollX - 290; 
+                    else left = window.innerWidth - 290;
                 }
-                
-                // Proteção para não sair na esquerda da tela
                 if (left < 0) left = 10;
 
                 menuCategorias.style.top = top + 'px';
@@ -326,53 +349,62 @@ document.addEventListener('DOMContentLoaded', function() {
                 menuCategorias.style.display = 'block';
             }
         });
+
+        // Quando tira o mouse da marca -> agenda fechamento
+        botao.addEventListener('mouseleave', function() {
+            agendarFechamentoCategorias();
+        });
     });
 
     // -------------------------------------------------------------
-    // REDIRECIONAMENTO AO CLICAR NA CATEGORIA
+    // INTERAÇÃO COM O PRÓPRIO MENU DE CATEGORIAS
+    // -------------------------------------------------------------
+    if(menuCategorias) {
+        // Se o mouse entrar no menu laranja, cancela o fechamento dele
+        menuCategorias.addEventListener('mouseenter', function() {
+            clearTimeout(timeoutMenuCat);
+            // Também cancela o fechamento do menu "Ver Mais" se estivermos vindo dele
+            clearTimeout(timeoutMenuMais);
+        });
+
+        // Se sair do menu laranja, fecha ele
+        menuCategorias.addEventListener('mouseleave', function() {
+            agendarFechamentoCategorias();
+            
+            // Se o menu "Ver Mais" estava aberto, agenda para fechar ele também
+            if(menuMaisMarcas && menuMaisMarcas.classList.contains('ativo')) {
+                 timeoutMenuMais = setTimeout(() => {
+                    menuMaisMarcas.classList.remove("ativo");
+                    if(btnVerMais) btnVerMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
+                }, 200);
+            }
+        });
+    }
+
+    // -------------------------------------------------------------
+    // REDIRECIONAMENTO AO CLICAR NA CATEGORIA (Isso mantém click)
     // -------------------------------------------------------------
     const botoesCat = document.querySelectorAll('.item-cat-dropdown');
     botoesCat.forEach(btn => {
         btn.addEventListener('click', function() {
             const categoria = this.getAttribute('data-cat');
-            
-            // Monta a URL com a marca selecionada anteriormente e a categoria clicada
             let url = `loja.html?marca=${encodeURIComponent(marcaAtualSelecionada)}`;
-            
             if(categoria !== 'todas') {
                 url += `&cat=${encodeURIComponent(categoria)}`;
             }
-            
             window.location.href = url;
         });
     });
 
     // -------------------------------------------------------------
-    // FECHAR MENUS AO CLICAR FORA
+    // LIMPEZA GERAL NO SCROLL
     // -------------------------------------------------------------
-    document.addEventListener('click', function(e) {
-        // Fecha Categorias se clicar fora dele
-        if(menuCategorias && menuCategorias.style.display === 'block') {
-            if (!menuCategorias.contains(e.target)) menuCategorias.style.display = 'none';
-        }
-
-        // Fecha Menu Mais Marcas se clicar fora dele E fora do botão que abre ele
-        const menuMais = document.getElementById("menuMaisMarcas");
-        const btnMais = document.getElementById("btnVerMais");
-        
-        if(menuMais && menuMais.classList.contains('ativo')) {
-            // Importante: Se clicou no menu de categorias, NÃO fecha o menu de marcas
-            const clicouNoMenuCat = menuCategorias && menuCategorias.contains(e.target);
-            
-            if (!menuMais.contains(e.target) && !btnMais.contains(e.target) && !clicouNoMenuCat) {
-                menuMais.classList.remove('ativo');
-                if(btnMais) btnMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
-            }
-        }
-    });
-
     window.addEventListener('scroll', function() {
         if(menuCategorias) menuCategorias.style.display = 'none';
+        if(menuMaisMarcas) {
+            menuMaisMarcas.classList.remove('ativo');
+            if(btnVerMais) btnVerMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
+        }
     });
 
     // -------------------------------------------------------------
