@@ -147,6 +147,9 @@
           cursor: pointer;
           transition: color 0.2s, background 0.2s;
           padding: 5px 0;
+          display: block; /* Garante que o link ocupe a linha */
+          text-decoration: none;
+          color: #333;
       }
       .filtro-item:hover {
           color: #ff6600;
@@ -272,33 +275,12 @@
             <div class="box-sidebar">
                 <h3><i class="fas fa-filter"></i> Filtrar Por</h3>
                 
-                <div class="grupo-filtro">
-                    <h4>Categorias</h4>
-                    <ul id="listaCategorias">
-                        <li class="filtro-item" data-cat="todas">Ver Todas</li>
-                        <li class="filtro-item" data-cat="motor">Motor</li>
-                        <li class="filtro-item" data-cat="hidraulica">Hidráulica</li>
-                        <li class="filtro-item" data-cat="transmissao">Transmissão</li>
-                        <li class="filtro-item" data-cat="eletrica">Elétrica</li>
-                        <li class="filtro-item" data-cat="filtros">Filtros</li>
-                        <li class="filtro-item" data-cat="rodante">Material Rodante</li>
-                        <li class="filtro-item" data-cat="fps">FPS / Implementos</li>
-                    </ul>
+                <div id="sidebar-dinamica-container">
+                    <p style="padding:15px; color:#666; font-size:0.9rem;">
+                        <i class="fas fa-spinner fa-spin"></i> Carregando menu...
+                    </p>
                 </div>
 
-                <div class="grupo-filtro">
-                    <h4>Marcas</h4>
-                    <ul id="listaMarcas">
-                        <li class="filtro-item" data-marca="todas">Todas as Marcas</li>
-                        <li class="filtro-item" data-marca="caterpillar">Caterpillar</li>
-                        <li class="filtro-item" data-marca="komatsu">Komatsu</li>
-                        <li class="filtro-item" data-marca="volvo-michigan">Volvo / Michigan</li>
-                        <li class="filtro-item" data-marca="case">Case</li>
-                        <li class="filtro-item" data-marca="jcb">JCB</li>
-                        <li class="filtro-item" data-marca="cummins">Cummins</li>
-                        <li class="filtro-item" data-marca="massey">Massey Ferguson</li>
-                    </ul>
-                </div>
             </div>
         </aside>
 
@@ -395,40 +377,6 @@
             document.getElementById('popupAvisoLogin').style.display = 'none';
             sessionStorage.setItem('popupFechado', 'true');
         }
-
-        // --- SCRIPT DE CORREÇÃO DA FILTRAGEM ---
-        // Lê os parâmetros da URL (ex: ?marca=caterpillar) e simula o clique no filtro
-        document.addEventListener("DOMContentLoaded", () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const marcaParam = urlParams.get('marca');
-            const catParam = urlParams.get('cat');
-            
-            // Se houver parâmetro de marca na URL
-            if (marcaParam) {
-                const btnMarca = document.querySelector(`.filtro-item[data-marca="${marcaParam}"]`);
-                if (btnMarca) {
-                    console.log("Aplicando filtro automático de marca:", marcaParam);
-                    // Adiciona classe ativa visualmente
-                    document.querySelectorAll('.filtro-item[data-marca]').forEach(b => b.classList.remove('ativo'));
-                    btnMarca.classList.add('ativo');
-                    
-                    // Simula o clique para disparar o JS da loja (loja.js)
-                    // Pequeno delay para garantir que o loja.js carregou os eventos
-                    setTimeout(() => btnMarca.click(), 500); 
-                }
-            }
-            
-            // Se houver parâmetro de categoria na URL
-            if (catParam) {
-                const btnCat = document.querySelector(`.filtro-item[data-cat="${catParam}"]`);
-                if (btnCat) {
-                    console.log("Aplicando filtro automático de categoria:", catParam);
-                    document.querySelectorAll('.filtro-item[data-cat]').forEach(b => b.classList.remove('ativo'));
-                    btnCat.classList.add('ativo');
-                    setTimeout(() => btnCat.click(), 500);
-                }
-            }
-        });
     </script>
 
     <script type="module">
@@ -437,7 +385,7 @@
 
         const btnAuth = document.getElementById('btnAuth');
         const txtAuth = document.getElementById('txtAuth');
-        const dropdown = document.getElementById('loginDropdown'); // Dropdown flutuante
+        const dropdown = document.getElementById('loginDropdown'); 
         const popup = document.getElementById('popupAvisoLogin');
 
         onAuthStateChanged(auth, (user) => {
@@ -445,14 +393,9 @@
                 // --- USUÁRIO LOGADO ---
                 console.log("Usuário logado:", user.email);
                 
-                // Altera o texto do botão
                 txtAuth.innerHTML = "<strong>Sair</strong><br>da conta";
-                
-                // Esconde o dropdown de login (pois já está logado)
-                // Ou podemos manter para mostrar "Meus Pedidos", mas vamos simplificar:
                 if(dropdown) dropdown.style.display = 'none'; 
 
-                // Ação do botão vira Logout
                 btnAuth.removeAttribute('href');
                 btnAuth.onclick = (e) => {
                     e.preventDefault();
@@ -462,23 +405,17 @@
                         });
                     }
                 };
-
-                // Garante que o popup não apareça
                 if(popup) popup.style.display = 'none';
 
             } else {
                 // --- USUÁRIO NÃO LOGADO ---
                 console.log("Ninguém logado.");
 
-                // Restaura o texto original
                 txtAuth.innerHTML = "<strong>Entre</strong> ou<br><strong>Cadastre-se</strong>";
-                
-                // Restaura links e hover
-                if(dropdown) dropdown.style.display = ''; // Volta ao padrão do CSS
+                if(dropdown) dropdown.style.display = ''; 
                 btnAuth.href = "cadastro.html";
                 btnAuth.onclick = null; 
 
-                // Popup de aviso
                 if (popup && !sessionStorage.getItem('popupFechado')) {
                     popup.style.display = 'flex';
                 }

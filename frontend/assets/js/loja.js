@@ -1,9 +1,8 @@
 /* =========================================
-   LOJA.JS (Versão Final - Produção)
+   LOJA.JS (Versão Final - Com Menu Dinâmico)
    ========================================= */
 
 import { db, auth } from './firebase-config.js';
-// ADICIONADO: doc e getDoc na importação abaixo para o Banner funcionar
 import { 
     collection, getDocs, query, where, limit, startAfter, orderBy, doc, getDoc 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -22,28 +21,144 @@ let filtroAtivo = {
 };
 
 // --- INICIALIZAÇÃO ---
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("Loja iniciada. DB status:", db ? "Conectado" : "Erro de Conexão");
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log("Loja iniciada...");
 
-    // 1. Carrega componentes visuais
+    // 1. Carrega componentes visuais estáticos
     carregarBannerLoja();
     atualizarBadgeLoja();
 
-    // 2. Lê filtros da URL (Vindo da Home ou links externos)
+    // 2. CONSTRÓI O MENU LATERAL (Busca do Firebase)
+    await carregarSidebarDinamica();
+
+    // 3. Lê filtros da URL (Vindo da Home ou refresh)
     const params = new URLSearchParams(window.location.search);
     const marca = params.get('marca');
-    const cat = params.get('cat');
-    const busca = params.get('busca'); // Correção: busca estava como 'categoria' no exemplo anterior, ajustado para padrão
+    const cat = params.get('categoria') || params.get('cat'); 
+    const busca = params.get('busca');
 
-    // 3. Configura eventos
-    configurarSidebar();
+    // 4. Configura busca do header
     configurarBuscaHeader();
 
-    // 4. Inicia a busca com os filtros da URL
+    // 5. Inicia a busca de produtos
     filtrarLoja(marca, cat, busca);
 });
 
-/* --- FUNÇÃO PRINCIPAL DE BUSCA --- */
+/* --- 1. FUNÇÃO: GERAR SIDEBAR DINÂMICA --- */
+async function carregarSidebarDinamica() {
+    // ATENÇÃO: O ID deve bater com o HTML
+    const sidebarContainer = document.getElementById('sidebar-dinamica-container'); 
+    
+    if (!sidebarContainer) {
+        console.warn("Elemento 'sidebar-dinamica-container' não encontrado.");
+        return;
+    }
+
+    sidebarContainer.innerHTML = '<p style="padding:10px; color:#666;">Carregando filtros...</p>';
+
+    try {
+        let html = '';
+
+        // A. Botão "Ver Todos"
+        html += `
+            <div class="grupo-filtro">
+                <h4>Catálogo</h4>
+                <ul>
+                    <li><a href="#" class="filtro-item" data-cat="todas">Ver Todos os Produtos</a></li>
+                </ul>
+            </div>
+        `;
+
+        // B. Busca Marcas no Firebase
+        // Tenta buscar da coleção 'marcas'. Se não existir, avisa no console.
+        const qMarcas = query(collection(db, "marcas"), orderBy("nome"));
+        const snapMarcas = await getDocs(qMarcas);
+
+        if (!snapMarcas.empty) {
+            html += `<div class="grupo-filtro"><h4>Marcas</h4><ul>`;
+            snapMarcas.forEach(doc => {
+                const d = doc.data();
+                const nome = d.nome || d.marca; 
+                if(nome) {
+                    html += `<li><a href="#" class="filtro-item" data-marca="${nome}">${nome}</a></li>`;
+                }
+            });
+            html += `</ul></div>`;
+        }
+
+        // C. Busca Categorias no Firebase
+        const qCats = query(collection(db, "categorias"), orderBy("nome"));
+        const snapCats = await getDocs(qCats);
+
+        if (!snapCats.empty) {
+            html += `<div class="grupo-filtro"><h4>Categorias</h4><ul>`;
+            snapCats.forEach(doc => {
+                const d = doc.data();
+                const nome = d.nome || d.categoria;
+                if(nome) {
+                    html += `<li><a href="#" class="filtro-item" data-cat="${nome}">${nome}</a></li>`;
+                }
+            });
+            html += `</ul></div>`;
+        }
+
+        // Injeta o HTML na página
+        sidebarContainer.innerHTML = html;
+
+        // Ativa os cliques nos novos botões
+        configurarCliquesSidebar();
+
+    } catch (error) {
+        console.error("Erro ao carregar sidebar:", error);
+        sidebarContainer.innerHTML = '<p style="padding:10px">Não foi possível carregar os filtros.</p>';
+    }
+}
+
+/* --- 2. CLICK HANDLERS DA SIDEBAR --- */
+function configurarCliquesSidebar() {
+    const itens = document.querySelectorAll('.filtro-item');
+    itens.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            const marca = item.dataset.marca;
+            const cat = item.dataset.cat;
+            
+            // Atualiza URL sem recarregar a página
+            const url = new URL(window.location);
+            
+            if(marca) { 
+                if(marca === 'todas') {
+                    url.searchParams.delete('marca');
+                    url.searchParams.delete('cat');
+                    url.searchParams.delete('busca');
+                    filtrarLoja(null, null, null);
+                } else {
+                    url.searchParams.set('marca', marca); 
+                    url.searchParams.delete('cat'); 
+                    url.searchParams.delete('busca'); 
+                    filtrarLoja(marca, null, null);
+                }
+            } else if(cat) { 
+                if(cat === 'todas') {
+                    url.searchParams.delete('marca');
+                    url.searchParams.delete('cat');
+                    url.searchParams.delete('busca');
+                    filtrarLoja(null, null, null);
+                } else {
+                    url.searchParams.set('cat', cat); 
+                    url.searchParams.delete('marca'); 
+                    url.searchParams.delete('busca');
+                    filtrarLoja(null, cat, null);
+                }
+            }
+            
+            window.history.pushState({}, '', url);
+        });
+    });
+}
+
+/* --- 3. BUSCA E RENDERIZAÇÃO DE PRODUTOS --- */
 async function buscarProdutosNoFirebase(reset = false) {
     if (carregando) return;
     if (!temMais && !reset) return;
@@ -52,7 +167,6 @@ async function buscarProdutosNoFirebase(reset = false) {
     const container = document.getElementById('gradeProdutosLoja');
     const qtdResultados = document.getElementById('qtdResultados');
     
-    // Se for reset, mostra o loader limpo
     if (reset) {
         if(container) {
             container.innerHTML = `
@@ -67,43 +181,37 @@ async function buscarProdutosNoFirebase(reset = false) {
     }
 
     try {
-        // Verifica conexão antes de tentar
         if (!db) throw new Error("Banco de dados não inicializado.");
 
         const produtosRef = collection(db, "produtos");
         let restricoes = [];
 
-        // --- APLICAÇÃO DE FILTROS ---
-        
+        // --- APLICAÇÃO DE FILTROS NA QUERY ---
         if (filtroAtivo.busca) {
-            // Busca textual (Nome)
+            // Busca por texto (Exige índice 'nome' no Firestore)
             const termo = filtroAtivo.busca; 
             restricoes.push(orderBy("nome"));
             restricoes.push(where("nome", ">=", termo));
             restricoes.push(where("nome", "<=", termo + '\uf8ff'));
         } 
         else if (filtroAtivo.marca && filtroAtivo.marca !== 'todas') {
-            // Filtro de Marca (Exato)
             restricoes.push(where("marca", "==", filtroAtivo.marca)); 
         } 
         else if (filtroAtivo.cat && filtroAtivo.cat !== 'todas') {
-            // Filtro de Categoria
             restricoes.push(where("categoria", "==", filtroAtivo.cat));
         }
 
-        // Paginação
         restricoes.push(limit(ITENS_POR_PAGINA));
+        
         if (!reset && ultimoDoc) {
             restricoes.push(startAfter(ultimoDoc));
         }
 
-        // Executa Query
         const q = query(produtosRef, ...restricoes);
         const snapshot = await getDocs(q);
 
-        if (reset && container) container.innerHTML = ''; // Limpa loader
+        if (reset && container) container.innerHTML = '';
 
-        // --- RESULTADO VAZIO ---
         if (snapshot.empty) {
             temMais = false;
             if (reset && container) {
@@ -111,19 +219,18 @@ async function buscarProdutosNoFirebase(reset = false) {
                     <div style="grid-column:1/-1; text-align:center; padding: 40px; color: #666;">
                         <i class="fas fa-search" style="font-size: 40px; margin-bottom: 15px; opacity: 0.3;"></i>
                         <h3>Nenhum produto encontrado</h3>
-                        <p>Tente ajustar os filtros ou buscar por outro termo.</p>
-                        <button onclick="window.location.href='loja.html'" class="botao" style="margin-top:15px;">Ver Todos</button>
+                        <p>Tente ajustar os filtros.</p>
+                        <button onclick="window.location.href='loja.html'" class="botao botao-primario" style="margin-top:15px;">Limpar Filtros</button>
                     </div>`;
                 if(qtdResultados) qtdResultados.innerText = "0 produtos";
             }
             return;
         }
 
-        // --- SUCESSO ---
         ultimoDoc = snapshot.docs[snapshot.docs.length - 1];
         
         if(reset && qtdResultados) {
-            qtdResultados.innerText = `${snapshot.size} produtos listados`;
+            qtdResultados.innerText = `${snapshot.size}${snapshot.size === ITENS_POR_PAGINA ? '+' : ''} produtos encontrados`;
         }
 
         snapshot.forEach((doc) => {
@@ -132,7 +239,6 @@ async function buscarProdutosNoFirebase(reset = false) {
             criarCardProduto(dados, container);
         });
 
-        // Verifica se precisa do botão "Carregar Mais"
         if (snapshot.docs.length >= ITENS_POR_PAGINA) {
             adicionarBotaoCarregarMais(container);
         } else {
@@ -141,41 +247,40 @@ async function buscarProdutosNoFirebase(reset = false) {
 
     } catch (error) {
         console.error("Erro LOJA:", error);
-        
-        // Mensagem de erro amigável na tela
         if(reset && container) {
-            container.innerHTML = `
-                <div style="grid-column:1/-1; text-align:center; padding: 40px; color: #d9534f;">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 30px;"></i>
-                    <p>Não foi possível carregar os produtos no momento.</p>
-                </div>`;
+            container.innerHTML = `<p style="text-align:center">Erro ao carregar produtos. Verifique sua conexão.</p>`;
         }
-        
-        // Dica para o desenvolvedor no console
-        if(error.message.includes("index")) {
-            console.warn("ALERTA FIREBASE: É necessário criar um índice composto. Verifique o link no console acima.");
-        }
+        // Aviso comum de falta de índice no Firestore
+        if(error.message.includes("index")) console.warn("ALERTA: Clique no link do console para criar o índice no Firebase.");
     } finally {
         carregando = false;
     }
 }
 
-/* --- RENDERIZAÇÃO (UI) --- */
+/* --- 4. RENDERIZAÇÃO DO CARD --- */
 function criarCardProduto(p, container) {
     if(!container) return;
 
     const card = document.createElement('div');
     card.classList.add('produto-card');
     
-    // Tratamento seguro da imagem
+    // Tratamento de Imagem
     const imgUrl = p.imagem || p.img || p.urlImagem || './assets/images/sem-foto.png';
     
-    // Tratamento seguro do preço
+    // Tratamento de Preço
     let precoDisplay = "Consulte";
     if (p.preco) {
-        let valor = parseFloat(p.preco.toString().replace(',', '.'));
+        // Tenta converter para float se for string
+        let valor = p.preco;
+        if(typeof valor === 'string') {
+             valor = parseFloat(valor.replace('R$', '').replace(/\./g, '').replace(',', '.').trim());
+        }
+        
         if (!isNaN(valor) && valor > 0) {
             precoDisplay = valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        } else {
+            // Se falhar a conversão ou for 0, mostra o texto original (ex: "Sob Consulta")
+            precoDisplay = p.preco;
         }
     }
 
@@ -184,7 +289,7 @@ function criarCardProduto(p, container) {
             <img src="${imgUrl}" alt="${p.nome}" onerror="this.src='./assets/images/sem-foto.png'">
         </div>
         <div class="produto-info">
-            <span class="categoria-tag">${p.marca || p.categoria || 'Peça'}</span>
+            <span class="categoria-tag">${p.marca || 'Geral'}</span>
             <h3 title="${p.nome}">${p.nome}</h3>
             <p class="codigo">Cód: ${p.codigo || '--'}</p>
             <div class="preco-box">
@@ -196,7 +301,7 @@ function criarCardProduto(p, container) {
         </div>
     `;
 
-    // Click no botão comprar
+    // Evento do botão comprar dentro do card
     const btn = card.querySelector('.btn-add-carrinho');
     if(btn) {
         btn.addEventListener('click', (e) => {
@@ -205,36 +310,19 @@ function criarCardProduto(p, container) {
         });
     }
 
-    // Click no card (Detalhamento)
-    card.addEventListener('click', (e) => {
-        if(!e.target.closest('.btn-add-carrinho')) {
-            // window.location.href = `produto.html?id=${p.id}`;
-        }
-    });
-
     container.appendChild(card);
 }
 
 function adicionarBotaoCarregarMais(container) {
     removerBotaoCarregarMais();
-    
     const div = document.createElement('div');
     div.id = "area-btn-carregar";
     div.style.gridColumn = "1/-1";
     div.style.textAlign = "center";
     div.style.marginTop = "30px";
-    div.style.paddingBottom = "20px";
-    
-    div.innerHTML = `<button id="btnCarregarMais" class="botao botao-secundario">Carregar mais produtos</button>`;
-    
+    div.innerHTML = `<button id="btnCarregarMais" class="botao botao-secundario">Carregar mais</button>`;
     container.appendChild(div);
-
-    const btn = document.getElementById('btnCarregarMais');
-    if(btn) {
-        btn.addEventListener('click', () => {
-            buscarProdutosNoFirebase(false); 
-        });
-    }
+    document.getElementById('btnCarregarMais').addEventListener('click', () => buscarProdutosNoFirebase(false));
 }
 
 function removerBotaoCarregarMais() {
@@ -242,14 +330,12 @@ function removerBotaoCarregarMais() {
     if(area) area.remove();
 }
 
-/* --- GERENCIAMENTO DE FILTROS --- */
+/* --- 5. LÓGICA DE CONTROLE DE FILTROS --- */
 function filtrarLoja(marcaUrl, catUrl, buscaUrl) {
-    // 1. Atualiza Variáveis
     filtroAtivo.marca = (marcaUrl && marcaUrl !== 'todas') ? marcaUrl : null;
     filtroAtivo.cat = (catUrl && catUrl !== 'todas') ? catUrl : null;
     filtroAtivo.busca = buscaUrl ? buscaUrl : null;
 
-    // 2. Atualiza Interface (Título)
     const titulo = document.getElementById('tituloResultadoLoja');
     if(titulo) {
         if(filtroAtivo.busca) titulo.innerText = `Busca: "${filtroAtivo.busca}"`;
@@ -258,64 +344,27 @@ function filtrarLoja(marcaUrl, catUrl, buscaUrl) {
         else titulo.innerText = "Catálogo Completo";
     }
 
-    // 3. Atualiza Visual da Sidebar
+    // Atualiza Visual ("active") da Sidebar
     document.querySelectorAll('.filtro-item').forEach(item => {
         item.classList.remove('ativo'); 
-        if(item.dataset.marca === marcaUrl || item.dataset.cat === catUrl) {
-            item.classList.add('ativo');
-        }
+        
+        // Verifica se é o filtro atual e marca como ativo
+        if(filtroAtivo.marca && item.dataset.marca === filtroAtivo.marca) item.classList.add('ativo');
+        if(filtroAtivo.cat && item.dataset.cat === filtroAtivo.cat) item.classList.add('ativo');
+        if(!filtroAtivo.marca && !filtroAtivo.cat && item.dataset.cat === 'todas') item.classList.add('ativo');
     });
 
-    // 4. Dispara Busca
     buscarProdutosNoFirebase(true); 
 }
 
-// Auxiliar para deixar texto bonito (ex: volvo -> Volvo)
 function formatarTexto(str) {
     if(!str) return "";
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-/* --- EVENT LISTENERS --- */
-function configurarSidebar() {
-    const itens = document.querySelectorAll('.filtro-item');
-    itens.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            const marca = item.dataset.marca;
-            const cat = item.dataset.cat;
-            
-            // Atualiza URL sem recarregar (SPA feel)
-            const url = new URL(window.location);
-            
-            if(marca) { 
-                url.searchParams.set('marca', marca); 
-                url.searchParams.delete('cat'); 
-                url.searchParams.delete('busca'); 
-                filtrarLoja(marca, null, null);
-            } else if(cat) { 
-                url.searchParams.set('cat', cat); 
-                url.searchParams.delete('marca'); 
-                url.searchParams.delete('busca');
-                filtrarLoja(null, cat, null);
-            } else {
-                // Caso clique em "Ver todas"
-                url.searchParams.delete('marca');
-                url.searchParams.delete('cat');
-                url.searchParams.delete('busca');
-                filtrarLoja(null, null, null);
-            }
-            
-            window.history.pushState({}, '', url);
-        });
-    });
-}
-
 function configurarBuscaHeader() {
     const btn = document.getElementById('btnBuscaLoja');
     const input = document.getElementById('campoBuscaLoja');
-    
     if(btn && input) {
         const acaoBusca = () => { 
             const termo = input.value.trim();
@@ -333,36 +382,41 @@ function configurarBuscaHeader() {
     }
 }
 
-/* --- BANNER --- */
+/* --- 6. EXTRAS (Banner, Carrinho) --- */
 async function carregarBannerLoja() {
     try {
-        const docRef = doc(db, "configuracoes", "banner_site");
-        const docSnap = await getDoc(docRef);
+        const docSnap = await getDoc(doc(db, "configuracoes", "banner_site"));
         const imgBanner = document.getElementById("bannerPrincipal");
         if (docSnap.exists() && imgBanner && docSnap.data().url) {
             imgBanner.src = docSnap.data().url;
+            imgBanner.style.display = 'block';
         }
-    } catch (e) {
-        console.log("Banner: padrão utilizado ou erro ao carregar.");
+    } catch (e) { 
+        console.log("Banner padrão mantido."); 
     }
 }
 
-/* --- CARRINHO --- */
+/* --- FUNÇÕES DO CARRINHO (INTEGRAÇÃO) --- */
 async function addCarrinhoLoja(id, produtoObj) {
-    // 1. Recupera carrinho
     let carrinho = JSON.parse(localStorage.getItem('carrinhoDispemaq')) || [];
     
-    // 2. Prepara preço numérico
+    // Limpeza robusta do preço para cálculo
     let precoNum = 0;
-    if(produtoObj.preco) {
-        // Limpeza básica para garantir que é numero
-        let clean = produtoObj.preco.toString().replace('R$', '').trim();
-        // Se usar virgula como decimal
-        if(clean.includes(',')) clean = clean.replace('.', '').replace(',', '.');
-        precoNum = parseFloat(clean);
+    if (produtoObj.preco) {
+        if(typeof produtoObj.preco === 'number') {
+            precoNum = produtoObj.preco;
+        } else {
+            let pClean = produtoObj.preco.toString().replace('R$', '').trim();
+            // Se tiver ponto como milhar e virgula como decimal (padrão BR: 1.200,50)
+            if(pClean.includes(',') && pClean.includes('.')) {
+                pClean = pClean.replace(/\./g, '').replace(',', '.'); 
+            } else if(pClean.includes(',')) {
+                pClean = pClean.replace(',', '.');
+            }
+            precoNum = parseFloat(pClean) || 0;
+        }
     }
 
-    // 3. Verifica duplicidade
     const index = carrinho.findIndex(x => x.id === id);
     if(index > -1) {
         carrinho[index].qtd += 1;
@@ -371,34 +425,31 @@ async function addCarrinhoLoja(id, produtoObj) {
             id: produtoObj.id,
             nome: produtoObj.nome,
             img: produtoObj.imagem || produtoObj.img || './assets/images/sem-foto.png',
-            preco: isNaN(precoNum) ? 0 : precoNum, 
+            preco: precoNum, 
             qtd: 1
         });
     }
-    
-    // 4. Salva e Atualiza
     localStorage.setItem('carrinhoDispemaq', JSON.stringify(carrinho));
+    
     atualizarBadgeLoja();
     
-    // 5. Feedback Visual
-    // Verifica se a função global toggleCarrinho existe (geralmente no script.js)
-    if(typeof toggleCarrinho === 'function') {
-        toggleCarrinho(true); // Abre o carrinho
+    // Abre o carrinho (sem passar 'true' para não quebrar o preventDefault do HTML)
+    if(window.toggleCarrinho) {
+        window.toggleCarrinho(); 
     } else {
         alert("Produto adicionado ao carrinho!");
     }
 }
 
+// Disponível globalmente para ser chamada
 function atualizarBadgeLoja() {
     const carrinho = JSON.parse(localStorage.getItem('carrinhoDispemaq')) || [];
-    const totalItens = carrinho.reduce((acc, item) => acc + item.qtd, 0);
-    
+    const total = carrinho.reduce((acc, item) => acc + item.qtd, 0);
     const badge = document.getElementById('badgeCarrinhoLoja');
     if(badge) {
-        badge.innerText = totalItens;
-        badge.style.display = totalItens > 0 ? 'flex' : 'none';
+        badge.innerText = total;
+        badge.style.display = total > 0 ? 'flex' : 'none';
     }
-    
     renderizarItensCarrinhoLateral(carrinho);
 }
 
@@ -409,39 +460,36 @@ function renderizarItensCarrinhoLateral(carrinho) {
     
     div.innerHTML = "";
     let totalValor = 0;
-
+    
     if(carrinho.length === 0) {
-        div.innerHTML = "<p style='padding:20px; text-align:center; color:#888;'>Seu carrinho está vazio.</p>";
+        div.innerHTML = "<p style='padding:20px; text-align:center; color:#666;'>Seu carrinho está vazio.</p>";
     } else {
         carrinho.forEach(item => {
-            const subtotal = item.qtd * item.preco;
-            totalValor += subtotal;
-            
+            totalValor += item.qtd * item.preco;
             div.innerHTML += `
-                <div class="item-carrinho-lateral">
-                    <img src="${item.img}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;">
-                    <div class="info-item" style="flex:1; margin-left:10px;">
-                        <div style="font-size:0.9rem; font-weight:bold;">${item.nome}</div>
-                        <div style="font-size:0.8rem; color:#666;">${item.qtd}x ${item.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                <div class="item-carrinho-lateral" style="display:flex; align-items:center; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
+                    <img src="${item.img}" style="width:50px; height:50px; object-fit:cover; border-radius:4px;">
+                    <div style="flex:1; margin-left:10px;">
+                        <b style="font-size:0.9rem;">${item.nome}</b><br>
+                        <small style="color:#666;">${item.qtd}x R$ ${item.preco.toFixed(2)}</small>
                     </div>
-                    <button onclick="removerDoCarrinhoLocal('${item.id}')" style="border:none; background:transparent; color:red; cursor:pointer;">
+                    <button onclick="removerDoCarrinhoLocal('${item.id}')" style="color:red; border:none; background:none; cursor:pointer; font-size:1.1rem; padding:5px;">
                         <i class="fas fa-trash"></i>
                     </button>
-                </div>
-            `;
+                </div>`;
         });
     }
-
+    
     if(totalEl) totalEl.innerText = totalValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
-// Global para o HTML acessar (necessário para o onclick do botão de remover)
+// Função Global para o botão de lixeira no HTML gerado
 window.removerDoCarrinhoLocal = function(id) {
-    let carrinho = JSON.parse(localStorage.getItem('carrinhoDispemaq')) || [];
-    carrinho = carrinho.filter(i => i.id !== id);
-    localStorage.setItem('carrinhoDispemaq', JSON.stringify(carrinho));
+    let c = JSON.parse(localStorage.getItem('carrinhoDispemaq')) || [];
+    c = c.filter(i => i.id !== id);
+    localStorage.setItem('carrinhoDispemaq', JSON.stringify(c));
     atualizarBadgeLoja();
 }
 
-// Garante que a função esteja disponível globalmente
+// Expõe atualização para uso externo se necessário
 window.atualizarBadgeLoja = atualizarBadgeLoja;
