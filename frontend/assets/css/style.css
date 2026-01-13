@@ -142,14 +142,6 @@ body {
     background: var(--cinza-claro);
 }
 
-.destaque-whatsapp {
-    background: #25d366;
-    color: var(--branco);
-}
-
-.destaque-whatsapp:hover {
-    background: #20ba5a;
-}
 
 /* Menu Mobile */
 .botao-menu-mobile {
@@ -274,40 +266,6 @@ body {
     background: #f2f2f2;
 }
 
-
-
-/* --- MENU DE MARCAS (DROPDOWN) --- */
-#menuMarcas {
-    display: none; 
-    position: absolute;
-    top: 100%;
-    right: 0;
-    width: 100%;
-    max-width: 1280px;
-    background: #fff;
-    border-top: 4px solid #ff6600;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-    padding: 20px;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 15px;
-    z-index: 9999;
-}
-
-#menuMarcas.ativo, #menuMarcas.mostrar {
-    display: grid;
-}
-
-.dropdown-marcas {
-    position: relative; 
-    z-index: 900;
-    text-align: center;
-}
-
-.marca-item.selecionada, .item-marca.selecionada {
-    background-color: #ff6600 !important;
-    color: white !important;
-    border-color: #ff6600 !important;
-}
 
 
 /* ============================================================

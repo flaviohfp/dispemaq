@@ -13,14 +13,15 @@
     <link rel="stylesheet" href="./assets/css/style.css" />
 
     <style>
+      /* --- ESTILOS DO MENU DE MARCAS --- */
       .menu-marcas-superposto {
-          display: none; /* Começa escondido */
-          position: absolute; /* Ignora o layout e flutua */
+          display: none;
+          position: absolute;
           width: 220px;
           background-color: white;
           border: 1px solid #ddd;
-          box-shadow: 0px 10px 25px rgba(0,0,0,0.5); /* Sombra forte */
-          z-index: 10000 !important; /* Força ficar em cima de tudo */
+          box-shadow: 0px 10px 25px rgba(0,0,0,0.5);
+          z-index: 10000 !important;
           border-radius: 6px;
           padding: 10px;
           flex-direction: column;
@@ -28,7 +29,7 @@
       }
       
       .menu-marcas-superposto.ativo {
-          display: flex; /* Aparece quando tem a classe ativo */
+          display: flex;
       }
 
       .marca-item-extra {
@@ -47,12 +48,141 @@
       .marca-item-extra:hover {
           background-color: #ff6600;
           color: white;
-          padding-left: 15px; /* Efeito visual */
+          padding-left: 15px;
       }
       
       .marca-item-extra:last-child {
           border-bottom: none;
       }
+
+      /* --- ESTILOS DOS BOTÕES DE CABEÇALHO (LOGIN E CARRINHO) --- */
+      .header-btn-container {
+          position: relative;
+          display: flex;
+          align-items: center;
+          height: 100%;
+          margin-right: 20px; /* Espaço entre os botões */
+          z-index: 110;
+          font-family: inherit;
+      }
+
+      .header-btn-trigger {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          text-decoration: none;
+          color: white;
+          font-size: 0.85rem;
+          line-height: 1.2;
+          padding: 5px;
+          transition: color 0.3s;
+          cursor: pointer;
+      }
+
+      .header-icon-svg {
+          position: relative; /* Para posicionar o badge */
+          display: flex;
+          align-items: center;
+      }
+
+      .header-icon-svg svg {
+          width: 28px;
+          height: 28px;
+          fill: white;
+          transition: fill 0.3s;
+      }
+
+      /* Hover: Muda cor para laranja */
+      .header-btn-container:hover .header-btn-trigger { color: #ff6600; }
+      .header-btn-container:hover .header-icon-svg svg { fill: #ff6600; }
+
+      /* Ajuste do Badge (Contador) no novo Layout */
+      .badge-carrinho {
+          position: absolute;
+          top: -5px;
+          right: -8px;
+          background-color: #ff6600; /* Laranja da marca */
+          color: white;
+          font-size: 10px;
+          font-weight: bold;
+          height: 16px;
+          min-width: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          border: 2px solid white; /* Borda branca para destacar */
+      }
+
+      /* Dropdown Flutuante (Apenas para o Login) */
+      .login-dropdown-content {
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          transform: translateX(-50%) translateY(15px);
+          width: 230px;
+          opacity: 0;
+          visibility: hidden;
+          transition: all 0.3s ease;
+          pointer-events: none;
+          padding-top: 15px;
+      }
+
+      .header-btn-container:hover .login-dropdown-content {
+          opacity: 1;
+          visibility: visible;
+          transform: translateX(-50%) translateY(0px);
+          pointer-events: auto;
+      }
+
+      .dropdown-arrow {
+          position: absolute;
+          top: 0px; 
+          left: 0; right: 0;
+          display: flex; justify-content: center;
+          z-index: 112;
+      }
+      .dropdown-arrow svg {
+          fill: #fff;
+          filter: drop-shadow(0 -2px 2px rgba(0,0,0,0.08));
+      }
+
+      .dropdown-box-inner {
+          background-color: #fff;
+          border-top: 3px solid #ff6600;
+          border-radius: 4px;
+          box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+          padding: 20px;
+          text-align: center;
+          display: flex; flex-direction: column; gap: 15px;
+          position: relative; z-index: 111;
+      }
+
+      .dropdown-title {
+          font-size: 0.85rem; font-weight: 700; color: #333; line-height: 1.4;
+      }
+
+      .btn-entrar-full {
+          display: flex; align-items: center; justify-content: center;
+          background-color: #ff6600; color: #fff;
+          font-weight: 800; font-size: 0.9rem; text-transform: uppercase;
+          text-decoration: none;
+          padding: 10px; border-radius: 4px;
+          transition: transform 0.2s, background-color 0.2s;
+      }
+      .btn-entrar-full:hover {
+          background-color: #e65c00;
+          transform: scale(1.05); 
+          color: white;
+      }
+
+      .dropdown-bottom-links {
+          display: flex; flex-direction: column; gap: 6px;
+          font-size: 0.8rem; color: #666;
+          border-top: 1px solid #eee; padding-top: 12px;
+      }
+      .dropdown-bottom-links a { text-decoration: none; color: inherit; }
+      .dropdown-bottom-links a strong { color: #ff6600; }
     </style>
   </head>
 
@@ -88,11 +218,44 @@
           </div>
 
           <div class="acoes-usuario">
-            <a href="login.html" class="item-acao" id="btnAuth">
-              <i class="fas fa-user-circle" id="iconAuth"></i>
-              <span id="txtAuth">Entrar</span>
-            </a>
+            
+            <div class="header-btn-container">
+              <a href="cadastro.html" class="header-btn-trigger" id="btnAuth">
+                <div class="header-icon-svg">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#000000" viewBox="0 0 256 256"><path d="M230.93,220a8,8,0,0,1-6.93,4H32a8,8,0,0,1-6.92-12c15.23-26.33,38.7-45.21,66.09-54.16a72,72,0,1,1,73.66,0c27.39,8.95,50.86,27.83,66.09,54.16A8,8,0,0,1,230.93,220Z"></path></svg>
+                </div>
+                <div class="header-text" id="txtAuth">
+                  <strong>Entre</strong> ou<br><strong>Cadastre-se</strong>
+                </div>
+              </a>
 
+              <div class="login-dropdown-content">
+                <div class="dropdown-arrow">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#fff" viewBox="0 0 256 256"><path d="M215.39,163.06A8,8,0,0,1,208,168H48a8,8,0,0,1-5.66-13.66l80-80a8,8,0,0,1,11.32,0l80,80A8,8,0,0,1,215.39,163.06Z"></path></svg>
+                </div>
+                <div class="dropdown-box-inner">
+                  <span class="dropdown-title">Já possui cadastro?<br>Acesse sua conta</span>
+                  <a href="login.html" class="btn-entrar-full">ENTRAR</a>
+                  <div class="dropdown-bottom-links">
+                    <a href="cadastro.html" title="Cadastrar">Cliente novo? <strong>Cadastrar</strong></a>
+                    <a href="login.html?pedidos=true" title="Consultar pedido">Consulte seu pedido <strong>acompanhe aqui</strong></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="header-btn-container">
+                <a href="#" class="header-btn-trigger" onclick="toggleCarrinho(event)">
+                  <div class="header-icon-svg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#000000" viewBox="0 0 256 256"><path d="M222.14,58.87A8,8,0,0,0,216,56H54.68L49.79,29.14A16,16,0,0,0,34.05,16H16a8,8,0,0,0,0,16h18L59.56,172.29a24,24,0,0,0,5.33,11.27,28,28,0,1,0,44.4,8.44h45.42A27.75,27.75,0,0,0,152,204a28,28,0,1,0,28-28H83.17a8,8,0,0,1-7.87-6.57L72.13,152h116a24,24,0,0,0,23.61-19.71l12.16-66.86A8,8,0,0,0,222.14,58.87ZM96,204a12,12,0,1,1-12-12A12,12,0,0,1,96,204Zm96,0a12,12,0,1,1-12-12A12,12,0,0,1,192,204Zm4-74.57A8,8,0,0,1,188.1,136H69.22L57.59,72H206.41Z"></path></svg>
+                    
+                    <span class="badge-carrinho">0</span>
+                  </div>
+                  <div class="header-text">
+                    <strong>Meu</strong><br>Carrinho
+                  </div>
+                </a>
+            </div>
             <a
               id="btnLinkAdmin"
               href="admin.html"
@@ -109,21 +272,7 @@
             >
               <i class="fas fa-cogs"></i> Painel
             </a>
-
-            <a href="#" class="item-acao" onclick="toggleCarrinho(event)">
-              <div class="carrinho-botao">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="badge-carrinho">0</span>
-              </div>
-              <span>Carrinho</span>
-            </a>
-            <a
-              href="https://wa.me/554984276503?text=Ol%C3%A1%20tudo%20bem?"
-              class="item-acao destaque-whatsapp"
-            >
-              <i class="fab fa-whatsapp"></i>
-              <span>Vendas</span>
-            </a>
+            
             <button class="botao-menu-mobile" id="botaoMenuMobile">
               <span></span>
               <span></span>
@@ -154,7 +303,7 @@
     
       <div class="dropdown-marcas">
           <button id="btnVerMais" class="botao-marcas" onclick="abrirMenuMarcas(event)">
-            <i class="fas fa-plus-circle"></i> Ver mais marcas
+            <i class="fas fa-plus-circle"></i>MARCAS
           </button>
       </div>
     </div>
@@ -660,7 +809,7 @@
         </p>
         <div>
           <a
-            href="login.html"
+            href="cadastro.html"
             style="
               background: #ff6600;
               color: white;
