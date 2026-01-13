@@ -85,20 +85,14 @@ async function carregarProdutosDestaque() {
 // B) Carregar Banners
 async function carregarBanners() {
     const slider = document.getElementById('bannerSlider');
-    const indicadores = document.getElementById('bannerIndicadores');
-    // Se não tiver slider (pode ser outra página), sai da função para não dar erro
     if(!slider && !document.getElementById('banner-track')) return;
-
-    // Nota: O HTML novo usa banner-track e lógica interna no HTML, 
-    // mas mantivemos a função aqui caso precise usar slider antigo ou lógica mista.
 }
 
 /* ============================================================
-   3. FUNÇÕES GLOBAIS (CARRINHO, UI E MENU MARCAS)
+   3. FUNÇÕES GLOBAIS (UI, MENUS, CARRINHO)
    ============================================================ */
 
-// --- FUNÇÃO CORRIGIDA PARA O MENU DE MARCAS ---
-// Esta função é chamada pelo onclick do HTML novo
+// --- ABRIR MENU "VER MAIS MARCAS" ---
 window.abrirMenuMarcas = function(event) {
     if(event) {
         event.preventDefault();
@@ -117,24 +111,21 @@ window.abrirMenuMarcas = function(event) {
         return;
     }
 
-    // Fecha o outro menu (de categorias) se estiver aberto para não encavalar
+    // Fecha o menu de categorias se estiver aberto
     const menuCat = document.getElementById('menuCategoriasFlutuante');
     if(menuCat) menuCat.style.display = 'none';
 
-    // CÁLCULO DE POSIÇÃO (Faz o menu flutuar no lugar certo)
+    // Posiciona o menu abaixo do botão
     const rect = btn.getBoundingClientRect(); 
-    
-    // Configura a posição do menu baseado no scroll da página + posição do botão
-    // Alinhado à esquerda do botão, descendo
     menu.style.top = (rect.bottom + window.scrollY + 5) + "px"; 
-    // Tenta alinhar a esquerda, se passar da tela, ajusta
+    
     let leftPos = rect.left + window.scrollX;
+    // Ajuste para não sair da tela à direita
     if (leftPos + 220 > window.innerWidth) {
-        leftPos = window.innerWidth - 230; // Ajuste para não cortar na direita
+        leftPos = window.innerWidth - 230;
     }
     menu.style.left = leftPos + "px";
 
-    // Abre o menu
     menu.classList.add("ativo");
     btn.innerHTML = '<i class="fas fa-minus-circle"></i> Fechar';
 }
@@ -189,7 +180,6 @@ function renderizarCarrinho() {
     }
 }
 
-// Funções Globais (window)
 window.adicionarAoCarrinho = function(el) {
     const produto = {
         id: el.getAttribute('data-id'),
@@ -198,11 +188,9 @@ window.adicionarAoCarrinho = function(el) {
         img: el.getAttribute('data-img'),
         qtd: 1
     };
-
     const existente = carrinho.find(i => i.id === produto.id);
     if (existente) existente.qtd++;
     else carrinho.push(produto);
-
     atualizarBadge();
     renderizarCarrinho();
     document.getElementById("carrinhoLateral").classList.add("aberto");
@@ -246,68 +234,72 @@ window.subirTopo = function() {
 }
 
 /* ============================================================
-   4. INICIALIZAÇÃO (DOM READY)
+   4. INICIALIZAÇÃO E LÓGICA DE MENUS (CORRIGIDA)
    ============================================================ */
 document.addEventListener('DOMContentLoaded', function() {
     
-    // Inicia funções principais
     carregarProdutosDestaque();
-    // carregarBanners() é chamado no HTML do carrossel, mas deixei aqui caso precise
     atualizarBadge();
 
-    // --- LOGICA DE CLICK NOS ITENS DO MENU FLUTUANTE ---
-    // (Para os botões dentro do menu "Ver Mais")
-    const botoesMenuExtra = document.querySelectorAll('.marca-item-extra');
-    botoesMenuExtra.forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            // Aqui você define o que acontece ao clicar numa marca do menu extra
-            // Por enquanto, vou simular que seleciona a marca igual aos botões principais
-            const marca = this.getAttribute('data-marca') || this.innerText;
-            alert("Você clicou na marca: " + marca + ". Aqui você pode redirecionar para a loja.");
-            // Exemplo: window.location.href = `loja.html?marca=${marca}`;
-        });
-    });
-
-    // --- MENU DE CATEGORIAS (PEÇAS) ---
+    // -------------------------------------------------------------
+    // LÓGICA UNIFICADA PARA ABRIR O MENU DE CATEGORIAS
+    // Funciona para botões principais E para botões do menu extra
+    // -------------------------------------------------------------
     const menuCategorias = document.getElementById('menuCategoriasFlutuante');
     const tituloMenuCat = document.getElementById('tituloMarcaDropdown');
-    const todosBotoesMarcaPrincipal = document.querySelectorAll('.item-marca'); // Apenas os da barra laranja
+    
+    // Seleciona TODOS os botões que representam marcas (Principal + Extra)
+    const todosBotoesMarca = document.querySelectorAll('.item-marca, .marca-item-extra');
 
-    todosBotoesMarcaPrincipal.forEach(botao => {
+    todosBotoesMarca.forEach(botao => {
         botao.addEventListener('click', function(e) {
             e.preventDefault();
-            e.stopPropagation();
+            e.stopPropagation(); // Impede que o clique feche o menu imediatamente
 
-            // Fecha o menu "Ver Mais Marcas" se estiver aberto
+            // 1. Fecha o menu "Ver Mais Marcas" se estiver aberto
             const menuMais = document.getElementById("menuMaisMarcas");
             const btnMais = document.getElementById("btnVerMais");
             if(menuMais && menuMais.classList.contains('ativo')){
                 menuMais.classList.remove('ativo');
-                btnMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
+                if(btnMais) btnMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
             }
 
-            // Reseta estilos
-            todosBotoesMarcaPrincipal.forEach(b => {
+            // 2. Limpa seleção visual anterior
+            document.querySelectorAll('.item-marca').forEach(b => {
                 b.classList.remove('selecionada');
                 b.style.backgroundColor = '';
                 b.style.color = '';
             });
 
-            this.classList.add('selecionada');
-            this.style.backgroundColor = '#ff6600';
-            this.style.color = 'white';
+            // 3. Se for um botão da barra principal, marca ele visualmente
+            if(this.classList.contains('item-marca')) {
+                this.classList.add('selecionada');
+                this.style.backgroundColor = '#ff6600';
+                this.style.color = 'white';
+            }
 
+            // 4. Captura os dados da marca
             const marcaNome = this.getAttribute('data-marca') || this.innerText.trim();
             const marcaNomeBonito = this.innerText.trim();
             marcaAtualSelecionada = marcaNome;
 
+            // 5. Atualiza o título do menu de categorias
             if(tituloMenuCat) tituloMenuCat.innerText = "Peças para " + marcaNomeBonito;
 
+            // 6. Posiciona e Mostra o Menu de Categorias
             if(menuCategorias) {
                 const rect = this.getBoundingClientRect();
                 const top = rect.bottom + window.scrollY;
                 let left = rect.left + window.scrollX;
 
+                // Se for botão do menu extra (vertical), talvez queira ajustar a posição X
+                // para garantir que o menu apareça bem visível
+                if(this.classList.contains('marca-item-extra')) {
+                    // Joga um pouco pra direita para não cobrir o botão
+                    left += 50; 
+                }
+
+                // Proteção para não estourar a tela na direita
                 if (left + 280 > window.innerWidth) left = window.innerWidth - 290;
                 if (left < 0) left = 10;
 
@@ -318,38 +310,47 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Redirecionamento das Categorias
+    // -------------------------------------------------------------
+    // REDIRECIONAMENTO AO CLICAR NA CATEGORIA
+    // -------------------------------------------------------------
     const botoesCat = document.querySelectorAll('.item-cat-dropdown');
     botoesCat.forEach(btn => {
         btn.addEventListener('click', function() {
             const categoria = this.getAttribute('data-cat');
+            
+            // Monta a URL com a marca selecionada anteriormente e a categoria clicada
             let url = `loja.html?marca=${encodeURIComponent(marcaAtualSelecionada)}`;
-            if(categoria !== 'todas') url += `&cat=${encodeURIComponent(categoria)}`;
+            
+            if(categoria !== 'todas') {
+                url += `&cat=${encodeURIComponent(categoria)}`;
+            }
+            
             window.location.href = url;
         });
     });
 
-    // --- FECHAR MENUS AO CLICAR FORA ---
+    // -------------------------------------------------------------
+    // FECHAR MENUS AO CLICAR FORA
+    // -------------------------------------------------------------
     document.addEventListener('click', function(e) {
         // Fecha Categorias
         if(menuCategorias && menuCategorias.style.display === 'block') {
             if (!menuCategorias.contains(e.target)) menuCategorias.style.display = 'none';
         }
 
-        // Fecha Menu Mais Marcas (Novo)
+        // Fecha Menu Mais Marcas
         const menuMais = document.getElementById("menuMaisMarcas");
         const btnMais = document.getElementById("btnVerMais");
         if(menuMais && menuMais.classList.contains('ativo')) {
-            // Se o clique NÃO foi no menu E NÃO foi no botão
             if (!menuMais.contains(e.target) && !btnMais.contains(e.target)) {
                 menuMais.classList.remove('ativo');
                 if(btnMais) btnMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
             }
         }
     });
-    
-    // Fecha ao rolar a tela (opcional, para evitar menu voando)
+
     window.addEventListener('scroll', function() {
+        if(menuCategorias) menuCategorias.style.display = 'none';
         const menuMais = document.getElementById("menuMaisMarcas");
         const btnMais = document.getElementById("btnVerMais");
         if(menuMais && menuMais.classList.contains('ativo')) {
@@ -358,16 +359,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // --- LOGIN / LOGOUT / ADMIN BTN ---
+    // -------------------------------------------------------------
+    // LOGIN / ADMIN
+    // -------------------------------------------------------------
     const btnAuth = document.getElementById('btnAuth');
     const txtAuth = document.getElementById('txtAuth');
     const btnLinkAdmin = document.getElementById('btnLinkAdmin'); 
     
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            // -- LOGADO --
             if(txtAuth) txtAuth.innerText = "Sair";
-            
             if(btnAuth) {
                 btnAuth.href = "#";
                 btnAuth.onclick = (e) => {
@@ -375,19 +376,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     if(confirm("Sair da conta?")) signOut(auth).then(() => window.location.reload());
                 };
             }
-
-            // MOSTRAR BOTÃO ADMIN
-            if (user.email === EMAIL_ADMIN) {
-                if(btnLinkAdmin) btnLinkAdmin.style.display = 'inline-flex';
-            } else {
-                if(btnLinkAdmin) btnLinkAdmin.style.display = 'none';
+            if (user.email === EMAIL_ADMIN && btnLinkAdmin) {
+                btnLinkAdmin.style.display = 'inline-flex';
+            } else if(btnLinkAdmin) {
+                btnLinkAdmin.style.display = 'none';
             }
-
             const popup = document.getElementById('popupAvisoLogin');
             if(popup) popup.style.display = 'none';
-
         } else {
-            // -- DESLOGADO --
             if(txtAuth) txtAuth.innerText = "Entrar";
             if(btnAuth) {
                 btnAuth.href = "login.html";
@@ -397,12 +393,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // --- MENU MOBILE ---
+    // -------------------------------------------------------------
+    // MOBILE & UI EXTRAS
+    // -------------------------------------------------------------
     const btnMenu = document.getElementById('botaoMenuMobile');
     const navMenu = document.getElementById('menuNavegacao');
     if (btnMenu) btnMenu.addEventListener('click', () => navMenu.classList.toggle('ativo'));
 
-    // --- BOTÃO TOPO ---
     window.addEventListener('scroll', () => {
         const btn = document.getElementById("btnTopo");
         if (btn) {
