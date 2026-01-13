@@ -234,7 +234,7 @@ window.subirTopo = function() {
 }
 
 /* ============================================================
-   4. INICIALIZAÇÃO E LÓGICA DE MENUS (CORRIGIDA)
+   4. INICIALIZAÇÃO E LÓGICA DE MENUS (DOM READY)
    ============================================================ */
 document.addEventListener('DOMContentLoaded', function() {
     
@@ -243,7 +243,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // -------------------------------------------------------------
     // LÓGICA UNIFICADA PARA ABRIR O MENU DE CATEGORIAS
-    // Funciona para botões principais E para botões do menu extra
     // -------------------------------------------------------------
     const menuCategorias = document.getElementById('menuCategoriasFlutuante');
     const tituloMenuCat = document.getElementById('tituloMarcaDropdown');
@@ -254,53 +253,72 @@ document.addEventListener('DOMContentLoaded', function() {
     todosBotoesMarca.forEach(botao => {
         botao.addEventListener('click', function(e) {
             e.preventDefault();
-            e.stopPropagation(); // Impede que o clique feche o menu imediatamente
+            e.stopPropagation(); 
 
-            // 1. Fecha o menu "Ver Mais Marcas" se estiver aberto
+            // Verifica se o clique veio do menu "Ver Mais" (vertical)
+            const ehMenuExtra = this.classList.contains('marca-item-extra');
             const menuMais = document.getElementById("menuMaisMarcas");
             const btnMais = document.getElementById("btnVerMais");
-            if(menuMais && menuMais.classList.contains('ativo')){
-                menuMais.classList.remove('ativo');
-                if(btnMais) btnMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
+
+            // SE for clique na barra laranja principal, fecha o menu "Ver Mais" se estiver aberto
+            // SE for clique dentro do menu "Ver Mais", MANTÉM ele aberto (para ficar lado a lado)
+            if (!ehMenuExtra) {
+                if(menuMais && menuMais.classList.contains('ativo')){
+                    menuMais.classList.remove('ativo');
+                    if(btnMais) btnMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
+                }
             }
 
-            // 2. Limpa seleção visual anterior
-            document.querySelectorAll('.item-marca').forEach(b => {
+            // Limpa seleção visual de todos
+            todosBotoesMarca.forEach(b => {
                 b.classList.remove('selecionada');
-                b.style.backgroundColor = '';
+                b.style.backgroundColor = ''; 
                 b.style.color = '';
             });
 
-            // 3. Se for um botão da barra principal, marca ele visualmente
-            if(this.classList.contains('item-marca')) {
-                this.classList.add('selecionada');
-                this.style.backgroundColor = '#ff6600';
-                this.style.color = 'white';
-            }
+            // Marca o atual visualmente
+            this.classList.add('selecionada');
+            this.style.backgroundColor = '#ff6600';
+            this.style.color = 'white';
 
-            // 4. Captura os dados da marca
+            // Dados da Marca
             const marcaNome = this.getAttribute('data-marca') || this.innerText.trim();
             const marcaNomeBonito = this.innerText.trim();
             marcaAtualSelecionada = marcaNome;
 
-            // 5. Atualiza o título do menu de categorias
             if(tituloMenuCat) tituloMenuCat.innerText = "Peças para " + marcaNomeBonito;
 
-            // 6. Posiciona e Mostra o Menu de Categorias
+            // POSICIONAMENTO DO MENU DE CATEGORIAS
             if(menuCategorias) {
                 const rect = this.getBoundingClientRect();
-                const top = rect.bottom + window.scrollY;
-                let left = rect.left + window.scrollX;
+                
+                let top, left;
 
-                // Se for botão do menu extra (vertical), talvez queira ajustar a posição X
-                // para garantir que o menu apareça bem visível
-                if(this.classList.contains('marca-item-extra')) {
-                    // Joga um pouco pra direita para não cobrir o botão
-                    left += 50; 
+                if (ehMenuExtra) {
+                    // --- LÓGICA PARA MENU LATERAL (Abre ao lado direito) ---
+                    // O topo alinha com o topo do item clicado
+                    top = rect.top + window.scrollY; 
+                    // A esquerda alinha com a direita do item clicado (+ 5px de margem)
+                    left = rect.right + window.scrollX + 5; 
+                } else {
+                    // --- LÓGICA PARA BARRA PRINCIPAL (Abre embaixo) ---
+                    top = rect.bottom + window.scrollY;
+                    left = rect.left + window.scrollX;
                 }
 
-                // Proteção para não estourar a tela na direita
-                if (left + 280 > window.innerWidth) left = window.innerWidth - 290;
+                // Ajuste para não estourar a tela na direita (Mobile ou telas pequenas)
+                // Se a posição left + largura do menu (aprox 280px) for maior que a tela...
+                if (left + 280 > window.innerWidth) {
+                    if (ehMenuExtra) {
+                        // Se for menu extra e não couber na direita, joga para a ESQUERDA do menu de marcas
+                        left = rect.left + window.scrollX - 290; 
+                    } else {
+                        // Se for barra principal, alinha à direita da tela
+                        left = window.innerWidth - 290;
+                    }
+                }
+                
+                // Proteção para não sair na esquerda da tela
                 if (left < 0) left = 10;
 
                 menuCategorias.style.top = top + 'px';
@@ -333,16 +351,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // FECHAR MENUS AO CLICAR FORA
     // -------------------------------------------------------------
     document.addEventListener('click', function(e) {
-        // Fecha Categorias
+        // Fecha Categorias se clicar fora dele
         if(menuCategorias && menuCategorias.style.display === 'block') {
             if (!menuCategorias.contains(e.target)) menuCategorias.style.display = 'none';
         }
 
-        // Fecha Menu Mais Marcas
+        // Fecha Menu Mais Marcas se clicar fora dele E fora do botão que abre ele
         const menuMais = document.getElementById("menuMaisMarcas");
         const btnMais = document.getElementById("btnVerMais");
+        
         if(menuMais && menuMais.classList.contains('ativo')) {
-            if (!menuMais.contains(e.target) && !btnMais.contains(e.target)) {
+            // Importante: Se clicou no menu de categorias, NÃO fecha o menu de marcas
+            const clicouNoMenuCat = menuCategorias && menuCategorias.contains(e.target);
+            
+            if (!menuMais.contains(e.target) && !btnMais.contains(e.target) && !clicouNoMenuCat) {
                 menuMais.classList.remove('ativo');
                 if(btnMais) btnMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
             }
@@ -351,12 +373,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.addEventListener('scroll', function() {
         if(menuCategorias) menuCategorias.style.display = 'none';
-        const menuMais = document.getElementById("menuMaisMarcas");
-        const btnMais = document.getElementById("btnVerMais");
-        if(menuMais && menuMais.classList.contains('ativo')) {
-             menuMais.classList.remove('ativo');
-             if(btnMais) btnMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
-        }
     });
 
     // -------------------------------------------------------------
