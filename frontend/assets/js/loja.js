@@ -3,8 +3,9 @@
    ========================================= */
 
 import { db, auth } from './firebase-config.js';
+// ADICIONADO: doc e getDoc na importação abaixo para o Banner funcionar
 import { 
-    collection, getDocs, query, where, limit, startAfter, orderBy 
+    collection, getDocs, query, where, limit, startAfter, orderBy, doc, getDoc 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // --- VARIAVEIS GLOBAIS ---
@@ -28,17 +29,17 @@ document.addEventListener('DOMContentLoaded', () => {
     carregarBannerLoja();
     atualizarBadgeLoja();
 
-    // 2. Lê filtros da URL
+    // 2. Lê filtros da URL (Vindo da Home ou links externos)
     const params = new URLSearchParams(window.location.search);
     const marca = params.get('marca');
     const cat = params.get('cat');
-    const busca = params.get('busca');
+    const busca = params.get('busca'); // Correção: busca estava como 'categoria' no exemplo anterior, ajustado para padrão
 
     // 3. Configura eventos
     configurarSidebar();
     configurarBuscaHeader();
 
-    // 4. Inicia a busca
+    // 4. Inicia a busca com os filtros da URL
     filtrarLoja(marca, cat, busca);
 });
 
@@ -53,11 +54,13 @@ async function buscarProdutosNoFirebase(reset = false) {
     
     // Se for reset, mostra o loader limpo
     if (reset) {
-        container.innerHTML = `
-            <div style="grid-column:1/-1; text-align:center; padding:50px;">
-                <i class="fas fa-circle-notch fa-spin" style="font-size:30px; color:#ff6600;"></i>
-                <p style="margin-top:10px; color:#666;">Buscando produtos...</p>
-            </div>`;
+        if(container) {
+            container.innerHTML = `
+                <div style="grid-column:1/-1; text-align:center; padding:50px;">
+                    <i class="fas fa-circle-notch fa-spin" style="font-size:30px; color:#ff6600;"></i>
+                    <p style="margin-top:10px; color:#666;">Buscando produtos...</p>
+                </div>`;
+        }
         ultimoDoc = null;
         temMais = true;
         removerBotaoCarregarMais();
@@ -98,12 +101,12 @@ async function buscarProdutosNoFirebase(reset = false) {
         const q = query(produtosRef, ...restricoes);
         const snapshot = await getDocs(q);
 
-        if (reset) container.innerHTML = ''; // Limpa loader
+        if (reset && container) container.innerHTML = ''; // Limpa loader
 
         // --- RESULTADO VAZIO ---
         if (snapshot.empty) {
             temMais = false;
-            if (reset) {
+            if (reset && container) {
                 container.innerHTML = `
                     <div style="grid-column:1/-1; text-align:center; padding: 40px; color: #666;">
                         <i class="fas fa-search" style="font-size: 40px; margin-bottom: 15px; opacity: 0.3;"></i>
@@ -140,7 +143,7 @@ async function buscarProdutosNoFirebase(reset = false) {
         console.error("Erro LOJA:", error);
         
         // Mensagem de erro amigável na tela
-        if(reset) {
+        if(reset && container) {
             container.innerHTML = `
                 <div style="grid-column:1/-1; text-align:center; padding: 40px; color: #d9534f;">
                     <i class="fas fa-exclamation-triangle" style="font-size: 30px;"></i>
@@ -159,6 +162,8 @@ async function buscarProdutosNoFirebase(reset = false) {
 
 /* --- RENDERIZAÇÃO (UI) --- */
 function criarCardProduto(p, container) {
+    if(!container) return;
+
     const card = document.createElement('div');
     card.classList.add('produto-card');
     
@@ -193,15 +198,16 @@ function criarCardProduto(p, container) {
 
     // Click no botão comprar
     const btn = card.querySelector('.btn-add-carrinho');
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        addCarrinhoLoja(p.id, p);
-    });
+    if(btn) {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            addCarrinhoLoja(p.id, p);
+        });
+    }
 
     // Click no card (Detalhamento)
     card.addEventListener('click', (e) => {
         if(!e.target.closest('.btn-add-carrinho')) {
-            // Se tiver página de detalhes, descomente:
             // window.location.href = `produto.html?id=${p.id}`;
         }
     });
@@ -223,9 +229,12 @@ function adicionarBotaoCarregarMais(container) {
     
     container.appendChild(div);
 
-    document.getElementById('btnCarregarMais').addEventListener('click', () => {
-        buscarProdutosNoFirebase(false); 
-    });
+    const btn = document.getElementById('btnCarregarMais');
+    if(btn) {
+        btn.addEventListener('click', () => {
+            buscarProdutosNoFirebase(false); 
+        });
+    }
 }
 
 function removerBotaoCarregarMais() {
@@ -251,7 +260,7 @@ function filtrarLoja(marcaUrl, catUrl, buscaUrl) {
 
     // 3. Atualiza Visual da Sidebar
     document.querySelectorAll('.filtro-item').forEach(item => {
-        item.classList.remove('ativo'); // Supondo que você tenha CSS para .ativo
+        item.classList.remove('ativo'); 
         if(item.dataset.marca === marcaUrl || item.dataset.cat === catUrl) {
             item.classList.add('ativo');
         }
@@ -277,7 +286,7 @@ function configurarSidebar() {
             const marca = item.dataset.marca;
             const cat = item.dataset.cat;
             
-            // Atualiza URL
+            // Atualiza URL sem recarregar (SPA feel)
             const url = new URL(window.location);
             
             if(marca) { 
@@ -334,7 +343,7 @@ async function carregarBannerLoja() {
             imgBanner.src = docSnap.data().url;
         }
     } catch (e) {
-        // Silencioso se não tiver banner
+        console.log("Banner: padrão utilizado ou erro ao carregar.");
     }
 }
 
@@ -346,10 +355,11 @@ async function addCarrinhoLoja(id, produtoObj) {
     // 2. Prepara preço numérico
     let precoNum = 0;
     if(produtoObj.preco) {
-        let p = produtoObj.preco.toString().replace('R$', '').trim().replace('.', '').replace(',', '.'); // Limpeza pesada
-        // Se o seu preço já vem limpo "1200.50", o replace acima não estraga, mas cuidado se usar milhar com ponto
-        // Fallback simples:
-        precoNum = parseFloat(produtoObj.preco.toString().replace(',', '.'));
+        // Limpeza básica para garantir que é numero
+        let clean = produtoObj.preco.toString().replace('R$', '').trim();
+        // Se usar virgula como decimal
+        if(clean.includes(',')) clean = clean.replace('.', '').replace(',', '.');
+        precoNum = parseFloat(clean);
     }
 
     // 3. Verifica duplicidade
@@ -370,8 +380,13 @@ async function addCarrinhoLoja(id, produtoObj) {
     localStorage.setItem('carrinhoDispemaq', JSON.stringify(carrinho));
     atualizarBadgeLoja();
     
-    // 5. Feedback Visual (Opcional: abrir sidebar)
-    if(typeof toggleCarrinho === 'function') toggleCarrinho();
+    // 5. Feedback Visual
+    // Verifica se a função global toggleCarrinho existe (geralmente no script.js)
+    if(typeof toggleCarrinho === 'function') {
+        toggleCarrinho(true); // Abre o carrinho
+    } else {
+        alert("Produto adicionado ao carrinho!");
+    }
 }
 
 function atualizarBadgeLoja() {
@@ -420,7 +435,7 @@ function renderizarItensCarrinhoLateral(carrinho) {
     if(totalEl) totalEl.innerText = totalValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
-// Global para o HTML acessar
+// Global para o HTML acessar (necessário para o onclick do botão de remover)
 window.removerDoCarrinhoLocal = function(id) {
     let carrinho = JSON.parse(localStorage.getItem('carrinhoDispemaq')) || [];
     carrinho = carrinho.filter(i => i.id !== id);
@@ -428,4 +443,5 @@ window.removerDoCarrinhoLocal = function(id) {
     atualizarBadgeLoja();
 }
 
+// Garante que a função esteja disponível globalmente
 window.atualizarBadgeLoja = atualizarBadgeLoja;
