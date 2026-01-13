@@ -720,89 +720,170 @@ body {
     width: 20px;
     text-align: center;
 }
-/* ============================================================
-   ESTILOS EXCLUSIVOS DA LOJA.HTML
-   ============================================================ */
+/* =========================================
+   GRID DA LOJA & CARDS DE PRODUTOS
+   ========================================= */
 
-/* Layout Grid: Sidebar (esquerda) + Produtos (direita) */
-.container-loja-layout {
+/* Grade Responsiva */
+#gradeProdutosLoja {
     display: grid;
-    grid-template-columns: 260px 1fr; /* Sidebar fixa 260px, resto fluido */
-    gap: 30px;
-    align-items: start;
+    /* Cria colunas automáticas: mínimo 260px, máximo 1 fração da tela */
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 25px; /* Espaço entre os cards */
+    padding: 20px 0;
 }
 
-/* Estilo da Sidebar */
-.sidebar-filtros .box-sidebar {
-    background-color: #f8f9fa;
-    padding: 20px;
-    border-radius: 8px;
-    border: 1px solid #eee;
+/* O Card em si */
+.produto-card {
+    background-color: #ffffff;
+    border-radius: 10px; /* Bordas arredondadas */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Sombra leve e chique */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Garante que nada saia das bordas arredondadas */
+    border: 1px solid #f0f0f0; /* Borda bem sutil */
+    position: relative;
 }
 
-.sidebar-filtros h3 {
-    font-size: 1.1rem;
-    color: #333;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #ff6600; /* Laranja da marca */
+/* Efeito ao passar o mouse (Hover) */
+.produto-card:hover {
+    transform: translateY(-5px); /* Levanta levemente */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12); /* Sombra aumenta */
+    border-color: #e0e0e0;
 }
 
-.grupo-filtro {
-    margin-bottom: 25px;
-}
-
-.grupo-filtro h4 {
-    font-size: 0.95rem;
-    margin-bottom: 10px;
-    color: #555;
-    text-transform: uppercase;
-    font-weight: bold;
-}
-
-.grupo-filtro ul {
-    list-style: none;
-    padding: 0;
-}
-
-.filtro-item {
-    padding: 8px 10px;
-    cursor: pointer;
-    color: #666;
-    border-radius: 4px;
-    transition: all 0.2s;
-    font-size: 0.95rem;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.filtro-item:hover {
-    background-color: #ff6600;
-    color: white;
-    padding-left: 15px; /* Efeito de deslizar */
-}
-
-/* Cabeçalho dos Resultados */
-.header-resultados {
-    background-color: #fff;
+/* Área da Imagem */
+.img-container {
+    width: 100%;
+    height: 220px; /* Altura fixa para alinhar tudo */
+    background-color: #f9f9f9; /* Fundo cinza bem clarinho para destacar a peça */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 15px;
     border-bottom: 1px solid #eee;
-    margin-bottom: 20px;
 }
 
-.header-resultados h2 {
-    color: #1e3a8a; /* Azul escuro da home */
-    margin: 0;
+.img-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* IMPORTANTE: Não estica a imagem, mantém a proporção */
+    mix-blend-mode: multiply; /* Ajuda a tirar o fundo branco da imagem se o fundo do container for cinza */
+}
+
+/* Informações do Produto */
+.produto-info {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Faz essa área ocupar o espaço restante */
+}
+
+/* Etiqueta de Categoria/Marca */
+.categoria-tag {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #888;
+    background-color: #f0f0f0;
+    padding: 4px 10px;
+    border-radius: 20px;
+    align-self: flex-start;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+/* Título do Produto */
+.produto-info h3 {
+    font-size: 1.1rem;
+    color: #333;
+    margin: 0 0 5px 0;
+    line-height: 1.4;
+    font-weight: 700;
+    
+    /* Limita a 2 linhas e põe "..." se for grande */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 44px; /* Altura fixa para 2 linhas */
+}
+
+/* Código do produto */
+.codigo {
+    font-size: 0.85rem;
+    color: #999;
+    margin-bottom: 15px;
+}
+
+/* Área de Preço e Botão */
+.preco-box {
+    margin-top: auto; /* Empurra o preço para o final do card */
+    margin-bottom: 15px;
+}
+
+.preco {
     font-size: 1.5rem;
+    color: #2c3e50; /* Azul escuro elegante */
+    font-weight: 800;
 }
 
-/* Responsividade para celular */
-@media (max-width: 900px) {
-    .container-loja-layout {
-        grid-template-columns: 1fr; /* Vira uma coluna só */
+/* Botão Comprar */
+.botao-comprar {
+    width: 100%;
+    padding: 12px;
+    background-color: #ff6600; /* Laranja ação */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Espaço entre ícone e texto */
+}
+
+.botao-comprar:hover {
+    background-color: #e65c00; /* Laranja mais escuro */
+}
+
+.botao-comprar:active {
+    transform: scale(0.98); /* Clique leve */
+}
+
+/* --- Ajuste para Celular (Mobile) --- */
+@media (max-width: 768px) {
+    #gradeProdutosLoja {
+        grid-template-columns: repeat(2, 1fr); /* 2 colunas no celular */
+        gap: 15px;
     }
     
-    .sidebar-filtros {
-        margin-bottom: 30px;
+    .img-container {
+        height: 150px; /* Imagem menor no celular */
+    }
+    
+    .produto-info {
+        padding: 12px;
+    }
+    
+    .produto-info h3 {
+        font-size: 0.95rem;
+        height: auto;
+    }
+    
+    .botao-comprar {
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    #gradeProdutosLoja {
+        grid-template-columns: 1fr; /* 1 coluna em celulares muito pequenos */
     }
 }
 
