@@ -3,10 +3,14 @@ import {
     collection, addDoc, getDocs, deleteDoc, doc, ref, uploadBytes, getDownloadURL, setDoc, getDoc, updateDoc
 } from './firebase-config.js';
 
+// Importando funções extras necessárias para arrays (não estavam no config)
+import { arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 /* ============================================================
    CONFIGURAÇÃO E VARIÁVEIS
    ============================================================ */
 const prodCollection = collection(db, "produtos");
+const filtrosRef = doc(db, "configuracoes", "filtros_loja"); // Referência dos filtros
 const EMAIL_ADMIN = "admin@dispemaq.com"; 
 
 // Verifica Autenticação
@@ -19,7 +23,8 @@ onAuthStateChanged(auth, (user) => {
     } else {
         console.log("Admin logado:", user.email);
         carregarProdutos(); 
-        carregarBannersAdmin(); 
+        carregarBannersAdmin();
+        carregarFiltrosAdmin(); // <--- NOVO: Carrega as marcas/categorias
     }
 });
 
@@ -41,32 +46,139 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 3. EVENTO DO BANNER
     const btnUpload = document.getElementById("btnUploadBanner");
-    const inputBanner = document.getElementById("arquivoBanner");
-
     if(btnUpload) {
         btnUpload.addEventListener("click", async (e) => {
             e.preventDefault(); 
             await adicionarBanner();
         });
-    } else {
-        console.error("Botão btnUploadBanner não encontrado no HTML!");
     }
 
-    // 4. Botões de Excluir (Delegação)
+    // 4. NOVOS EVENTOS DE FILTROS (Marcas e Categorias)
+    const btnAddMarca = document.getElementById("btnAddMarca");
+    const btnAddCat = document.getElementById("btnAddCategoria");
+
+    if(btnAddMarca) btnAddMarca.addEventListener("click", () => adicionarFiltro('marcas'));
+    if(btnAddCat) btnAddCat.addEventListener("click", () => adicionarFiltro('categorias'));
+
+    // 5. Botões de Excluir (Delegação Global)
     document.body.addEventListener('click', function(e) {
+        // Excluir Produto
         if(e.target.closest('.btn-delete-prod')) {
             const id = e.target.closest('.btn-delete-prod').dataset.id;
             deletarProduto(id, e.target);
         }
+        // Excluir Banner
         if(e.target.closest('.btn-delete-banner')) {
             const index = e.target.closest('.btn-delete-banner').dataset.index;
             removerBanner(index);
+        }
+        // Excluir Filtro (Novo)
+        if(e.target.closest('.btn-delete-filtro')) {
+            const btn = e.target.closest('.btn-delete-filtro');
+            const tipo = btn.dataset.tipo;
+            const valor = btn.dataset.valor;
+            removerFiltro(tipo, valor);
         }
     });
 });
 
 /* ============================================================
-   LÓGICA DE PRODUTOS (ATUALIZADA COM DESCRIÇÃO)
+   LÓGICA NOVA: GERENCIAR FILTROS (MARCAS E CATEGORIAS)
+   ============================================================ */
+
+// Carrega listas e preenche os Selects do formulário
+async function carregarFiltrosAdmin() {
+    try {
+        const docSnap = await getDoc(filtrosRef);
+        
+        // Se ainda não existir, cria vazio
+        if (!docSnap.exists()) {
+            await setDoc(filtrosRef, { marcas: [], categorias: [] });
+            return;
+        }
+
+        const dados = docSnap.data();
+        const marcas = dados.marcas || [];
+        const categorias = dados.categorias || [];
+
+        // 1. Renderiza as listas de gestão (com botão excluir)
+        renderizarListaGestao('listaMarcasAdmin', marcas, 'marcas');
+        renderizarListaGestao('listaCategoriasAdmin', categorias, 'categorias');
+
+        // 2. Preenche os SELECTS do formulário de cadastro
+        atualizarSelectFormulario('marca', marcas);
+        atualizarSelectFormulario('categoria', categorias);
+
+    } catch (error) {
+        console.error("Erro ao carregar filtros:", error);
+    }
+}
+
+function renderizarListaGestao(elementId, arrayItens, tipo) {
+    const ul = document.getElementById(elementId);
+    if(!ul) return;
+    ul.innerHTML = "";
+    
+    arrayItens.sort().forEach(item => {
+        ul.innerHTML += `
+            <li style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee;">
+                <span>${item}</span>
+                <button class="btn-delete-filtro" data-tipo="${tipo}" data-valor="${item}" style="color:red; background:none; border:none; cursor:pointer;">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </li>
+        `;
+    });
+}
+
+function atualizarSelectFormulario(selectId, arrayItens) {
+    const select = document.getElementById(selectId);
+    if(!select) return;
+
+    select.innerHTML = `<option value="" disabled selected>Selecione...</option>`;
+    arrayItens.sort().forEach(item => {
+        // O value fica minúsculo para padronizar no banco, o texto fica original
+        // Ex: value="volvo" Texto="Volvo"
+        // Mas para simplificar, vamos usar o mesmo valor
+        select.innerHTML += `<option value="${item}">${item}</option>`;
+    });
+}
+
+async function adicionarFiltro(tipo) {
+    const idInput = tipo === 'marcas' ? 'novaMarcaInput' : 'novaCategoriaInput';
+    const input = document.getElementById(idInput);
+    const valor = input.value.trim();
+
+    if (!valor) return alert("Digite um nome!");
+
+    try {
+        await updateDoc(filtrosRef, {
+            [tipo]: arrayUnion(valor)
+        });
+        input.value = "";
+        carregarFiltrosAdmin(); // Atualiza tudo na hora
+    } catch (e) {
+        console.error(e);
+        alert("Erro ao adicionar.");
+    }
+}
+
+async function removerFiltro(tipo, valor) {
+    if(!confirm(`Remover "${valor}" da lista?`)) return;
+
+    try {
+        await updateDoc(filtrosRef, {
+            [tipo]: arrayRemove(valor)
+        });
+        carregarFiltrosAdmin();
+    } catch (e) {
+        console.error(e);
+        alert("Erro ao remover.");
+    }
+}
+
+/* ============================================================
+   LÓGICA DE PRODUTOS (MANTIDA)
    ============================================================ */
 async function cadastrarProduto(e) {
     e.preventDefault();
@@ -84,8 +196,9 @@ async function cadastrarProduto(e) {
         const categoria = document.getElementById('categoria').value;
         const preco = parseFloat(document.getElementById('preco').value);
         
-        // --- NOVO: PEGAR A DESCRIÇÃO TÉCNICA ---
-        // Se o elemento não existir (caso esqueça de por no HTML), salva vazio
+        // Validação extra pois agora os selects podem estar vazios
+        if(!marca || !categoria) throw new Error("Selecione uma Marca e uma Categoria!");
+
         const descElement = document.getElementById('desc-produto');
         const descricao = descElement ? descElement.value : "Sem descrição técnica.";
 
@@ -105,13 +218,16 @@ async function cadastrarProduto(e) {
             marca: marca,
             categoria: categoria,
             preco: preco,
-            descricao: descricao, // <--- CAMPO NOVO SALVO AQUI
+            descricao: descricao, 
             img: urlFoto, 
             data_cadastro: new Date()
         });
 
         alert("Produto cadastrado com sucesso!");
         document.getElementById("formProduto").reset();
+        
+        // Recarregar selects para garantir que não perdeu nada
+        carregarFiltrosAdmin(); 
         carregarProdutos();
 
     } catch (error) {
@@ -171,7 +287,7 @@ async function deletarProduto(id, elementoBtn) {
 }
 
 /* ============================================================
-   LÓGICA DE BANNERS
+   LÓGICA DE BANNERS (MANTIDA)
    ============================================================ */
 
 async function adicionarBanner() {

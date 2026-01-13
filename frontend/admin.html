@@ -38,6 +38,37 @@
     </header>
 
     <div class="container">
+      
+      <div class="card-admin" style="border-left: 5px solid #ff6600">
+        <h3><i class="fas fa-tags"></i> Gerenciar Marcas e Categorias</h3>
+        <p>Adicione ou remova opções que aparecem nos filtros da loja e no cadastro de produtos.</p>
+        
+        <div style="display: flex; flex-wrap: wrap; gap: 30px; margin-top: 20px;">
+            
+            <div style="flex: 1; min-width: 250px;">
+                <h4 style="border-bottom: 1px solid #eee; padding-bottom: 5px;">Marcas</h4>
+                <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                    <input type="text" id="novaMarcaInput" placeholder="Nova Marca (Ex: Volvo)" style="flex:1; padding: 8px; border:1px solid #ddd; border-radius:4px;">
+                    <button id="btnAddMarca" style="background:#28a745; color:#fff; border:none; border-radius:4px; cursor:pointer; padding:0 15px;"><i class="fas fa-plus"></i></button>
+                </div>
+                <ul id="listaMarcasAdmin" style="list-style: none; padding: 0; max-height: 200px; overflow-y: auto; border: 1px solid #f0f0f0; border-radius: 4px;">
+                    <li style="padding: 10px; color: #999;">Carregando...</li>
+                </ul>
+            </div>
+
+            <div style="flex: 1; min-width: 250px;">
+                <h4 style="border-bottom: 1px solid #eee; padding-bottom: 5px;">Categorias</h4>
+                <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                    <input type="text" id="novaCategoriaInput" placeholder="Nova Categ. (Ex: Motor)" style="flex:1; padding: 8px; border:1px solid #ddd; border-radius:4px;">
+                    <button id="btnAddCategoria" style="background:#28a745; color:#fff; border:none; border-radius:4px; cursor:pointer; padding:0 15px;"><i class="fas fa-plus"></i></button>
+                </div>
+                <ul id="listaCategoriasAdmin" style="list-style: none; padding: 0; max-height: 200px; overflow-y: auto; border: 1px solid #f0f0f0; border-radius: 4px;">
+                    <li style="padding: 10px; color: #999;">Carregando...</li>
+                </ul>
+            </div>
+        </div>
+      </div>
+
       <div class="card-admin">
         <h2>Cadastrar Novo Produto</h2>
         <form id="formProduto">
@@ -60,46 +91,15 @@
             <div class="form-group">
               <label>Marca</label>
               <select id="marca" required>
-                <option value="" disabled selected>Selecione...</option>
-                <option value="cnh-fiatitallis">CNH / FIATALLIS</option>
-                <option value="caterpillar">Caterpillar</option>
-                <option value="jcb">JCB</option>
-                <option value="komatsu">Komatsu</option>
-                <option value="hyundai">Hyundai</option>
-                <option value="volvo-michigan">Volvo / Michigan</option>
-                <option value="bobcat">Bobcat</option>
-                <option value="cummins">Cummins</option>
-                <option value="doosan">Doosan – Develon</option>
-                <option value="isuzu">Isuzu</option>
-                <option value="kubota">Kubota</option>
-                <option value="link-belt">Link-Belt</option>
-                <option value="massey">Massey Ferguson</option>
-                <option value="muller">Muller – Randon</option>
-                <option value="perkins">Perkins</option>
-                <option value="sany">SANY</option>
-                <option value="sdlg">SDLG</option>
-                <option value="xcmg">XCMG</option>
-                <option value="outras">Outras / Diversas</option>
-              </select>
+                <option value="" disabled selected>Carregando lista...</option>
+                </select>
             </div>
 
             <div class="form-group">
               <label>Categoria</label>
               <select id="categoria" required>
-                <option value="" disabled selected>Selecione...</option>
-                <option value="motor">Motor</option>
-                <option value="combustivel">Sistema de Combustível</option>
-                <option value="transmissao">Transmissão</option>
-                <option value="freios-eixos">Direção / Freios / Eixos</option>
-                <option value="eletrica">Sistema Elétrico</option>
-                <option value="hidraulica">Sistema Hidráulico</option>
-                <option value="chassi">Chassi / Estruturas</option>
-                <option value="cabine">Cabine / Operação</option>
-                <option value="ar-condicionado">Ar Condicionado</option>
-                <option value="filtros">Filtros</option>
-                <option value="rodante">Material Rodante</option>
-                <option value="implementos">FPS / Implementos</option>
-              </select>
+                <option value="" disabled selected>Carregando lista...</option>
+                </select>
             </div>
 
             <div class="form-group">
