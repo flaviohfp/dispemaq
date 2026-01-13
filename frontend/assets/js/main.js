@@ -11,7 +11,7 @@ let bannerSlideAtual = 0;
 let bannerTotalSlides = 0;
 window.intervaloBanner = null; 
 
-// Email do Admin
+// Email do Admin (Deve ser igual ao cadastrado no Firebase Auth)
 const EMAIL_ADMIN = "admin@dispemaq.com"; 
 
 /* ============================================================
@@ -27,40 +27,48 @@ async function carregarProdutosDestaque() {
 
     try {
         const querySnapshot = await getDocs(collection(db, "produtos"));
-        
+        container.innerHTML = ''; 
+
         if (querySnapshot.empty) {
             container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Nenhum produto cadastrado.</p>';
             return;
         }
 
-        let htmlFinal = ''; 
-
         querySnapshot.forEach((docSnap) => {
             const produto = docSnap.data();
-            const id = docSnap.id;
+            const id = docSnap.id; // ID DO FIREBASE
             
+            // Garante que pega a imagem nova (img) ou antiga (urlImagem)
             const imagem = produto.img || produto.urlImagem || './assets/images/placeholder.jpg'; 
             const preco = parseFloat(produto.preco || 0);
+            
+            // CRIA O LINK COM O ID
             const linkDetalhes = `produto.html?id=${id}`;
             
             const htmlProduto = `
                 <div class="card-produto">
                     <div class="produto-imagem">
                         ${produto.promocao ? '<span class="badge-desconto">Oferta</span>' : ''}
+                        
                         <a href="${linkDetalhes}" style="display:block; width:100%; height:100%;">
                             <img src="${imagem}" alt="${produto.nome}" style="cursor:pointer;">
                         </a>
                     </div>
+
                     <div class="produto-info">
                         <span class="produto-categoria">${produto.categoria || 'Peças'}</span>
+                        
                         <a href="${linkDetalhes}" style="text-decoration:none; color:inherit;">
                             <h3 class="produto-nome">${produto.nome}</h3>
                         </a>
+
                         <span class="produto-codigo">Cód: ${produto.cod || produto.codigo || '--'}</span>
+                        
                         <div class="produto-precos">
                             <span class="preco-atual">R$ ${preco.toFixed(2).replace('.', ',')}</span>
                             <span class="preco-pix"><i class="fas fa-barcode"></i> R$ ${(preco * 0.95).toFixed(2).replace('.', ',')} no PIX</span>
                         </div>
+                        
                         <div class="produto-acoes">
                             <button class="botao-adicionar" 
                                 onclick="adicionarAoCarrinho(this)"
@@ -74,10 +82,8 @@ async function carregarProdutosDestaque() {
                     </div>
                 </div>
             `;
-            htmlFinal += htmlProduto;
+            container.innerHTML += htmlProduto;
         });
-
-        container.innerHTML = htmlFinal;
 
     } catch (error) {
         console.error("Erro ao carregar produtos:", error);
@@ -87,52 +93,54 @@ async function carregarProdutosDestaque() {
 
 // B) Carregar Banners
 async function carregarBanners() {
-    const slider = document.getElementById('bannerSlider') || document.getElementById('banner-track');
+    const slider = document.getElementById('bannerSlider');
     const indicadores = document.getElementById('bannerIndicadores');
-    
     if(!slider) return;
 
     try {
         let bannersData = [];
+
+        // 1. Busca configuração no Firebase
         const docRef = doc(db, "configuracoes", "banner_site");
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
             const dados = docSnap.data();
+            
+            // VERIFICA SE TEM LISTA (Novo sistema)
             if (dados.listaBanners && Array.isArray(dados.listaBanners) && dados.listaBanners.length > 0) {
                 bannersData = dados.listaBanners;
-            } else if (dados.url) {
+            } 
+            // SE NÃO, VERIFICA SE TEM URL ÚNICA (Sistema antigo - compatibilidade)
+            else if (dados.url) {
                 bannersData = [{ img: dados.url }];
             }
         } 
         
+        // Se não achou nada, usa placeholders
         if (bannersData.length === 0) {
+            console.log("Nenhum banner configurado. Usando padrão.");
             bannersData = [
-                { img: 'https://placehold.co/1920x600/1e3a8a/FFF?text=Banner+1+-+Ofertas' },
-                { img: 'https://placehold.co/1920x600/ff6600/FFF?text=Banner+2+-+Entrega' }
+                { img: 'https://placehold.co/1920x600/1e3a8a/FFF?text=Banner+1+-+Ofertas+da+Semana' },
+                { img: 'https://placehold.co/1920x600/ff6600/FFF?text=Banner+2+-+Envio+para+todo+Brasil' }
             ];
         }
 
+        // Limpa o HTML atual
         slider.innerHTML = '';
         if(indicadores) indicadores.innerHTML = '';
 
+        // Renderiza os Banners
         bannersData.forEach((banner, index) => {
             const imgSrc = banner.img || banner.imagem;
-            if (slider.id === 'banner-track') {
-                const img = document.createElement('img');
-                img.src = imgSrc;
-                img.style.width = '100%';
-                img.style.height = '100%';
-                img.style.objectFit = 'cover';
-                img.style.flexShrink = '0';
-                slider.appendChild(img);
-            } else {
-                const div = document.createElement('div');
-                div.className = 'banner-item';
-                div.innerHTML = `<img src="${imgSrc}" alt="Banner ${index + 1}">`;
-                slider.appendChild(div);
-            }
 
+            // Cria a Div da Imagem
+            const div = document.createElement('div');
+            div.className = 'banner-item';
+            div.innerHTML = `<img src="${imgSrc}" alt="Banner ${index + 1}">`;
+            slider.appendChild(div);
+
+            // Cria a Bolinha (Indicador)
             if(indicadores) {
                 const bola = document.createElement('div');
                 bola.className = `indicador ${index === 0 ? 'ativo' : ''}`;
@@ -141,10 +149,13 @@ async function carregarBanners() {
             }
         });
 
+        // Configura variáveis de controle
         bannerTotalSlides = bannersData.length;
         bannerSlideAtual = 0;
 
+        // Auto-Play
         if (window.intervaloBanner) clearInterval(window.intervaloBanner);
+        
         if (bannerTotalSlides > 1) {
             window.intervaloBanner = setInterval(() => {
                 window.mudarSlide(1);
@@ -153,6 +164,7 @@ async function carregarBanners() {
 
     } catch (error) {
         console.error("Erro banner:", error);
+        slider.innerHTML = '<div class="banner-item"><img src="https://placehold.co/1920x500?text=Erro+ao+carregar" alt="Erro"></div>';
     }
 }
 
@@ -160,6 +172,7 @@ async function carregarBanners() {
    3. FUNÇÕES GLOBAIS (CARRINHO E UI)
    ============================================================ */
 
+// --- CARRINHO ---
 function atualizarBadge() {
     const badges = document.querySelectorAll('.badge-carrinho'); 
     const total = carrinho.reduce((acc, item) => acc + item.qtd, 0);
@@ -209,6 +222,7 @@ function renderizarCarrinho() {
     }
 }
 
+// Funções Globais (window)
 window.adicionarAoCarrinho = function(el) {
     const produto = {
         id: el.getAttribute('data-id'),
@@ -224,11 +238,8 @@ window.adicionarAoCarrinho = function(el) {
 
     atualizarBadge();
     renderizarCarrinho();
-    
-    const lateral = document.getElementById("carrinhoLateral");
-    const overlay = document.getElementById("overlay");
-    if(lateral) lateral.classList.add("aberto");
-    if(overlay) overlay.classList.add("ativo");
+    document.getElementById("carrinhoLateral").classList.add("aberto");
+    document.getElementById("overlay").classList.add("ativo");
 };
 
 window.alterarQuantidade = function(id, acao) {
@@ -253,15 +264,13 @@ window.toggleCarrinho = function(e) {
     if(e) e.preventDefault();
     const car = document.getElementById("carrinhoLateral");
     const over = document.getElementById("overlay");
-    if(!car) return;
-
     if(car.classList.contains("aberto")) {
         car.classList.remove("aberto");
-        if(over) over.classList.remove("ativo");
+        over.classList.remove("ativo");
     } else {
         renderizarCarrinho();
         car.classList.add("aberto");
-        if(over) over.classList.add("ativo");
+        over.classList.add("ativo");
     }
 };
 
@@ -269,9 +278,9 @@ window.subirTopo = function() {
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// --- BANNER CONTROLES ---
+// --- BANNER (CONTROLES) ---
 window.mostrarSlide = function(index) {
-    const slider = document.getElementById('bannerSlider') || document.getElementById('banner-track');
+    const slider = document.getElementById('bannerSlider');
     if (!slider || bannerTotalSlides <= 1) return;
 
     if (index >= bannerTotalSlides) bannerSlideAtual = 0;
@@ -280,10 +289,9 @@ window.mostrarSlide = function(index) {
 
     slider.style.transform = `translateX(-${bannerSlideAtual * 100}%)`;
 
-    const dots = document.querySelectorAll('.indicador');
-    if(dots.length > 0) {
-        dots.forEach((b, i) => b.classList.toggle('ativo', i === bannerSlideAtual));
-    }
+    document.querySelectorAll('.indicador').forEach((b, i) => {
+        b.classList.toggle('ativo', i === bannerSlideAtual);
+    });
 }
 
 window.mudarSlide = function(direcao) {
@@ -295,7 +303,7 @@ window.irParaSlide = function(index) {
 }
 
 /* ============================================================
-   4. INICIALIZAÇÃO (LÓGICA PRINCIPAL CORRIGIDA)
+   4. INICIALIZAÇÃO (DOM READY)
    ============================================================ */
 document.addEventListener('DOMContentLoaded', function() {
     
@@ -304,119 +312,66 @@ document.addEventListener('DOMContentLoaded', function() {
     carregarBanners(); 
     atualizarBadge();
 
-    // ==========================================================
-    // ESCUTA DE EVENTOS GERAL (CORREÇÃO DOS MENUS)
-    // ==========================================================
-    document.addEventListener('click', function(e) {
-        
-        // --- 1. LÓGICA DO BOTÃO "VER MAIS MARCAS" ---
-        // Verifica se clicou no botão ou em algo dentro dele (ícone)
-        const btnVerMais = e.target.closest('#btnVerMais') || e.target.closest('#btnMarcas');
-        const menuMaisMarcas = document.getElementById("menuMaisMarcas") || document.getElementById("menuMarcas");
-
-        // Se clicou no botão VER MAIS:
-        if (btnVerMais && menuMaisMarcas) {
-            e.preventDefault();
+    // --- MENUS E INTERFACE ---
+    const btnVerMais = document.getElementById("btnMarcas");
+    const menuMaisMarcas = document.getElementById("menuMarcas");
+    
+    if (btnVerMais && menuMaisMarcas) {
+        btnVerMais.addEventListener("click", function(e) {
             e.stopPropagation();
-
-            console.log("Botão Ver Mais Clicado!"); // Debug
-
-            // Fecha outros menus conflitantes
+            menuMaisMarcas.classList.toggle("ativo");
             const menuCat = document.getElementById('menuCategoriasFlutuante');
             if(menuCat) menuCat.style.display = 'none';
 
-            // Pega posição do botão na tela
-            const rect = btnVerMais.getBoundingClientRect();
-            
-            // Aplica posição ao menu (FIXED requer coordenadas exatas)
-            menuMaisMarcas.style.top = rect.bottom + "px"; 
-            // O menu tem 250px, alinhamos ele à direita do botão
-            menuMaisMarcas.style.left = (rect.right - 250) + "px"; 
-
-            // Alterna visibilidade
-            menuMaisMarcas.classList.toggle("ativo");
-
-            // Muda texto e ícone do botão
             if (menuMaisMarcas.classList.contains("ativo")) {
-                btnVerMais.innerHTML = '<i class="fas fa-minus-circle"></i> Fechar';
+                btnVerMais.innerHTML = '<i class="fas fa-minus-circle"></i> Ver menos';
             } else {
                 btnVerMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
             }
-            return; // Para a execução aqui para não cair no "fechar fora"
-        }
+        });
+    }
 
-        // --- 2. LÓGICA DAS MARCAS (ABRIR MENU DE PEÇAS) ---
-        const botaoMarca = e.target.closest('.item-marca') || e.target.closest('.marca-item');
-        
-        // Se clicou em uma marca (e não é do menu mobile)
-        if (botaoMarca && !botaoMarca.closest('.menu-mobile-content')) {
+    // --- MENU DE CATEGORIAS FLUTUANTE ---
+    const menuCategorias = document.getElementById('menuCategoriasFlutuante');
+    const tituloMenuCat = document.getElementById('tituloMarcaDropdown');
+    const todosBotoesMarca = document.querySelectorAll('.item-marca, .marca-item');
+
+    todosBotoesMarca.forEach(botao => {
+        botao.addEventListener('click', function(e) {
             e.preventDefault();
-            
-            const menuCategorias = document.getElementById('menuCategoriasFlutuante');
-            const tituloMenuCat = document.getElementById('tituloMarcaDropdown');
-            
-            // Limpa seleções anteriores
-            document.querySelectorAll('.item-marca, .marca-item').forEach(b => b.classList.remove('selecionada'));
-            botaoMarca.classList.add('selecionada');
+            e.stopPropagation();
 
-            // Pega nome da marca
-            const marcaNome = botaoMarca.getAttribute('data-marca') || botaoMarca.innerText.trim();
+            todosBotoesMarca.forEach(b => {
+                b.classList.remove('selecionada');
+                b.style.backgroundColor = '';
+                b.style.color = '';
+            });
+
+            this.classList.add('selecionada');
+            this.style.backgroundColor = '#ff6600';
+            this.style.color = 'white';
+
+            const marcaNome = this.getAttribute('data-marca') || this.innerText.trim();
+            const marcaNomeBonito = this.innerText.trim();
             marcaAtualSelecionada = marcaNome;
 
-            // Atualiza título
-            if(tituloMenuCat) tituloMenuCat.innerText = "Peças para " + botaoMarca.innerText.trim();
+            if(tituloMenuCat) tituloMenuCat.innerText = "Peças para " + marcaNomeBonito;
 
             if(menuCategorias) {
-                // Posiciona o menu de categorias
-                const rect = botaoMarca.getBoundingClientRect();
-                const top = rect.bottom + window.scrollY; // Para position:absolute
+                const rect = this.getBoundingClientRect();
+                const top = rect.bottom + window.scrollY;
                 let left = rect.left + window.scrollX;
 
-                // Evita estourar a tela na direita
                 if (left + 280 > window.innerWidth) left = window.innerWidth - 290;
                 if (left < 0) left = 10;
 
                 menuCategorias.style.top = top + 'px';
                 menuCategorias.style.left = left + 'px';
                 menuCategorias.style.display = 'block';
-                e.stopPropagation(); 
             }
-        }
-
-        // --- 3. CLIQUE FORA (FECHAR MENUS) ---
-        // Verifica se devemos fechar o Menu de Mais Marcas
-        if (menuMaisMarcas && menuMaisMarcas.classList.contains('ativo')) {
-            // Se o clique NÃO foi dentro do menu (já sabemos que não foi no botão)
-            if (!menuMaisMarcas.contains(e.target)) {
-                menuMaisMarcas.classList.remove('ativo');
-                // Reseta botão original
-                const btnOriginal = document.getElementById("btnVerMais") || document.getElementById("btnMarcas");
-                if (btnOriginal) btnOriginal.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
-            }
-        }
-
-        // Verifica se devemos fechar o Menu de Categorias
-        const menuCat = document.getElementById('menuCategoriasFlutuante');
-        if(menuCat && menuCat.style.display === 'block') {
-            if (!menuCat.contains(e.target) && !botaoMarca) {
-                menuCat.style.display = 'none';
-                document.querySelectorAll('.item-marca, .marca-item').forEach(b => b.classList.remove('selecionada'));
-            }
-        }
+        });
     });
 
-    // Fechar menu ao rolar a página (UX melhor)
-    window.addEventListener("scroll", () => {
-        const menuMaisMarcas = document.getElementById("menuMaisMarcas") || document.getElementById("menuMarcas");
-        const btnOriginal = document.getElementById("btnVerMais") || document.getElementById("btnMarcas");
-        
-        if(menuMaisMarcas && menuMaisMarcas.classList.contains("ativo")) {
-            menuMaisMarcas.classList.remove("ativo");
-            if(btnOriginal) btnOriginal.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
-        }
-    });
-
-    // Clique nas categorias dentro do menu flutuante (Redirecionamento)
     const botoesCat = document.querySelectorAll('.item-cat-dropdown');
     botoesCat.forEach(btn => {
         btn.addEventListener('click', function() {
@@ -427,14 +382,29 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // --- LOGIN / LOGOUT ---
+    // Fechar menus ao clicar fora
+    document.addEventListener('click', function(e) {
+        if(menuCategorias && menuCategorias.style.display === 'block') {
+            if (!menuCategorias.contains(e.target)) menuCategorias.style.display = 'none';
+        }
+        if(menuMaisMarcas && menuMaisMarcas.classList.contains('ativo')) {
+            if (!menuMaisMarcas.contains(e.target) && e.target !== btnVerMais) {
+                menuMaisMarcas.classList.remove('ativo');
+                btnVerMais.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
+            }
+        }
+    });
+
+    // --- LOGIN / LOGOUT / ADMIN BTN ---
     const btnAuth = document.getElementById('btnAuth');
     const txtAuth = document.getElementById('txtAuth');
     const btnLinkAdmin = document.getElementById('btnLinkAdmin'); 
     
     onAuthStateChanged(auth, (user) => {
         if (user) {
+            // -- LOGADO --
             if(txtAuth) txtAuth.innerText = "Sair";
+            
             if(btnAuth) {
                 btnAuth.href = "#";
                 btnAuth.onclick = (e) => {
@@ -442,14 +412,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     if(confirm("Sair da conta?")) signOut(auth).then(() => window.location.reload());
                 };
             }
-            if (user.email === EMAIL_ADMIN && btnLinkAdmin) {
-                btnLinkAdmin.style.display = 'inline-flex';
-            } else if (btnLinkAdmin) {
-                btnLinkAdmin.style.display = 'none';
+
+            // MOSTRAR BOTÃO ADMIN
+            if (user.email === EMAIL_ADMIN) {
+                if(btnLinkAdmin) btnLinkAdmin.style.display = 'inline-flex';
+            } else {
+                if(btnLinkAdmin) btnLinkAdmin.style.display = 'none';
             }
+
             const popup = document.getElementById('popupAvisoLogin');
             if(popup) popup.style.display = 'none';
+
         } else {
+            // -- DESLOGADO --
             if(txtAuth) txtAuth.innerText = "Entrar";
             if(btnAuth) {
                 btnAuth.href = "login.html";
@@ -476,32 +451,3 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-
-
-// --- FUNÇÃO DE EMERGÊNCIA PARA O MENU ---
-window.toggleMenuMarcas = function() {
-    console.log("Função forçada chamada!"); // Isso vai aparecer no F12 se funcionar
-    
-    const menu = document.getElementById("menuMaisMarcas");
-    const btn = document.getElementById("btnVerMais");
-
-    if (!menu) {
-        alert("ERRO: O menu com id='menuMaisMarcas' não foi encontrado no HTML!");
-        return;
-    }
-
-    // Lógica de Posição
-    const rect = btn.getBoundingClientRect();
-    menu.style.top = rect.bottom + "px";
-    menu.style.left = (rect.right - 250) + "px";
-    
-    // Alterna a classe
-    menu.classList.toggle("ativo");
-    
-    // Muda o ícone
-    if (menu.classList.contains("ativo")) {
-        btn.innerHTML = '<i class="fas fa-minus-circle"></i> Fechar';
-    } else {
-        btn.innerHTML = '<i class="fas fa-plus-circle"></i> Ver mais marcas';
-    }
-}
