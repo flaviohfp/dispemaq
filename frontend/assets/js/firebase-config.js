@@ -1,4 +1,8 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+/* =========================================
+   FIREBASE CONFIG (Atualizado v10.7.1)
+   ========================================= */
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
 // --- AUTH ---
 import { 
@@ -7,9 +11,9 @@ import {
     createUserWithEmailAndPassword, 
     signOut, 
     onAuthStateChanged 
-} from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// --- FIRESTORE (Adicionado updateDoc que faltava) ---
+// --- FIRESTORE ---
 import { 
     getFirestore, 
     collection, 
@@ -20,7 +24,7 @@ import {
     setDoc, 
     getDoc,
     updateDoc 
-} from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // --- STORAGE ---
 import { 
@@ -28,9 +32,9 @@ import {
     ref, 
     uploadBytes, 
     getDownloadURL 
-} from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-// Suas chaves originais
+// Suas chaves (NÃO ALTERADAS)
 const firebaseConfig = {
   apiKey: "AIzaSyBd9UFvalhbsQb2vSVcladqZX-ZQzpeJPI",
   authDomain: "dispemaq-fe9ef.firebaseapp.com",
@@ -48,7 +52,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-// Exportando TUDO (Adicionado updateDoc)
+// Exportando TUDO para manter compatibilidade com seus outros arquivos
 export { 
     app,
     auth, 
