@@ -4,23 +4,24 @@ import {
 } from './firebase-config.js';
 
 /* ============================================================
-   CONFIGURAÇÃO E VARIÁVEIS
+   CONFIGURAÇÃO E VARIÁVEIS globais
    ============================================================ */
 const prodCollection = collection(db, "produtos");
-const EMAIL_ADMIN = "admin@dispemaq.com"; 
+const EMAIL_ADMIN = "admin@dispemaq.com"; // Mude se necessário
 
 // Verifica Autenticação
 onAuthStateChanged(auth, (user) => {
     if (!user) {
         window.location.href = "login.html";
     } else if (user.email !== EMAIL_ADMIN) {
-        alert("Acesso Negado.");
-        window.location.href = "index.html";
+        alert("Acesso Negado. Apenas o administrador pode acessar este painel.");
+        window.location.href = "index.html"; // Redireciona usuários comuns
     } else {
-        console.log("Admin logado:", user.email);
+        console.log("Admin logado com sucesso:", user.email);
+        // Inicia o carregamento de todos os módulos
+        carregarFiltrosAdmin();
         carregarProdutos(); 
         carregarBannersAdmin();
-        carregarFiltrosAdmin(); // Carrega as marcas/categorias
     }
 });
 
@@ -31,10 +32,12 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // 1. Logout
     const btnLogout = document.getElementById("btnLogout");
-    if(btnLogout) btnLogout.addEventListener("click", async () => {
-        await signOut(auth);
-        window.location.reload();
-    });
+    if(btnLogout) {
+        btnLogout.addEventListener("click", async () => {
+            await signOut(auth);
+            window.location.reload();
+        });
+    }
 
     // 2. Cadastrar Produto
     const form = document.getElementById("formProduto");
@@ -56,13 +59,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if(btnAddMarca) btnAddMarca.addEventListener("click", () => adicionarFiltro('marcas'));
     if(btnAddCat) btnAddCat.addEventListener("click", () => adicionarFiltro('categorias'));
 
-    // 5. DELEGAÇÃO DE CLIQUES (Para botões gerados dinamicamente)
+    // 5. DELEGAÇÃO DE CLIQUES (Para botões gerados dinamicamente no JS)
     document.body.addEventListener('click', function(e) {
         
         // --- Excluir Produto ---
         if(e.target.closest('.btn-delete-prod')) {
             const id = e.target.closest('.btn-delete-prod').dataset.id;
-            deletarProduto(id, e.target);
+            deletarProduto(id, e.target.closest('tr'));
         }
         
         // --- Excluir Banner ---
@@ -77,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
             removerFiltro(btn.dataset.colecao, btn.dataset.id);
         }
 
-        // --- Editar Filtro (Marca/Cat) [NOVO] ---
+        // --- Editar Filtro (Marca/Cat) ---
         if(e.target.closest('.btn-edit-filtro')) {
             const btn = e.target.closest('.btn-edit-filtro');
             editarFiltro(btn.dataset.colecao, btn.dataset.id, btn.dataset.nome);
@@ -86,32 +89,27 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* ============================================================
-   LÓGICA CORRIGIDA: GERENCIAR FILTROS (MARCAS E CATEGORIAS)
+   LÓGICA: GERENCIAR FILTROS (MARCAS E CATEGORIAS)
    ============================================================ */
-
 async function carregarFiltrosAdmin() {
     try {
-        // Busca Marcas (Sem orderBy do Firebase para não travar se a lista for nova)
+        // Busca Marcas
         const snapMarcas = await getDocs(collection(db, "marcas"));
         let marcas = [];
         snapMarcas.forEach(doc => { marcas.push({ id: doc.id, nome: doc.data().nome }); });
-        
-        // Ordena em ordem alfabética usando JavaScript
         marcas.sort((a, b) => a.nome.localeCompare(b.nome)); 
 
         // Busca Categorias
         const snapCat = await getDocs(collection(db, "categorias"));
         let categorias = [];
         snapCat.forEach(doc => { categorias.push({ id: doc.id, nome: doc.data().nome }); });
-        
-        // Ordena em ordem alfabética usando JavaScript
         categorias.sort((a, b) => a.nome.localeCompare(b.nome));
 
-        // Renderiza nas listas
+        // Renderiza nas listas do painel
         renderizarListaGestao('listaMarcasAdmin', marcas, 'marcas');
         renderizarListaGestao('listaCategoriasAdmin', categorias, 'categorias');
 
-        // Preenche os SELECTS do formulário
+        // Preenche os SELECTS do formulário de produto
         atualizarSelectFormulario('marca', marcas);
         atualizarSelectFormulario('categoria', categorias);
 
@@ -133,15 +131,14 @@ function renderizarListaGestao(elementId, arrayItens, colecao) {
     }
 
     arrayItens.forEach(item => {
-        // Adicionamos o botão de EDITAR (lápis azul)
         ul.innerHTML += `
             <li style="display:flex; justify-content:space-between; align-items:center; padding:8px; border-bottom:1px solid #eee;">
                 <span>${item.nome}</span>
                 <div>
-                    <button class="btn-edit-filtro" data-colecao="${colecao}" data-id="${item.id}" data-nome="${item.nome}" style="color:#007bff; background:none; border:none; cursor:pointer; margin-right: 15px; font-size: 1.1em;">
+                    <button class="btn-edit-filtro" data-colecao="${colecao}" data-id="${item.id}" data-nome="${item.nome}" style="color:#007bff; background:none; border:none; cursor:pointer; margin-right: 15px; font-size: 1.1em;" title="Editar">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn-delete-filtro" data-colecao="${colecao}" data-id="${item.id}" style="color:#dc3545; background:none; border:none; cursor:pointer; font-size: 1.1em;">
+                    <button class="btn-delete-filtro" data-colecao="${colecao}" data-id="${item.id}" style="color:#dc3545; background:none; border:none; cursor:pointer; font-size: 1.1em;" title="Excluir">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -165,13 +162,14 @@ async function adicionarFiltro(colecao) {
     const input = document.getElementById(idInput);
     const nome = input.value.trim();
 
-    if (!nome) return alert("Por favor, digite um nome antes de adicionar!");
+    if (!nome) {
+        alert("Por favor, digite um nome antes de adicionar!");
+        return input.focus();
+    }
 
     try {
-        // Cria um ID limpo para o banco (ex: "Filtro de Óleo" vira "filtro_de_oleo")
-        const idDoc = nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '_');
-        
-        await setDoc(doc(db, colecao, idDoc), { 
+        // Usa addDoc para criar um ID único automaticamente (mais seguro para edições)
+        await addDoc(collection(db, colecao), { 
             nome: nome 
         });
         
@@ -183,11 +181,10 @@ async function adicionarFiltro(colecao) {
     }
 }
 
-// NOVA FUNÇÃO: Editar o texto de uma Marca ou Categoria
 async function editarFiltro(colecao, idDoc, nomeAtual) {
     const novoNome = prompt(`Editar nome (${colecao === 'marcas' ? 'Marca' : 'Categoria'}):`, nomeAtual);
     
-    // Se a pessoa cancelar ou enviar em branco, ou enviar igual, não faz nada
+    // Se cancelar ou mandar igual/vazio, cancela a ação
     if(novoNome === null || novoNome.trim() === "" || novoNome.trim() === nomeAtual) {
         return; 
     }
@@ -196,22 +193,22 @@ async function editarFiltro(colecao, idDoc, nomeAtual) {
         await updateDoc(doc(db, colecao, idDoc), { 
             nome: novoNome.trim() 
         });
-        carregarFiltrosAdmin(); // Atualiza a tela imediatamente
+        carregarFiltrosAdmin();
     } catch (error) {
-        console.error(error);
+        console.error("Erro na edição: ", error);
         alert("Erro ao salvar a edição.");
     }
 }
 
 async function removerFiltro(colecao, idDoc) {
-    if(!confirm(`Tem certeza que deseja excluir esta opção?`)) return;
+    if(!confirm(`Tem certeza que deseja excluir permanentemente esta opção?`)) return;
 
     try {
         await deleteDoc(doc(db, colecao, idDoc));
         carregarFiltrosAdmin();
     } catch (e) {
         console.error(e);
-        alert("Erro ao remover.");
+        alert("Erro ao remover do banco de dados.");
     }
 }
 
@@ -224,28 +221,32 @@ async function cadastrarProduto(e) {
     const txtOriginal = btn.innerHTML;
     
     try {
-        btn.innerHTML = 'Salvando...';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
         btn.disabled = true;
 
-        const nome = document.getElementById('nome').value;
-        const cod = document.getElementById('cod').value;
+        const nome = document.getElementById('nome').value.trim();
+        const cod = document.getElementById('cod').value.trim();
         const marca = document.getElementById('marca').value;
         const categoria = document.getElementById('categoria').value;
-        const preco = parseFloat(document.getElementById('preco').value);
+        const precoRaw = document.getElementById('preco').value.replace(',', '.'); // Suporte a vírgula
+        const preco = parseFloat(precoRaw) || 0; // Se ficar vazio vira 0 (Sob consulta)
         
+        if(!nome) throw new Error("O nome do produto é obrigatório.");
         if(!marca || !categoria) throw new Error("Selecione uma Marca e uma Categoria!");
 
         const descElement = document.getElementById('desc-produto');
-        const descricao = descElement ? descElement.value : "Sem descrição técnica.";
+        const descricao = descElement && descElement.value.trim() !== "" ? descElement.value : "Sem descrição técnica.";
 
         const arquivoInput = document.getElementById('arquivoImagem');
-        if (arquivoInput.files.length === 0) throw new Error("Selecione uma foto!");
+        if (arquivoInput.files.length === 0) throw new Error("Selecione uma foto para o produto!");
 
+        // Upload da foto
         const arquivo = arquivoInput.files[0];
-        const storageRef = ref(storage, `produtos/${Date.now()}-${arquivo.name}`);
+        const storageRef = ref(storage, `produtos/${Date.now()}_${arquivo.name}`);
         await uploadBytes(storageRef, arquivo);
         const urlFoto = await getDownloadURL(storageRef);
 
+        // Salvar no banco de dados
         await addDoc(prodCollection, {
             nome: nome,
             cod: cod,
@@ -260,12 +261,11 @@ async function cadastrarProduto(e) {
         alert("Produto cadastrado com sucesso!");
         document.getElementById("formProduto").reset();
         
-        carregarFiltrosAdmin(); 
-        carregarProdutos();
+        carregarProdutos(); // Recarrega a tabela
 
     } catch (error) {
         console.error("Erro ao cadastrar:", error);
-        alert("Erro: " + error.message);
+        alert(error.message);
     } finally {
         btn.innerHTML = txtOriginal;
         btn.disabled = false;
@@ -276,27 +276,30 @@ async function carregarProdutos() {
     const tbody = document.getElementById("tabelaProdutos");
     if(!tbody) return;
     
-    tbody.innerHTML = '<tr><td colspan="5">Carregando...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Carregando produtos...</td></tr>';
 
     try {
+        // Busca ordenando pelos mais recentes (Exige índice no Firebase se quiser usar orderBy('data_cadastro', 'desc'))
         const querySnapshot = await getDocs(prodCollection);
         tbody.innerHTML = "";
 
         if (querySnapshot.empty) {
-            tbody.innerHTML = '<tr><td colspan="5">Nenhum produto cadastrado.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum produto cadastrado no sistema.</td></tr>';
             return;
         }
 
         querySnapshot.forEach((docItem) => {
              const p = docItem.data();
+             const valorFormatado = p.preco > 0 ? `R$ ${p.preco.toFixed(2).replace('.', ',')}` : "Sob Consulta";
+
              tbody.innerHTML += `
                  <tr style="border-bottom: 1px solid #eee;">
-                     <td style="padding:10px;"><img src="${p.img}" style="width:50px; height:50px; object-fit:cover; border-radius:4px;"></td>
-                     <td><strong>${p.nome}</strong><br><small>${p.cod || ''}</small></td>
-                     <td>${p.marca}<br><small>${p.categoria}</small></td>
-                     <td style="color:green; font-weight:bold;">R$ ${p.preco}</td>
+                     <td style="padding:10px;"><img src="${p.img || p.imagem}" style="width:50px; height:50px; object-fit:cover; border-radius:4px; border:1px solid #ddd;"></td>
+                     <td><strong>${p.nome}</strong><br><small style="color:#777;">Cód: ${p.cod || '--'}</small></td>
+                     <td>${p.marca}<br><small style="color:#777;">${p.categoria}</small></td>
+                     <td style="color:green; font-weight:bold;">${valorFormatado}</td>
                      <td>
-                         <button class="btn-delete-prod" data-id="${docItem.id}" style="background:red; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
+                         <button class="btn-delete-prod" data-id="${docItem.id}" title="Excluir Produto" style="background:#dc3545; color:white; border:none; padding:8px 12px; border-radius:4px; cursor:pointer;">
                              <i class="fas fa-trash"></i>
                          </button>
                      </td>
@@ -305,40 +308,44 @@ async function carregarProdutos() {
         });
     } catch(error) {
         console.error("Erro ao carregar produtos:", error);
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red;">Erro ao carregar lista.</td></tr>';
     }
 }
 
-async function deletarProduto(id, elementoBtn) {
-    if(confirm("Excluir produto?")) {
+async function deletarProduto(id, rowElement) {
+    if(confirm("ATENÇÃO: Deseja realmente excluir este produto? A ação não pode ser desfeita.")) {
         try {
+            rowElement.style.opacity = "0.5"; // Efeito visual de loading
             await deleteDoc(doc(db, "produtos", id));
-            elementoBtn.closest("tr").remove();
+            rowElement.remove();
         } catch (error) {
+            console.error(error);
             alert("Erro ao excluir: " + error.message);
+            rowElement.style.opacity = "1";
         }
     }
 }
 
 /* ============================================================
-   LÓGICA DE BANNERS
+   LÓGICA DE BANNERS DO SITE
    ============================================================ */
 async function adicionarBanner() {
     const input = document.getElementById("arquivoBanner");
     const btn = document.getElementById("btnUploadBanner");
     
     if(!input || !input.files || input.files.length === 0) {
-        alert("Por favor, selecione uma imagem primeiro!");
+        alert("Por favor, selecione a imagem do banner no seu computador!");
         return;
     }
 
     try {
         if(btn) {
-            btn.innerText = "Enviando...";
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
             btn.disabled = true;
         }
         
         const file = input.files[0];
-        const storageRef = ref(storage, `banners/${Date.now()}_${file.name}`);
+        const storageRef = ref(storage, `banners/${Date.now()}_${file.name.replace(/\s/g, '')}`);
         await uploadBytes(storageRef, file);
         const url = await getDownloadURL(storageRef);
 
@@ -346,7 +353,8 @@ async function adicionarBanner() {
         const docSnap = await getDoc(docRef);
         
         let listaAtual = [];
-        if (docSnap.exists() && docSnap.data().listaBanners) {
+        // Checa com segurança se o documento e a lista existem
+        if (docSnap.exists() && docSnap.data() && docSnap.data().listaBanners) {
             listaAtual = docSnap.data().listaBanners;
         }
 
@@ -355,15 +363,16 @@ async function adicionarBanner() {
             criadoEm: Date.now()
         });
 
+        // O merge:true garante que ele vai criar o documento caso seja o primeiro acesso da vida da loja
         await setDoc(docRef, { listaBanners: listaAtual }, { merge: true });
 
-        alert("Banner adicionado com sucesso!");
+        alert("Banner adicionado ao site com sucesso!");
         input.value = ""; 
         carregarBannersAdmin(); 
 
     } catch (error) {
         console.error("Erro banner:", error);
-        alert("Erro ao enviar banner: " + error.message);
+        alert("Erro ao enviar banner. Verifique as permissões de Storage do Firebase.");
     } finally {
         if(btn) {
             btn.innerHTML = '<i class="fas fa-upload"></i> Enviar Banner';
@@ -376,14 +385,14 @@ async function carregarBannersAdmin() {
     const container = document.getElementById("listaBannersAdmin");
     if(!container) return;
 
-    container.innerHTML = "Carregando lista de banners...";
+    container.innerHTML = "<p>Carregando lista de banners...</p>";
 
     try {
         const docRef = doc(db, "configuracoes", "banner_site");
         const docSnap = await getDoc(docRef);
 
-        if (!docSnap.exists() || !docSnap.data().listaBanners || docSnap.data().listaBanners.length === 0) {
-            container.innerHTML = "<p style='padding:10px; color:#777;'>Nenhum banner ativo. Adicione um acima.</p>";
+        if (!docSnap.exists() || !docSnap.data() || !docSnap.data().listaBanners || docSnap.data().listaBanners.length === 0) {
+            container.innerHTML = "<p style='padding:15px; background:#f9f9f9; text-align:center; color:#777; border-radius:4px;'>Nenhum banner ativo no site. Adicione um acima.</p>";
             return;
         }
 
@@ -391,15 +400,13 @@ async function carregarBannersAdmin() {
         container.innerHTML = ""; 
 
         banners.forEach((banner, index) => {
-            const imgUrl = banner.img || banner.imagem;
-
             container.innerHTML += `
-                <div style="display: flex; align-items: center; justify-content: space-between; background: #fff; padding: 15px; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                <div style="display: flex; align-items: center; justify-content: space-between; background: #fff; padding: 15px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
                     <div style="display:flex; align-items:center; gap:15px;">
-                        <span style="font-weight:bold; color:#007bff; font-size: 1.2em;">#${index + 1}</span>
-                        <img src="${imgUrl}" style="height: 60px; width: 150px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc;">
+                        <span style="font-weight:bold; color:#ff6600; font-size: 1.2em;">#${index + 1}</span>
+                        <img src="${banner.img}" style="height: 60px; width: 150px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc;">
                         <div>
-                            <small style="color:#999;">Banner Ativo</small>
+                            <small style="color:#999;">Banner visível no site</small>
                         </div>
                     </div>
                     <button class="btn-delete-banner" data-index="${index}" style="background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9em;">
@@ -410,13 +417,13 @@ async function carregarBannersAdmin() {
         });
 
     } catch (error) {
-        console.error(error);
-        container.innerHTML = "<p style='color:red;'>Erro ao carregar banners.</p>";
+        console.error("Erro ao carregar banners:", error);
+        container.innerHTML = "<p style='color:red;'>Erro ao carregar sistema de banners.</p>";
     }
 }
 
 async function removerBanner(index) {
-    if(!confirm("Tem certeza que deseja remover este banner do carrossel?")) return;
+    if(!confirm("Tem certeza que deseja remover este banner do carrossel do site?")) return;
 
     try {
         const docRef = doc(db, "configuracoes", "banner_site");
@@ -426,10 +433,10 @@ async function removerBanner(index) {
             let lista = docSnap.data().listaBanners || [];
             lista.splice(index, 1);
             await updateDoc(docRef, { listaBanners: lista });
-            carregarBannersAdmin();
+            carregarBannersAdmin(); // Recarrega os banners
         }
     } catch (error) {
-        console.error(error);
-        alert("Erro ao remover banner.");
+        console.error("Erro ao remover banner:", error);
+        alert("Erro ao remover banner do sistema.");
     }
 }
