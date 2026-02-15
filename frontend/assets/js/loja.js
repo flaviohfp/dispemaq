@@ -1,5 +1,5 @@
 /* =========================================
-   LOJA.JS (Versão Final - Com Menu Dinâmico)
+   LOJA.JS (Versão Final - Integração Completa)
    ========================================= */
 
 import { db, auth } from './firebase-config.js';
@@ -46,7 +46,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 /* --- 1. FUNÇÃO: GERAR SIDEBAR DINÂMICA --- */
 async function carregarSidebarDinamica() {
-    // ATENÇÃO: O ID deve bater com o HTML
     const sidebarContainer = document.getElementById('sidebar-dinamica-container'); 
     
     if (!sidebarContainer) {
@@ -54,7 +53,7 @@ async function carregarSidebarDinamica() {
         return;
     }
 
-    sidebarContainer.innerHTML = '<p style="padding:10px; color:#666;">Carregando filtros...</p>';
+    sidebarContainer.innerHTML = '<p style="padding:10px; color:#666;"><i class="fas fa-spinner fa-spin"></i> Carregando filtros...</p>';
 
     try {
         let html = '';
@@ -70,7 +69,6 @@ async function carregarSidebarDinamica() {
         `;
 
         // B. Busca Marcas no Firebase
-        // Tenta buscar da coleção 'marcas'. Se não existir, avisa no console.
         const qMarcas = query(collection(db, "marcas"), orderBy("nome"));
         const snapMarcas = await getDocs(qMarcas);
 
@@ -110,7 +108,7 @@ async function carregarSidebarDinamica() {
 
     } catch (error) {
         console.error("Erro ao carregar sidebar:", error);
-        sidebarContainer.innerHTML = '<p style="padding:10px">Não foi possível carregar os filtros.</p>';
+        sidebarContainer.innerHTML = '<p style="padding:10px; color:red;">Erro ao carregar os filtros.</p>';
     }
 }
 
@@ -124,7 +122,6 @@ function configurarCliquesSidebar() {
             const marca = item.dataset.marca;
             const cat = item.dataset.cat;
             
-            // Atualiza URL sem recarregar a página
             const url = new URL(window.location);
             
             if(marca) { 
@@ -188,7 +185,6 @@ async function buscarProdutosNoFirebase(reset = false) {
 
         // --- APLICAÇÃO DE FILTROS NA QUERY ---
         if (filtroAtivo.busca) {
-            // Busca por texto (Exige índice 'nome' no Firestore)
             const termo = filtroAtivo.busca; 
             restricoes.push(orderBy("nome"));
             restricoes.push(where("nome", ">=", termo));
@@ -248,9 +244,8 @@ async function buscarProdutosNoFirebase(reset = false) {
     } catch (error) {
         console.error("Erro LOJA:", error);
         if(reset && container) {
-            container.innerHTML = `<p style="text-align:center">Erro ao carregar produtos. Verifique sua conexão.</p>`;
+            container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px;"><p>Erro ao carregar produtos. Verifique sua conexão.</p></div>`;
         }
-        // Aviso comum de falta de índice no Firestore
         if(error.message.includes("index")) console.warn("ALERTA: Clique no link do console para criar o índice no Firebase.");
     } finally {
         carregando = false;
@@ -264,22 +259,17 @@ function criarCardProduto(p, container) {
     const card = document.createElement('div');
     card.classList.add('produto-card');
     
-    // Tratamento de Imagem
     const imgUrl = p.imagem || p.img || p.urlImagem || './assets/images/sem-foto.png';
-    
-    // Tratamento de Preço
     let precoDisplay = "Consulte";
+    
     if (p.preco) {
-        // Tenta converter para float se for string
         let valor = p.preco;
         if(typeof valor === 'string') {
              valor = parseFloat(valor.replace('R$', '').replace(/\./g, '').replace(',', '.').trim());
         }
-        
         if (!isNaN(valor) && valor > 0) {
             precoDisplay = valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         } else {
-            // Se falhar a conversão ou for 0, mostra o texto original (ex: "Sob Consulta")
             precoDisplay = p.preco;
         }
     }
@@ -289,7 +279,7 @@ function criarCardProduto(p, container) {
             <img src="${imgUrl}" alt="${p.nome}" onerror="this.src='./assets/images/sem-foto.png'">
         </div>
         <div class="produto-info">
-            <span class="categoria-tag">${p.marca || 'Geral'}</span>
+            <span class="categoria-tag">${p.marca || p.categoria || 'Geral'}</span>
             <h3 title="${p.nome}">${p.nome}</h3>
             <p class="codigo">Cód: ${p.codigo || '--'}</p>
             <div class="preco-box">
@@ -301,7 +291,6 @@ function criarCardProduto(p, container) {
         </div>
     `;
 
-    // Evento do botão comprar dentro do card
     const btn = card.querySelector('.btn-add-carrinho');
     if(btn) {
         btn.addEventListener('click', (e) => {
@@ -320,7 +309,7 @@ function adicionarBotaoCarregarMais(container) {
     div.style.gridColumn = "1/-1";
     div.style.textAlign = "center";
     div.style.marginTop = "30px";
-    div.innerHTML = `<button id="btnCarregarMais" class="botao botao-secundario">Carregar mais</button>`;
+    div.innerHTML = `<button id="btnCarregarMais" class="botao botao-secundario">Carregar mais produtos</button>`;
     container.appendChild(div);
     document.getElementById('btnCarregarMais').addEventListener('click', () => buscarProdutosNoFirebase(false));
 }
@@ -344,14 +333,11 @@ function filtrarLoja(marcaUrl, catUrl, buscaUrl) {
         else titulo.innerText = "Catálogo Completo";
     }
 
-    // Atualiza Visual ("active") da Sidebar
     document.querySelectorAll('.filtro-item').forEach(item => {
         item.classList.remove('ativo'); 
-        
-        // Verifica se é o filtro atual e marca como ativo
         if(filtroAtivo.marca && item.dataset.marca === filtroAtivo.marca) item.classList.add('ativo');
         if(filtroAtivo.cat && item.dataset.cat === filtroAtivo.cat) item.classList.add('ativo');
-        if(!filtroAtivo.marca && !filtroAtivo.cat && item.dataset.cat === 'todas') item.classList.add('ativo');
+        if(!filtroAtivo.marca && !filtroAtivo.cat && !filtroAtivo.busca && item.dataset.cat === 'todas') item.classList.add('ativo');
     });
 
     buscarProdutosNoFirebase(true); 
@@ -378,6 +364,7 @@ function configurarBuscaHeader() {
             }
         };
         btn.addEventListener('click', acaoBusca);
+        // O Enter já está sendo tratado no HTML via onkeypress, mas mantemos aqui por garantia
         input.addEventListener('keypress', (e) => { if(e.key === 'Enter') acaoBusca(); });
     }
 }
@@ -397,17 +384,15 @@ async function carregarBannerLoja() {
 }
 
 /* --- FUNÇÕES DO CARRINHO (INTEGRAÇÃO) --- */
-async function addCarrinhoLoja(id, produtoObj) {
+function addCarrinhoLoja(id, produtoObj) {
     let carrinho = JSON.parse(localStorage.getItem('carrinhoDispemaq')) || [];
     
-    // Limpeza robusta do preço para cálculo
     let precoNum = 0;
     if (produtoObj.preco) {
         if(typeof produtoObj.preco === 'number') {
             precoNum = produtoObj.preco;
         } else {
             let pClean = produtoObj.preco.toString().replace('R$', '').trim();
-            // Se tiver ponto como milhar e virgula como decimal (padrão BR: 1.200,50)
             if(pClean.includes(',') && pClean.includes('.')) {
                 pClean = pClean.replace(/\./g, '').replace(',', '.'); 
             } else if(pClean.includes(',')) {
@@ -429,19 +414,17 @@ async function addCarrinhoLoja(id, produtoObj) {
             qtd: 1
         });
     }
-    localStorage.setItem('carrinhoDispemaq', JSON.stringify(carrinho));
     
+    localStorage.setItem('carrinhoDispemaq', JSON.stringify(carrinho));
     atualizarBadgeLoja();
     
-    // Abre o carrinho (sem passar 'true' para não quebrar o preventDefault do HTML)
-    if(window.toggleCarrinho) {
+    if(typeof window.toggleCarrinho === 'function') {
         window.toggleCarrinho(); 
     } else {
         alert("Produto adicionado ao carrinho!");
     }
 }
 
-// Disponível globalmente para ser chamada
 function atualizarBadgeLoja() {
     const carrinho = JSON.parse(localStorage.getItem('carrinhoDispemaq')) || [];
     const total = carrinho.reduce((acc, item) => acc + item.qtd, 0);
@@ -466,30 +449,77 @@ function renderizarItensCarrinhoLateral(carrinho) {
     } else {
         carrinho.forEach(item => {
             totalValor += item.qtd * item.preco;
+            // Se o preço for 0, exibe "Sob Consulta" no carrinho
+            let textoPreco = item.preco > 0 
+                ? `R$ ${item.preco.toFixed(2).replace('.', ',')}` 
+                : "Sob Consulta";
+
             div.innerHTML += `
                 <div class="item-carrinho-lateral" style="display:flex; align-items:center; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
-                    <img src="${item.img}" style="width:50px; height:50px; object-fit:cover; border-radius:4px;">
+                    <img src="${item.img}" style="width:50px; height:50px; object-fit:cover; border-radius:4px; border: 1px solid #eee;">
                     <div style="flex:1; margin-left:10px;">
                         <b style="font-size:0.9rem;">${item.nome}</b><br>
-                        <small style="color:#666;">${item.qtd}x R$ ${item.preco.toFixed(2)}</small>
+                        <small style="color:#666;">${item.qtd}x ${textoPreco}</small>
                     </div>
-                    <button onclick="removerDoCarrinhoLocal('${item.id}')" style="color:red; border:none; background:none; cursor:pointer; font-size:1.1rem; padding:5px;">
+                    <button onclick="window.removerDoCarrinhoLocal('${item.id}')" style="color:red; border:none; background:none; cursor:pointer; font-size:1.1rem; padding:5px;">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>`;
         });
     }
     
-    if(totalEl) totalEl.innerText = totalValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    if(totalEl) {
+        totalEl.innerText = totalValor > 0 
+            ? totalValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) 
+            : "Consulte via Whats";
+    }
 }
 
-// Função Global para o botão de lixeira no HTML gerado
+// --- FUNÇÕES EXPORTADAS PARA O WINDOW (Uso no HTML) ---
+
+// Função do botão lixeira
 window.removerDoCarrinhoLocal = function(id) {
     let c = JSON.parse(localStorage.getItem('carrinhoDispemaq')) || [];
     c = c.filter(i => i.id !== id);
     localStorage.setItem('carrinhoDispemaq', JSON.stringify(c));
     atualizarBadgeLoja();
-}
+};
 
-// Expõe atualização para uso externo se necessário
+// Função de finalizar compra enviando os dados pro WhatsApp
+window.finalizarCompraWhatsApp = function() {
+    const carrinho = JSON.parse(localStorage.getItem('carrinhoDispemaq')) || [];
+    if (carrinho.length === 0) {
+        alert("Seu carrinho está vazio. Adicione produtos antes de finalizar!");
+        return;
+    }
+
+    let mensagem = "Olá Dispemaq! Gostaria de finalizar o pedido dos seguintes itens:\n\n";
+    let valorTotal = 0;
+    let temItemSobConsulta = false;
+
+    carrinho.forEach(item => {
+        if(item.preco > 0) {
+            mensagem += `✅ *${item.qtd}x* ${item.nome} (R$ ${item.preco.toFixed(2).replace('.', ',')})\n`;
+            valorTotal += (item.qtd * item.preco);
+        } else {
+            mensagem += `✅ *${item.qtd}x* ${item.nome} (Sob Consulta)\n`;
+            temItemSobConsulta = true;
+        }
+    });
+
+    mensagem += `\n*Valor Aproximado:* ${valorTotal > 0 ? valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'A combinar'}\n`;
+    
+    if(temItemSobConsulta) {
+        mensagem += `*(Alguns itens necessitam de cotação com o vendedor)*\n`;
+    }
+
+    mensagem += `\nAguardo retorno para combinarmos o frete e pagamento!`;
+
+    const numeroZap = "554984276503";
+    const linkZap = `https://wa.me/${numeroZap}?text=${encodeURIComponent(mensagem)}`;
+    
+    window.open(linkZap, '_blank');
+};
+
+// Deixa o atualizarBadge acessível caso precise forçar atualização de outro script
 window.atualizarBadgeLoja = atualizarBadgeLoja;

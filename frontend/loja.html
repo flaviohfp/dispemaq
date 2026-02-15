@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Loja - Catálogo de Peças</title>
+    <title>Loja - Catálogo de Peças Dispemaq</title>
 
     <link
       rel="stylesheet"
@@ -142,12 +142,42 @@
       .dropdown-bottom-links a { text-decoration: none; color: inherit; }
       .dropdown-bottom-links a strong { color: #ff6600; }
 
-      /* --- ESTILOS EXTRAS PARA FILTROS --- */
+      /* --- ESTILOS EXTRAS PARA FILTROS E LAYOUT DA LOJA --- */
+      .dyn-layout-loja {
+          display: flex;
+          gap: 30px;
+          align-items: flex-start;
+      }
+      
+      .sidebar-filtros {
+          width: 250px;
+          flex-shrink: 0;
+      }
+
+      .conteudo-principal-loja {
+          flex: 1;
+      }
+
+      .dyn-grade-produtos {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+          gap: 20px;
+      }
+
+      @media (max-width: 768px) {
+          .dyn-layout-loja {
+              flex-direction: column;
+          }
+          .sidebar-filtros {
+              width: 100%;
+          }
+      }
+
       .filtro-item {
           cursor: pointer;
           transition: color 0.2s, background 0.2s;
           padding: 5px 0;
-          display: block; /* Garante que o link ocupe a linha */
+          display: block;
           text-decoration: none;
           color: #333;
       }
@@ -209,6 +239,7 @@
               type="text"
               id="campoBuscaLoja"
               placeholder="Buscar peça, código ou máquina..."
+              onkeypress="if(event.key === 'Enter') document.getElementById('btnBuscaLoja').click();"
             />
             <button class="botao-buscar" id="btnBuscaLoja"><i class="fas fa-search"></i></button>
           </div>
@@ -251,8 +282,6 @@
                   </div>
                 </a>
             </div>
-
-           
 
           </div>
         </div>
@@ -336,7 +365,7 @@
             <div class="carrinho-total">
                <span>Total:</span> <strong id="totalCarrinhoLateral">R$ 0,00</strong>
             </div>
-            <button class="botao botao-primario botao-block">Finalizar Compra</button>
+            <button class="botao botao-primario botao-block" onclick="finalizarCompraWhatsApp()">Finalizar Compra</button>
         </div>
     </div>
 
