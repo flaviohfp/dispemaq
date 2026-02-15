@@ -25,7 +25,7 @@ onAuthStateChanged(auth, (user) => {
 });
 
 /* ============================================================
-   EVENTOS (AO CARREGAR A PÁGINA)
+   EVENTOS GLOBAIS (AO CARREGAR A PÁGINA)
    ============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
     
@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("formProduto");
     if(form) form.addEventListener("submit", cadastrarProduto);
 
-    // 3. EVENTO DO BANNER
+    // 3. Evento do Banner
     const btnUpload = document.getElementById("btnUploadBanner");
     if(btnUpload) {
         btnUpload.addEventListener("click", async (e) => {
@@ -49,63 +49,76 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // 4. EVENTOS DE FILTROS (Marcas e Categorias)
+    // 4. Botões de Adicionar Marcas e Categorias
     const btnAddMarca = document.getElementById("btnAddMarca");
     const btnAddCat = document.getElementById("btnAddCategoria");
 
     if(btnAddMarca) btnAddMarca.addEventListener("click", () => adicionarFiltro('marcas'));
     if(btnAddCat) btnAddCat.addEventListener("click", () => adicionarFiltro('categorias'));
 
-    // 5. Botões de Excluir (Delegação Global)
+    // 5. DELEGAÇÃO DE CLIQUES (Para botões gerados dinamicamente)
     document.body.addEventListener('click', function(e) {
-        // Excluir Produto
+        
+        // --- Excluir Produto ---
         if(e.target.closest('.btn-delete-prod')) {
             const id = e.target.closest('.btn-delete-prod').dataset.id;
             deletarProduto(id, e.target);
         }
-        // Excluir Banner
+        
+        // --- Excluir Banner ---
         if(e.target.closest('.btn-delete-banner')) {
             const index = e.target.closest('.btn-delete-banner').dataset.index;
             removerBanner(index);
         }
-        // Excluir Filtro
+        
+        // --- Excluir Filtro (Marca/Cat) ---
         if(e.target.closest('.btn-delete-filtro')) {
             const btn = e.target.closest('.btn-delete-filtro');
-            const colecao = btn.dataset.colecao;
-            const idDoc = btn.dataset.id;
-            removerFiltro(colecao, idDoc);
+            removerFiltro(btn.dataset.colecao, btn.dataset.id);
+        }
+
+        // --- Editar Filtro (Marca/Cat) [NOVO] ---
+        if(e.target.closest('.btn-edit-filtro')) {
+            const btn = e.target.closest('.btn-edit-filtro');
+            editarFiltro(btn.dataset.colecao, btn.dataset.id, btn.dataset.nome);
         }
     });
 });
 
 /* ============================================================
-   NOVA LÓGICA: GERENCIAR FILTROS (COLEÇÕES SEPARADAS)
+   LÓGICA CORRIGIDA: GERENCIAR FILTROS (MARCAS E CATEGORIAS)
    ============================================================ */
 
 async function carregarFiltrosAdmin() {
     try {
-        // Busca Marcas
-        const qMarcas = query(collection(db, "marcas"), orderBy("nome"));
-        const snapMarcas = await getDocs(qMarcas);
+        // Busca Marcas (Sem orderBy do Firebase para não travar se a lista for nova)
+        const snapMarcas = await getDocs(collection(db, "marcas"));
         let marcas = [];
         snapMarcas.forEach(doc => { marcas.push({ id: doc.id, nome: doc.data().nome }); });
+        
+        // Ordena em ordem alfabética usando JavaScript
+        marcas.sort((a, b) => a.nome.localeCompare(b.nome)); 
 
         // Busca Categorias
-        const qCat = query(collection(db, "categorias"), orderBy("nome"));
-        const snapCat = await getDocs(qCat);
+        const snapCat = await getDocs(collection(db, "categorias"));
         let categorias = [];
         snapCat.forEach(doc => { categorias.push({ id: doc.id, nome: doc.data().nome }); });
+        
+        // Ordena em ordem alfabética usando JavaScript
+        categorias.sort((a, b) => a.nome.localeCompare(b.nome));
 
-        // Renderiza listas de gestão
+        // Renderiza nas listas
         renderizarListaGestao('listaMarcasAdmin', marcas, 'marcas');
         renderizarListaGestao('listaCategoriasAdmin', categorias, 'categorias');
 
-        // Preenche os SELECTS do formulário de cadastro
+        // Preenche os SELECTS do formulário
         atualizarSelectFormulario('marca', marcas);
         atualizarSelectFormulario('categoria', categorias);
 
     } catch (error) {
         console.error("Erro ao carregar filtros:", error);
+        document.getElementById('listaMarcasAdmin').innerHTML = `<li style="color:red; padding:10px;">Erro ao carregar.</li>`;
+        document.getElementById('listaCategoriasAdmin').innerHTML = `<li style="color:red; padding:10px;">Erro ao carregar.</li>`;
     }
 }
 
@@ -115,17 +128,23 @@ function renderizarListaGestao(elementId, arrayItens, colecao) {
     ul.innerHTML = "";
     
     if(arrayItens.length === 0) {
-        ul.innerHTML = `<li style="padding:10px; color:#999;">Nenhum cadastrado.</li>`;
+        ul.innerHTML = `<li style="padding:10px; color:#999;">Nenhum item cadastrado.</li>`;
         return;
     }
 
     arrayItens.forEach(item => {
+        // Adicionamos o botão de EDITAR (lápis azul)
         ul.innerHTML += `
-            <li style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee;">
+            <li style="display:flex; justify-content:space-between; align-items:center; padding:8px; border-bottom:1px solid #eee;">
                 <span>${item.nome}</span>
-                <button class="btn-delete-filtro" data-colecao="${colecao}" data-id="${item.id}" style="color:red; background:none; border:none; cursor:pointer;">
-                    <i class="fas fa-trash"></i>
-                </button>
+                <div>
+                    <button class="btn-edit-filtro" data-colecao="${colecao}" data-id="${item.id}" data-nome="${item.nome}" style="color:#007bff; background:none; border:none; cursor:pointer; margin-right: 15px; font-size: 1.1em;">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-delete-filtro" data-colecao="${colecao}" data-id="${item.id}" style="color:#dc3545; background:none; border:none; cursor:pointer; font-size: 1.1em;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
             </li>
         `;
     });
@@ -146,10 +165,10 @@ async function adicionarFiltro(colecao) {
     const input = document.getElementById(idInput);
     const nome = input.value.trim();
 
-    if (!nome) return alert("Digite um nome!");
+    if (!nome) return alert("Por favor, digite um nome antes de adicionar!");
 
     try {
-        // Cria um ID limpo para o documento (ex: "Filtro de Óleo" vira "filtro_de_oleo")
+        // Cria um ID limpo para o banco (ex: "Filtro de Óleo" vira "filtro_de_oleo")
         const idDoc = nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '_');
         
         await setDoc(doc(db, colecao, idDoc), { 
@@ -157,16 +176,35 @@ async function adicionarFiltro(colecao) {
         });
         
         input.value = "";
-        alert(`${colecao === 'marcas' ? 'Marca' : 'Categoria'} adicionada com sucesso!`);
-        carregarFiltrosAdmin(); // Atualiza a tela
+        carregarFiltrosAdmin(); // Atualiza a tela imediatamente
     } catch (e) {
         console.error(e);
-        alert("Erro ao adicionar.");
+        alert("Erro ao adicionar no banco de dados.");
+    }
+}
+
+// NOVA FUNÇÃO: Editar o texto de uma Marca ou Categoria
+async function editarFiltro(colecao, idDoc, nomeAtual) {
+    const novoNome = prompt(`Editar nome (${colecao === 'marcas' ? 'Marca' : 'Categoria'}):`, nomeAtual);
+    
+    // Se a pessoa cancelar ou enviar em branco, ou enviar igual, não faz nada
+    if(novoNome === null || novoNome.trim() === "" || novoNome.trim() === nomeAtual) {
+        return; 
+    }
+
+    try {
+        await updateDoc(doc(db, colecao, idDoc), { 
+            nome: novoNome.trim() 
+        });
+        carregarFiltrosAdmin(); // Atualiza a tela imediatamente
+    } catch (error) {
+        console.error(error);
+        alert("Erro ao salvar a edição.");
     }
 }
 
 async function removerFiltro(colecao, idDoc) {
-    if(!confirm(`Tem certeza que deseja excluir? Isso removerá a opção do menu, mas não apagará os produtos já cadastrados com ela.`)) return;
+    if(!confirm(`Tem certeza que deseja excluir esta opção?`)) return;
 
     try {
         await deleteDoc(doc(db, colecao, idDoc));
@@ -178,7 +216,7 @@ async function removerFiltro(colecao, idDoc) {
 }
 
 /* ============================================================
-   LÓGICA DE PRODUTOS (MANTIDA INTACTA)
+   LÓGICA DE PRODUTOS
    ============================================================ */
 async function cadastrarProduto(e) {
     e.preventDefault();
@@ -241,9 +279,7 @@ async function carregarProdutos() {
     tbody.innerHTML = '<tr><td colspan="5">Carregando...</td></tr>';
 
     try {
-        // Ordena produtos dos mais novos para os mais antigos
-        const qProd = query(prodCollection, orderBy("data_cadastro", "desc"));
-        const querySnapshot = await getDocs(qProd);
+        const querySnapshot = await getDocs(prodCollection);
         tbody.innerHTML = "";
 
         if (querySnapshot.empty) {
@@ -252,44 +288,23 @@ async function carregarProdutos() {
         }
 
         querySnapshot.forEach((docItem) => {
-            const p = docItem.data();
-            tbody.innerHTML += `
-                <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding:10px;"><img src="${p.img}" style="width:50px; height:50px; object-fit:cover; border-radius:4px;"></td>
-                    <td><strong>${p.nome}</strong><br><small>${p.cod || ''}</small></td>
-                    <td>${p.marca}<br><small>${p.categoria}</small></td>
-                    <td style="color:green; font-weight:bold;">R$ ${p.preco}</td>
-                    <td>
-                        <button class="btn-delete-prod" data-id="${docItem.id}" style="background:red; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
+             const p = docItem.data();
+             tbody.innerHTML += `
+                 <tr style="border-bottom: 1px solid #eee;">
+                     <td style="padding:10px;"><img src="${p.img}" style="width:50px; height:50px; object-fit:cover; border-radius:4px;"></td>
+                     <td><strong>${p.nome}</strong><br><small>${p.cod || ''}</small></td>
+                     <td>${p.marca}<br><small>${p.categoria}</small></td>
+                     <td style="color:green; font-weight:bold;">R$ ${p.preco}</td>
+                     <td>
+                         <button class="btn-delete-prod" data-id="${docItem.id}" style="background:red; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
+                             <i class="fas fa-trash"></i>
+                         </button>
+                     </td>
+                 </tr>
+             `;
         });
-    } catch (error) {
-        console.error("Erro ao carregar produtos (Pode ser falta de index):", error);
-        // Fallback caso falte index de ordenação
-        try {
-            const querySnapshot = await getDocs(prodCollection);
-            tbody.innerHTML = "";
-            querySnapshot.forEach((docItem) => { /* Código idêntico do loop acima */
-                 const p = docItem.data();
-                 tbody.innerHTML += `
-                     <tr style="border-bottom: 1px solid #eee;">
-                         <td style="padding:10px;"><img src="${p.img}" style="width:50px; height:50px; object-fit:cover; border-radius:4px;"></td>
-                         <td><strong>${p.nome}</strong><br><small>${p.cod || ''}</small></td>
-                         <td>${p.marca}<br><small>${p.categoria}</small></td>
-                         <td style="color:green; font-weight:bold;">R$ ${p.preco}</td>
-                         <td>
-                             <button class="btn-delete-prod" data-id="${docItem.id}" style="background:red; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
-                                 <i class="fas fa-trash"></i>
-                             </button>
-                         </td>
-                     </tr>
-                 `;
-            });
-        } catch(e) {}
+    } catch(error) {
+        console.error("Erro ao carregar produtos:", error);
     }
 }
 
@@ -305,7 +320,7 @@ async function deletarProduto(id, elementoBtn) {
 }
 
 /* ============================================================
-   LÓGICA DE BANNERS (MANTIDA INTACTA)
+   LÓGICA DE BANNERS
    ============================================================ */
 async function adicionarBanner() {
     const input = document.getElementById("arquivoBanner");
