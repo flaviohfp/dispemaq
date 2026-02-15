@@ -1,6 +1,6 @@
 import { 
     db, storage, auth, onAuthStateChanged, signOut,
-    collection, addDoc, getDocs, deleteDoc, doc, ref, uploadBytes, getDownloadURL, setDoc, getDoc, updateDoc, query, orderBy
+    collection, addDoc, getDocs, deleteDoc, doc, ref, uploadBytes, getDownloadURL, setDoc, getDoc, updateDoc
 } from './firebase-config.js';
 
 /* ============================================================
