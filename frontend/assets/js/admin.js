@@ -1,16 +1,12 @@
 import { 
     db, storage, auth, onAuthStateChanged, signOut,
-    collection, addDoc, getDocs, deleteDoc, doc, ref, uploadBytes, getDownloadURL, setDoc, getDoc, updateDoc
+    collection, addDoc, getDocs, deleteDoc, doc, ref, uploadBytes, getDownloadURL, setDoc, getDoc, updateDoc, query, orderBy
 } from './firebase-config.js';
-
-// Importando funções extras necessárias para arrays (não estavam no config)
-import { arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* ============================================================
    CONFIGURAÇÃO E VARIÁVEIS
    ============================================================ */
 const prodCollection = collection(db, "produtos");
-const filtrosRef = doc(db, "configuracoes", "filtros_loja"); // Referência dos filtros
 const EMAIL_ADMIN = "admin@dispemaq.com"; 
 
 // Verifica Autenticação
@@ -24,7 +20,7 @@ onAuthStateChanged(auth, (user) => {
         console.log("Admin logado:", user.email);
         carregarProdutos(); 
         carregarBannersAdmin();
-        carregarFiltrosAdmin(); // <--- NOVO: Carrega as marcas/categorias
+        carregarFiltrosAdmin(); // Carrega as marcas/categorias
     }
 });
 
@@ -53,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // 4. NOVOS EVENTOS DE FILTROS (Marcas e Categorias)
+    // 4. EVENTOS DE FILTROS (Marcas e Categorias)
     const btnAddMarca = document.getElementById("btnAddMarca");
     const btnAddCat = document.getElementById("btnAddCategoria");
 
@@ -72,40 +68,39 @@ document.addEventListener("DOMContentLoaded", () => {
             const index = e.target.closest('.btn-delete-banner').dataset.index;
             removerBanner(index);
         }
-        // Excluir Filtro (Novo)
+        // Excluir Filtro
         if(e.target.closest('.btn-delete-filtro')) {
             const btn = e.target.closest('.btn-delete-filtro');
-            const tipo = btn.dataset.tipo;
-            const valor = btn.dataset.valor;
-            removerFiltro(tipo, valor);
+            const colecao = btn.dataset.colecao;
+            const idDoc = btn.dataset.id;
+            removerFiltro(colecao, idDoc);
         }
     });
 });
 
 /* ============================================================
-   LÓGICA NOVA: GERENCIAR FILTROS (MARCAS E CATEGORIAS)
+   NOVA LÓGICA: GERENCIAR FILTROS (COLEÇÕES SEPARADAS)
    ============================================================ */
 
-// Carrega listas e preenche os Selects do formulário
 async function carregarFiltrosAdmin() {
     try {
-        const docSnap = await getDoc(filtrosRef);
-        
-        // Se ainda não existir, cria vazio
-        if (!docSnap.exists()) {
-            await setDoc(filtrosRef, { marcas: [], categorias: [] });
-            return;
-        }
+        // Busca Marcas
+        const qMarcas = query(collection(db, "marcas"), orderBy("nome"));
+        const snapMarcas = await getDocs(qMarcas);
+        let marcas = [];
+        snapMarcas.forEach(doc => { marcas.push({ id: doc.id, nome: doc.data().nome }); });
 
-        const dados = docSnap.data();
-        const marcas = dados.marcas || [];
-        const categorias = dados.categorias || [];
+        // Busca Categorias
+        const qCat = query(collection(db, "categorias"), orderBy("nome"));
+        const snapCat = await getDocs(qCat);
+        let categorias = [];
+        snapCat.forEach(doc => { categorias.push({ id: doc.id, nome: doc.data().nome }); });
 
-        // 1. Renderiza as listas de gestão (com botão excluir)
+        // Renderiza listas de gestão
         renderizarListaGestao('listaMarcasAdmin', marcas, 'marcas');
         renderizarListaGestao('listaCategoriasAdmin', categorias, 'categorias');
 
-        // 2. Preenche os SELECTS do formulário de cadastro
+        // Preenche os SELECTS do formulário de cadastro
         atualizarSelectFormulario('marca', marcas);
         atualizarSelectFormulario('categoria', categorias);
 
@@ -114,16 +109,21 @@ async function carregarFiltrosAdmin() {
     }
 }
 
-function renderizarListaGestao(elementId, arrayItens, tipo) {
+function renderizarListaGestao(elementId, arrayItens, colecao) {
     const ul = document.getElementById(elementId);
     if(!ul) return;
     ul.innerHTML = "";
     
-    arrayItens.sort().forEach(item => {
+    if(arrayItens.length === 0) {
+        ul.innerHTML = `<li style="padding:10px; color:#999;">Nenhum cadastrado.</li>`;
+        return;
+    }
+
+    arrayItens.forEach(item => {
         ul.innerHTML += `
             <li style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee;">
-                <span>${item}</span>
-                <button class="btn-delete-filtro" data-tipo="${tipo}" data-valor="${item}" style="color:red; background:none; border:none; cursor:pointer;">
+                <span>${item.nome}</span>
+                <button class="btn-delete-filtro" data-colecao="${colecao}" data-id="${item.id}" style="color:red; background:none; border:none; cursor:pointer;">
                     <i class="fas fa-trash"></i>
                 </button>
             </li>
@@ -136,40 +136,40 @@ function atualizarSelectFormulario(selectId, arrayItens) {
     if(!select) return;
 
     select.innerHTML = `<option value="" disabled selected>Selecione...</option>`;
-    arrayItens.sort().forEach(item => {
-        // O value fica minúsculo para padronizar no banco, o texto fica original
-        // Ex: value="volvo" Texto="Volvo"
-        // Mas para simplificar, vamos usar o mesmo valor
-        select.innerHTML += `<option value="${item}">${item}</option>`;
+    arrayItens.forEach(item => {
+        select.innerHTML += `<option value="${item.nome}">${item.nome}</option>`;
     });
 }
 
-async function adicionarFiltro(tipo) {
-    const idInput = tipo === 'marcas' ? 'novaMarcaInput' : 'novaCategoriaInput';
+async function adicionarFiltro(colecao) {
+    const idInput = colecao === 'marcas' ? 'novaMarcaInput' : 'novaCategoriaInput';
     const input = document.getElementById(idInput);
-    const valor = input.value.trim();
+    const nome = input.value.trim();
 
-    if (!valor) return alert("Digite um nome!");
+    if (!nome) return alert("Digite um nome!");
 
     try {
-        await updateDoc(filtrosRef, {
-            [tipo]: arrayUnion(valor)
+        // Cria um ID limpo para o documento (ex: "Filtro de Óleo" vira "filtro_de_oleo")
+        const idDoc = nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '_');
+        
+        await setDoc(doc(db, colecao, idDoc), { 
+            nome: nome 
         });
+        
         input.value = "";
-        carregarFiltrosAdmin(); // Atualiza tudo na hora
+        alert(`${colecao === 'marcas' ? 'Marca' : 'Categoria'} adicionada com sucesso!`);
+        carregarFiltrosAdmin(); // Atualiza a tela
     } catch (e) {
         console.error(e);
         alert("Erro ao adicionar.");
     }
 }
 
-async function removerFiltro(tipo, valor) {
-    if(!confirm(`Remover "${valor}" da lista?`)) return;
+async function removerFiltro(colecao, idDoc) {
+    if(!confirm(`Tem certeza que deseja excluir? Isso removerá a opção do menu, mas não apagará os produtos já cadastrados com ela.`)) return;
 
     try {
-        await updateDoc(filtrosRef, {
-            [tipo]: arrayRemove(valor)
-        });
+        await deleteDoc(doc(db, colecao, idDoc));
         carregarFiltrosAdmin();
     } catch (e) {
         console.error(e);
@@ -178,7 +178,7 @@ async function removerFiltro(tipo, valor) {
 }
 
 /* ============================================================
-   LÓGICA DE PRODUTOS (MANTIDA)
+   LÓGICA DE PRODUTOS (MANTIDA INTACTA)
    ============================================================ */
 async function cadastrarProduto(e) {
     e.preventDefault();
@@ -189,20 +189,17 @@ async function cadastrarProduto(e) {
         btn.innerHTML = 'Salvando...';
         btn.disabled = true;
 
-        // --- DADOS BÁSICOS ---
         const nome = document.getElementById('nome').value;
         const cod = document.getElementById('cod').value;
         const marca = document.getElementById('marca').value;
         const categoria = document.getElementById('categoria').value;
         const preco = parseFloat(document.getElementById('preco').value);
         
-        // Validação extra pois agora os selects podem estar vazios
         if(!marca || !categoria) throw new Error("Selecione uma Marca e uma Categoria!");
 
         const descElement = document.getElementById('desc-produto');
         const descricao = descElement ? descElement.value : "Sem descrição técnica.";
 
-        // --- IMAGEM ---
         const arquivoInput = document.getElementById('arquivoImagem');
         if (arquivoInput.files.length === 0) throw new Error("Selecione uma foto!");
 
@@ -211,7 +208,6 @@ async function cadastrarProduto(e) {
         await uploadBytes(storageRef, arquivo);
         const urlFoto = await getDownloadURL(storageRef);
 
-        // --- SALVAR NO FIRESTORE ---
         await addDoc(prodCollection, {
             nome: nome,
             cod: cod,
@@ -226,7 +222,6 @@ async function cadastrarProduto(e) {
         alert("Produto cadastrado com sucesso!");
         document.getElementById("formProduto").reset();
         
-        // Recarregar selects para garantir que não perdeu nada
         carregarFiltrosAdmin(); 
         carregarProdutos();
 
@@ -246,7 +241,9 @@ async function carregarProdutos() {
     tbody.innerHTML = '<tr><td colspan="5">Carregando...</td></tr>';
 
     try {
-        const querySnapshot = await getDocs(prodCollection);
+        // Ordena produtos dos mais novos para os mais antigos
+        const qProd = query(prodCollection, orderBy("data_cadastro", "desc"));
+        const querySnapshot = await getDocs(qProd);
         tbody.innerHTML = "";
 
         if (querySnapshot.empty) {
@@ -271,7 +268,28 @@ async function carregarProdutos() {
             `;
         });
     } catch (error) {
-        console.error(error);
+        console.error("Erro ao carregar produtos (Pode ser falta de index):", error);
+        // Fallback caso falte index de ordenação
+        try {
+            const querySnapshot = await getDocs(prodCollection);
+            tbody.innerHTML = "";
+            querySnapshot.forEach((docItem) => { /* Código idêntico do loop acima */
+                 const p = docItem.data();
+                 tbody.innerHTML += `
+                     <tr style="border-bottom: 1px solid #eee;">
+                         <td style="padding:10px;"><img src="${p.img}" style="width:50px; height:50px; object-fit:cover; border-radius:4px;"></td>
+                         <td><strong>${p.nome}</strong><br><small>${p.cod || ''}</small></td>
+                         <td>${p.marca}<br><small>${p.categoria}</small></td>
+                         <td style="color:green; font-weight:bold;">R$ ${p.preco}</td>
+                         <td>
+                             <button class="btn-delete-prod" data-id="${docItem.id}" style="background:red; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
+                                 <i class="fas fa-trash"></i>
+                             </button>
+                         </td>
+                     </tr>
+                 `;
+            });
+        } catch(e) {}
     }
 }
 
@@ -287,9 +305,8 @@ async function deletarProduto(id, elementoBtn) {
 }
 
 /* ============================================================
-   LÓGICA DE BANNERS (MANTIDA)
+   LÓGICA DE BANNERS (MANTIDA INTACTA)
    ============================================================ */
-
 async function adicionarBanner() {
     const input = document.getElementById("arquivoBanner");
     const btn = document.getElementById("btnUploadBanner");
@@ -305,13 +322,11 @@ async function adicionarBanner() {
             btn.disabled = true;
         }
         
-        // A. Upload da Imagem
         const file = input.files[0];
         const storageRef = ref(storage, `banners/${Date.now()}_${file.name}`);
         await uploadBytes(storageRef, file);
         const url = await getDownloadURL(storageRef);
 
-        // B. Pegar a lista atual
         const docRef = doc(db, "configuracoes", "banner_site");
         const docSnap = await getDoc(docRef);
         
@@ -320,13 +335,11 @@ async function adicionarBanner() {
             listaAtual = docSnap.data().listaBanners;
         }
 
-        // C. Adicionar nova imagem
         listaAtual.push({
             img: url,
             criadoEm: Date.now()
         });
 
-        // D. Salvar
         await setDoc(docRef, { listaBanners: listaAtual }, { merge: true });
 
         alert("Banner adicionado com sucesso!");

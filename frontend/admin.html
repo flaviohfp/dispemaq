@@ -5,33 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin - Dispemaq</title>
 
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="./assets/css/admin.css" />
   </head>
   <body>
     <header class="admin-header">
       <h1><i class="fas fa-tools"></i> Painel Admin</h1>
       <div style="display: flex; gap: 15px; align-items: center">
-        <a
-          href="./index.html"
-          target="_blank"
-          style="color: white; text-decoration: none"
-          ><i class="fas fa-external-link-alt"></i> Ver Loja</a
-        >
-        <button
-          id="btnLogout"
-          style="
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-          "
-        >
+        <a href="./index.html" target="_blank" style="color: white; text-decoration: none">
+            <i class="fas fa-external-link-alt"></i> Ver Loja
+        </a>
+        <button id="btnLogout" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
           Sair
         </button>
       </div>
@@ -48,8 +32,10 @@
             <div style="flex: 1; min-width: 250px;">
                 <h4 style="border-bottom: 1px solid #eee; padding-bottom: 5px;">Marcas</h4>
                 <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-                    <input type="text" id="novaMarcaInput" placeholder="Nova Marca (Ex: Volvo)" style="flex:1; padding: 8px; border:1px solid #ddd; border-radius:4px;">
-                    <button id="btnAddMarca" style="background:#28a745; color:#fff; border:none; border-radius:4px; cursor:pointer; padding:0 15px;"><i class="fas fa-plus"></i></button>
+                    <input type="text" id="novaMarcaInput" placeholder="Nova Marca (Ex: Makita)" style="flex:1; padding: 8px; border:1px solid #ddd; border-radius:4px;">
+                    <button id="btnAddMarca" style="background:#28a745; color:#fff; border:none; border-radius:4px; cursor:pointer; padding:0 15px;">
+                        <i class="fas fa-plus"></i>
+                    </button>
                 </div>
                 <ul id="listaMarcasAdmin" style="list-style: none; padding: 0; max-height: 200px; overflow-y: auto; border: 1px solid #f0f0f0; border-radius: 4px;">
                     <li style="padding: 10px; color: #999;">Carregando...</li>
@@ -59,8 +45,10 @@
             <div style="flex: 1; min-width: 250px;">
                 <h4 style="border-bottom: 1px solid #eee; padding-bottom: 5px;">Categorias</h4>
                 <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-                    <input type="text" id="novaCategoriaInput" placeholder="Nova Categ. (Ex: Motor)" style="flex:1; padding: 8px; border:1px solid #ddd; border-radius:4px;">
-                    <button id="btnAddCategoria" style="background:#28a745; color:#fff; border:none; border-radius:4px; cursor:pointer; padding:0 15px;"><i class="fas fa-plus"></i></button>
+                    <input type="text" id="novaCategoriaInput" placeholder="Nova Categ. (Ex: Furadeiras)" style="flex:1; padding: 8px; border:1px solid #ddd; border-radius:4px;">
+                    <button id="btnAddCategoria" style="background:#28a745; color:#fff; border:none; border-radius:4px; cursor:pointer; padding:0 15px;">
+                        <i class="fas fa-plus"></i>
+                    </button>
                 </div>
                 <ul id="listaCategoriasAdmin" style="list-style: none; padding: 0; max-height: 200px; overflow-y: auto; border: 1px solid #f0f0f0; border-radius: 4px;">
                     <li style="padding: 10px; color: #999;">Carregando...</li>
@@ -75,12 +63,7 @@
           <div class="form-grid">
             <div class="form-group">
               <label>Nome da Peça</label>
-              <input
-                type="text"
-                id="nome"
-                placeholder="Ex: Filtro de Óleo"
-                required
-              />
+              <input type="text" id="nome" placeholder="Ex: Filtro de Óleo" required />
             </div>
 
             <div class="form-group">
@@ -92,14 +75,14 @@
               <label>Marca</label>
               <select id="marca" required>
                 <option value="" disabled selected>Carregando lista...</option>
-                </select>
+              </select>
             </div>
 
             <div class="form-group">
               <label>Categoria</label>
               <select id="categoria" required>
                 <option value="" disabled selected>Carregando lista...</option>
-                </select>
+              </select>
             </div>
 
             <div class="form-group">
@@ -115,21 +98,14 @@
 
           <div class="input-group">
             <label for="desc-produto">Descrição Técnica Completa</label>
-            <textarea
-              id="desc-produto"
-              rows="6"
-              placeholder="Detalhes técnicos, compatibilidade, dimensões, material..."
-            ></textarea>
+            <textarea id="desc-produto" rows="6" placeholder="Detalhes técnicos, compatibilidade, dimensões, material..."></textarea>
           </div>
 
           <div style="margin-top: 20px">
             <button type="submit" class="btn-add">
               <i class="fas fa-plus-circle"></i> Cadastrar Produto
             </button>
-            <p
-              id="msgSucesso"
-              style="color: green; display: none; margin-top: 10px"
-            >
+            <p id="msgSucesso" style="color: green; display: none; margin-top: 10px">
               Produto cadastrado!
             </p>
           </div>
@@ -137,89 +113,23 @@
       </div>
 
       <div class="card-admin" style="border-left: 5px solid #007bff">
-        <h3>
-          <i class="fas fa-images"></i> Gerenciar Carrossel (Topo do Site)
-        </h3>
-        <p>
-          Adicione banners para rodar no topo da loja. (Recomendado:
-          1920x500px).
-        </p>
+        <h3><i class="fas fa-images"></i> Gerenciar Carrossel (Topo do Site)</h3>
+        <p>Adicione banners para rodar no topo da loja. (Recomendado: 1920x500px).</p>
 
-        <div
-          style="
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px dashed #ccc;
-            margin-bottom: 20px;
-          "
-        >
-          <label
-            style="
-              display: block;
-              font-weight: bold;
-              margin-bottom: 10px;
-              color: #333;
-            "
-            >Adicionar Novo Banner:</label
-          >
-
-          <div
-            style="
-              display: flex;
-              flex-wrap: wrap;
-              gap: 15px;
-              align-items: center;
-            "
-          >
-            <input
-              type="file"
-              id="arquivoBanner"
-              accept="image/*"
-              style="
-                padding: 10px;
-                background: white;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                flex: 1;
-                min-width: 200px;
-              "
-            />
-
-            <button
-              id="btnUploadBanner"
-              style="
-                background: #007bff;
-                color: white;
-                border: none;
-                padding: 12px 25px;
-                border-radius: 4px;
-                cursor: pointer;
-                font-weight: bold;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-              "
-            >
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px dashed #ccc; margin-bottom: 20px;">
+          <label style="display: block; font-weight: bold; margin-bottom: 10px; color: #333;">Adicionar Novo Banner:</label>
+          <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+            <input type="file" id="arquivoBanner" accept="image/*" style="padding: 10px; background: white; border: 1px solid #ddd; border-radius: 4px; flex: 1; min-width: 200px;" />
+            <button id="btnUploadBanner" style="background: #007bff; color: white; border: none; padding: 12px 25px; border-radius: 4px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px;">
               <i class="fas fa-upload"></i> Enviar Banner
             </button>
           </div>
         </div>
 
-        <h4
-          style="
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-          "
-        >
+        <h4 style="border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
           Banners Ativos:
         </h4>
-
-        <div
-          id="listaBannersAdmin"
-          style="display: flex; flex-direction: column; gap: 10px"
-        >
+        <div id="listaBannersAdmin" style="display: flex; flex-direction: column; gap: 10px">
           <p style="color: #666; font-style: italic">Carregando lista...</p>
         </div>
       </div>
