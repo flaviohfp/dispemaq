@@ -808,7 +808,7 @@ body {
    GRID DA LOJA & CARDS DE PRODUTOS
    ========================================= */
 
-/* Grade Responsiva */
+/* Grade Responsiva da Loja */
 #gradeProdutosLoja {
     display: grid;
     /* Cria colunas automáticas: mínimo 260px, máximo 1 fração da tela */
@@ -828,6 +828,14 @@ body {
     overflow: hidden; /* Garante que nada saia das bordas arredondadas */
     border: 1px solid #f0f0f0; /* Borda bem sutil */
     position: relative;
+    height: 100%; /* Garante que todos os cards na loja fiquem da mesma altura */
+}
+
+/* REGRA NOVA: Trava o tamanho dos cards apenas dentro do carrossel da Index */
+.carrossel-track .produto-card {
+    min-width: 260px; /* Largura padrão do card no carrossel */
+    max-width: 260px;
+    flex: 0 0 auto; /* O segredo: proíbe o flexbox de espremer o card */
 }
 
 /* Efeito ao passar o mouse (Hover) */
@@ -840,7 +848,7 @@ body {
 /* Área da Imagem */
 .img-container {
     width: 100%;
-    height: 220px; /* Altura fixa para alinhar tudo */
+    height: 200px; /* CORRIGIDO: Altura fixa em pixels em vez de 100% */
     background-color: #f9f9f9; /* Fundo cinza bem clarinho para destacar a peça */
     display: flex;
     align-items: center;
@@ -853,7 +861,7 @@ body {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain; /* IMPORTANTE: Não estica a imagem, mantém a proporção */
-    mix-blend-mode: multiply; /* Ajuda a tirar o fundo branco da imagem se o fundo do container for cinza */
+    mix-blend-mode: multiply; /* Ajuda a tirar o fundo branco da imagem */
 }
 
 /* Informações do Produto */
