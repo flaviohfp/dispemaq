@@ -452,7 +452,7 @@
             <iframe 
               width="100%" 
               height="100%" 
-              frameborder="0" 
+              formborder="0" 
               scrolling="no" 
               marginheight="0" 
               marginwidth="0" 
@@ -623,7 +623,6 @@
     </div>
 
     <script type="module">
-      // 1. O ERRO ESTAVA AQUI: Removi o "query" e "where" que travavam o script inteiro
       import { db, doc, getDoc, collection, getDocs } from "./assets/js/firebase-config.js";
 
       let currentIndex = 0;
@@ -812,8 +811,6 @@
           }
       });
 
-      // 2. FUNÇÃO INTELIGENTE DE VITRINES
-      // Agora ela encontra o produto independente de como o admin salvou no banco
       async function carregarVitrines() {
           const tiposVitrines = [
               { idHTML: 'lancamentos', chaves: ['lancamentos', 'lançamentos', 'lancamento'] },
@@ -850,38 +847,45 @@
                           );
                       });
 
-                      if (produtosDestaVitrine.length === 0) {
-                          secaoVitrine.style.display = 'none';
-                      } else {
+                      // FINAL DA FUNÇÃO QUE TINHA SIDO CORTADA + CSS NOVO DOS CARDS:
+                      if (produtosDestaVitrine.length > 0) {
                           secaoVitrine.style.display = 'block';
-                          trackVitrine.innerHTML = ''; 
-
+                          trackVitrine.innerHTML = '';
+                          
                           produtosDestaVitrine.forEach(produto => {
-                              const precoFormatado = produto.preco > 0 
-                                  ? `R$ ${parseFloat(produto.preco).toFixed(2).replace('.', ',')}` 
-                                  : "Sob Consulta";
+                              // Verifica imagem
+                              let imagemProduto = (produto.imagens && produto.imagens.length > 0) ? produto.imagens[0] : './assets/images/no-image.png';
                               
-                              const imagemProduto = produto.img || produto.imagem || './assets/images/placeholder.jpg';
-
+                              // Verifica preço
+                              let precoFormatado = 'Consulte';
+                              if (produto.preco && parseFloat(produto.preco) > 0) {
+                                  precoFormatado = parseFloat(produto.preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                              }
+                              
+                              // Aqui os cards são montados com as medidas corretas!
                               const cardHTML = `
-                                  <div class="card-produto">
-                                      <div class="imagem-produto-container">
-                                          <img src="${imagemProduto}" alt="${produto.nome}">
+                                  <div class="card-produto" style="width: 260px; flex: 0 0 auto; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+                                      
+                                      <div class="imagem-produto-container" style="width: 100%; height: 220px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fff; padding: 10px;">
+                                          <img src="${imagemProduto}" alt="${produto.nome}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
                                       </div>
-                                      <div class="info-produto">
-                                          <div class="tags-produto">
+                                      
+                                      <div class="info-produto" style="padding: 15px; display: flex; flex-direction: column; flex-grow: 1;">
+                                          <div class="tags-produto" style="margin-bottom: 10px;">
                                               <span class="tag-marca">${produto.marca || 'S/M'}</span>
                                               <span class="tag-categoria">${produto.categoria || 'Geral'}</span>
                                           </div>
-                                          <h3 class="nome-produto" title="${produto.nome}">${produto.nome}</h3>
-                                          <p class="ref-produto">Ref: ${produto.cod || '--'}</p>
                                           
-                                          <div class="preco-produto">
-                                              <span class="valor-atual">${precoFormatado}</span>
-                                              ${produto.preco > 0 ? '<span class="parcelamento">ou 12x no cartão</span>' : ''}
+                                          <h3 class="nome-produto" title="${produto.nome}" style="font-size: 16px; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; height: 38px;">${produto.nome}</h3>
+                                          
+                                          <p class="ref-produto" style="font-size: 12px; color: #666; margin-bottom: 10px;">Ref: ${produto.cod || '--'}</p>
+                                          
+                                          <div class="preco-produto" style="margin-top: auto; margin-bottom: 15px;">
+                                              <span class="valor-atual" style="font-size: 20px; font-weight: bold; color: #ff6600; display: block;">${precoFormatado}</span>
+                                              ${parseFloat(produto.preco) > 0 ? '<span class="parcelamento" style="font-size: 12px; color: #888;">ou 12x no cartão</span>' : ''}
                                           </div>
                                           
-                                          <button class="botao-comprar" onclick="window.location.href='detalhes.html?id=${produto.id}'">
+                                          <button class="botao-comprar" onclick="window.location.href='detalhes.html?id=${produto.id}'" style="width: 100%; margin-top: auto;">
                                               <i class="fas fa-search"></i> Ver Detalhes
                                           </button>
                                       </div>
@@ -898,19 +902,17 @@
           }
       }
 
+      // Função global exposta para que os botões (onclick no HTML) consigam rolar o carrossel
       window.scrollVitrine = function(button, direction) {
-          const container = button.parentElement.querySelector('.carrossel-track');
-          const scrollAmount = 300; 
-          
+          const track = button.parentElement.querySelector('.carrossel-track');
+          const scrollAmount = 280; // largura do card (260px) + gap
           if (direction === 'left') {
-              container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+              track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
           } else {
-              container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+              track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
           }
       };
 
     </script>
-
-    <script type="module" src="./assets/js/main.js"></script>
   </body>
 </html>
