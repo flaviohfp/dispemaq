@@ -13,6 +13,110 @@
     <link rel="stylesheet" href="./assets/css/style.css" />
 
     <style>
+      /* =========================================
+         CSS DA FAIXA LARANJA E MENU DE CATEGORIAS
+         ========================================= */
+      .faixa-laranja {
+        background-color: #ff6600;
+        position: relative;
+        z-index: 100; /* Fica acima do banner */
+      }
+      .faixa-laranja .nav-container {
+        display: flex;
+        align-items: center;
+      }
+      .menu-categorias-wrapper {
+        position: relative;
+        height: 100%;
+      }
+      .btn-categorias {
+        background-color: #e65c00;
+        color: white;
+        border: none;
+        padding: 15px 25px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 1rem;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      /* O Dropdown escondido */
+      .dropdown-categorias {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background-color: white;
+        min-width: 280px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        border-radius: 0 0 8px 8px;
+        z-index: 1000;
+        padding: 10px 0;
+        margin: 0;
+        list-style: none;
+      }
+      /* Mágica do Hover: passa o mouse, ele aparece */
+      .menu-categorias-wrapper:hover .dropdown-categorias {
+        display: block;
+      }
+      .dropdown-categorias li a {
+        display: block;
+        padding: 12px 20px;
+        color: #333;
+        text-decoration: none;
+        transition: background 0.2s;
+        border-bottom: 1px solid #f0f0f0;
+      }
+      .dropdown-categorias li a:hover {
+        background-color: #fff3e6;
+        color: #ff6600;
+      }
+      .dropdown-categorias li:last-child a {
+        border-bottom: none;
+      }
+      .dropdown-categorias li.destaque a {
+        background-color: #f9f9f9;
+        text-align: center;
+        color: #ff6600;
+      }
+      
+      /* Barra de marcas ao lado do botão categorias */
+      .barra-marcas {
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+        padding-left: 20px;
+        gap: 10px;
+        overflow-x: auto;
+      }
+      .barra-marcas::-webkit-scrollbar {
+        display: none;
+      }
+      .item-marca {
+        background: none;
+        border: none;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        padding: 10px;
+        white-space: nowrap;
+        transition: color 0.3s;
+      }
+      .item-marca:hover {
+        color: #ffd1b3;
+      }
+      .botao-marcas {
+        background: rgba(0,0,0,0.2);
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      /* CSS DO CARROSSEL DE PRODUTOS */
       .carrossel-container {
         position: relative;
         display: flex;
@@ -54,7 +158,6 @@
       .btn-carrossel.right {
         right: -10px;
       }
-      
     </style>
   </head>
 
@@ -93,16 +196,8 @@
             <div class="header-btn-container">
               <a href="cadastro.html" class="header-btn-trigger" id="btnAuth">
                 <div class="header-icon-svg">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="28"
-                    height="28"
-                    fill="#000000"
-                    viewBox="0 0 256 256"
-                  >
-                    <path
-                      d="M230.93,220a8,8,0,0,1-6.93,4H32a8,8,0,0,1-6.92-12c15.23-26.33,38.7-45.21,66.09-54.16a72,72,0,1,1,73.66,0c27.39,8.95,50.86,27.83,66.09,54.16A8,8,0,0,1,230.93,220Z"
-                    ></path>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#000000" viewBox="0 0 256 256">
+                    <path d="M230.93,220a8,8,0,0,1-6.93,4H32a8,8,0,0,1-6.92-12c15.23-26.33,38.7-45.21,66.09-54.16a72,72,0,1,1,73.66,0c27.39,8.95,50.86,27.83,66.09,54.16A8,8,0,0,1,230.93,220Z"></path>
                   </svg>
                 </div>
                 <div class="header-text" id="txtAuth">
@@ -112,52 +207,26 @@
 
               <div class="login-dropdown-content" id="loginDropdown">
                 <div class="dropdown-arrow">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    fill="#fff"
-                    viewBox="0 0 256 256"
-                  >
-                    <path
-                      d="M215.39,163.06A8,8,0,0,1,208,168H48a8,8,0,0,1-5.66-13.66l80-80a8,8,0,0,1,11.32,0l80,80A8,8,0,0,1,215.39,163.06Z"
-                    ></path>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#fff" viewBox="0 0 256 256">
+                    <path d="M215.39,163.06A8,8,0,0,1,208,168H48a8,8,0,0,1-5.66-13.66l80-80a8,8,0,0,1,11.32,0l80,80A8,8,0,0,1,215.39,163.06Z"></path>
                   </svg>
                 </div>
                 <div class="dropdown-box-inner">
-                  <span class="dropdown-title"
-                    >Já possui cadastro?<br />Acesse sua conta</span
-                  >
+                  <span class="dropdown-title">Já possui cadastro?<br />Acesse sua conta</span>
                   <a href="login.html" class="btn-entrar-full">ENTRAR</a>
                   <div class="dropdown-bottom-links">
-                    <a href="cadastro.html" title="Cadastrar"
-                      >Cliente novo? <strong>Cadastrar</strong></a
-                    >
-                    <a href="login.html?pedidos=true" title="Consultar pedido"
-                      >Consulte seu pedido <strong>acompanhe aqui</strong></a
-                    >
+                    <a href="cadastro.html" title="Cadastrar">Cliente novo? <strong>Cadastrar</strong></a>
+                    <a href="login.html?pedidos=true" title="Consultar pedido">Consulte seu pedido <strong>acompanhe aqui</strong></a>
                   </div>
                 </div>
               </div>
             </div>
 
             <div class="header-btn-container">
-              <a
-                href="#"
-                class="header-btn-trigger"
-                onclick="toggleCarrinho(event)"
-              >
+              <a href="#" class="header-btn-trigger" onclick="toggleCarrinho(event)">
                 <div class="header-icon-svg">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="28"
-                    height="28"
-                    fill="#000000"
-                    viewBox="0 0 256 256"
-                  >
-                    <path
-                      d="M222.14,58.87A8,8,0,0,0,216,56H54.68L49.79,29.14A16,16,0,0,0,34.05,16H16a8,8,0,0,0,0,16h18L59.56,172.29a24,24,0,0,0,5.33,11.27,28,28,0,1,0,44.4,8.44h45.42A27.75,27.75,0,0,0,152,204a28,28,0,1,0,28-28H83.17a8,8,0,0,1-7.87-6.57L72.13,152h116a24,24,0,0,0,23.61-19.71l12.16-66.86A8,8,0,0,0,222.14,58.87ZM96,204a12,12,0,1,1-12-12A12,12,0,0,1,96,204Zm96,0a12,12,0,1,1-12-12A12,12,0,0,1,192,204Zm4-74.57A8,8,0,0,1,188.1,136H69.22L57.59,72H206.41Z"
-                    ></path>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#000000" viewBox="0 0 256 256">
+                    <path d="M222.14,58.87A8,8,0,0,0,216,56H54.68L49.79,29.14A16,16,0,0,0,34.05,16H16a8,8,0,0,0,0,16h18L59.56,172.29a24,24,0,0,0,5.33,11.27,28,28,0,1,0,44.4,8.44h45.42A27.75,27.75,0,0,0,152,204a28,28,0,1,0,28-28H83.17a8,8,0,0,1-7.87-6.57L72.13,152h116a24,24,0,0,0,23.61-19.71l12.16-66.86A8,8,0,0,0,222.14,58.87ZM96,204a12,12,0,1,1-12-12A12,12,0,0,1,96,204Zm96,0a12,12,0,1,1-12-12A12,12,0,0,1,192,204Zm4-74.57A8,8,0,0,1,188.1,136H69.22L57.59,72H206.41Z"></path>
                   </svg>
                   <span class="badge-carrinho" id="badgeCarrinhoLoja">0</span>
                 </div>
@@ -170,18 +239,7 @@
             <a
               id="btnLinkAdmin"
               href="admin.html"
-              style="
-                display: none;
-                background-color: #dc3545;
-                color: white;
-                padding: 5px 10px;
-                border-radius: 5px;
-                text-decoration: none;
-                font-weight: bold;
-                margin-left: 10px;
-                align-items: center;
-                height: 40px;
-              "
+              style="display: none; background-color: #dc3545; color: white; padding: 5px 10px; border-radius: 5px; text-decoration: none; font-weight: bold; margin-left: 10px; align-items: center; height: 40px;"
             >
               <i class="fas fa-cogs"></i> Painel
             </a>
@@ -196,119 +254,39 @@
       </div>
     </header>
 
-    <div
-      id="faixaLaranjaCount"
-      style="
-        background-color: #ff6600;
-        color: #fff;
-        text-align: center;
-        padding: 10px;
-        font-weight: bold;
-        font-size: 15px;
-        display: none;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-      "
-    >
-      <i class="fas fa-tags"></i> Trabalhamos com mais de
-      <span
-        id="countMarcas"
-        style="
-          font-size: 18px;
-          background: #fff;
-          color: #ff6600;
-          padding: 2px 8px;
-          border-radius: 4px;
-          margin: 0 5px;
-        "
-        >0</span
-      >
-      marcas das melhores linhas do mercado!
-    </div>
+    <nav class="faixa-laranja">
+      <div class="container nav-container">
+        
+        <div class="menu-categorias-wrapper">
+          <button class="btn-categorias">
+            <i class="fas fa-bars"></i> Todas as Categorias
+          </button>
+          
+          <ul class="dropdown-categorias" id="listaCategoriasContainer">
+            <li style="padding: 10px 20px; color: #666;">Carregando...</li>
+          </ul>
+        </div>
 
-    <div class="barra-marcas" id="barraMarcasContainer">
-      <span style="color: #fff; padding: 10px">Carregando marcas...</span>
-    </div>
+        <div class="barra-marcas" id="barraMarcasContainer">
+          <span style="color: #fff; padding: 10px">Carregando marcas...</span>
+        </div>
 
+      </div>
+    </nav>
+    
     <div id="menuMaisMarcas" class="menu-marcas-superposto"></div>
 
-    <div id="menuCategoriasFlutuante" class="menu-cat-dropdown">
-      <div class="menu-cat-header" id="tituloMarcaDropdown">Categorias</div>
-
-      <div class="lista-cat-scroll" id="listaCategoriasContainer">
-        <p style="padding: 10px; color: #666">Carregando...</p>
-      </div>
-    </div>
-
-    <section
-      class="hero-slider"
-      style="
-        position: relative;
-        width: 100%;
-        max-width: 1920px;
-        margin: 0 auto;
-        overflow: hidden;
-      "
-    >
-      <div
-        id="banner-track"
-        style="
-          display: flex;
-          transition: transform 0.5s ease-in-out;
-          height: 400px;
-          background: #eee;
-        "
-      >
-        <div
-          style="
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #999;
-          "
-        >
+    <section class="hero-slider" style="position: relative; width: 100%; max-width: 1920px; margin: 0 auto; overflow: hidden;">
+      <div id="banner-track" style="display: flex; transition: transform 0.5s ease-in-out; height: 400px; background: #eee;">
+        <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #999;">
           Carregando Banners...
         </div>
       </div>
 
-      <button
-        id="btnPrev"
-        style="
-          position: absolute;
-          left: 10px;
-          top: 50%;
-          transform: translateY(-50%);
-          background: rgba(0, 0, 0, 0.5);
-          color: white;
-          border: none;
-          padding: 15px;
-          cursor: pointer;
-          font-size: 24px;
-          border-radius: 4px;
-          z-index: 10;
-        "
-      >
+      <button id="btnPrev" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: rgba(0, 0, 0, 0.5); color: white; border: none; padding: 15px; cursor: pointer; font-size: 24px; border-radius: 4px; z-index: 10;">
         ❮
       </button>
-      <button
-        id="btnNext"
-        style="
-          position: absolute;
-          right: 10px;
-          top: 50%;
-          transform: translateY(-50%);
-          background: rgba(0, 0, 0, 0.5);
-          color: white;
-          border: none;
-          padding: 15px;
-          cursor: pointer;
-          font-size: 24px;
-          border-radius: 4px;
-          z-index: 10;
-        "
-      >
+      <button id="btnNext" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: rgba(0, 0, 0, 0.5); color: white; border: none; padding: 15px; cursor: pointer; font-size: 24px; border-radius: 4px; z-index: 10;">
         ❯
       </button>
     </section>
@@ -318,17 +296,11 @@
         <div class="vitrine-secao" id="secao-lancamentos" style="display: none">
           <h2 class="titulo-vitrine">Lançamentos</h2>
           <div class="carrossel-container">
-            <button
-              class="btn-carrossel left"
-              onclick="scrollVitrine(this, 'left')"
-            >
+            <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')">
               <i class="fas fa-chevron-left"></i>
             </button>
             <div class="carrossel-track" id="vitrine-lancamentos"></div>
-            <button
-              class="btn-carrossel right"
-              onclick="scrollVitrine(this, 'right')"
-            >
+            <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')">
               <i class="fas fa-chevron-right"></i>
             </button>
           </div>
@@ -337,17 +309,11 @@
         <div class="vitrine-secao" id="secao-destaques" style="display: none">
           <h2 class="titulo-vitrine">Destaques da Semana</h2>
           <div class="carrossel-container">
-            <button
-              class="btn-carrossel left"
-              onclick="scrollVitrine(this, 'left')"
-            >
+            <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')">
               <i class="fas fa-chevron-left"></i>
             </button>
             <div class="carrossel-track" id="vitrine-destaques"></div>
-            <button
-              class="btn-carrossel right"
-              onclick="scrollVitrine(this, 'right')"
-            >
+            <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')">
               <i class="fas fa-chevron-right"></i>
             </button>
           </div>
@@ -356,17 +322,11 @@
         <div class="vitrine-secao" id="secao-ofertas" style="display: none">
           <h2 class="titulo-vitrine">Ofertas</h2>
           <div class="carrossel-container">
-            <button
-              class="btn-carrossel left"
-              onclick="scrollVitrine(this, 'left')"
-            >
+            <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')">
               <i class="fas fa-chevron-left"></i>
             </button>
             <div class="carrossel-track" id="vitrine-ofertas"></div>
-            <button
-              class="btn-carrossel right"
-              onclick="scrollVitrine(this, 'right')"
-            >
+            <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')">
               <i class="fas fa-chevron-right"></i>
             </button>
           </div>
@@ -375,49 +335,31 @@
         <div class="vitrine-secao" id="secao-interesses" style="display: none">
           <h2 class="titulo-vitrine">Você também pode estar interessado</h2>
           <div class="carrossel-container">
-            <button
-              class="btn-carrossel left"
-              onclick="scrollVitrine(this, 'left')"
-            >
+            <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')">
               <i class="fas fa-chevron-left"></i>
             </button>
             <div class="carrossel-track" id="vitrine-interesses"></div>
-            <button
-              class="btn-carrossel right"
-              onclick="scrollVitrine(this, 'right')"
-            >
+            <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')">
               <i class="fas fa-chevron-right"></i>
             </button>
           </div>
         </div>
 
-        <div
-          class="vitrine-secao"
-          id="secao-mais-vendidos"
-          style="display: none"
-        >
+        <div class="vitrine-secao" id="secao-mais-vendidos" style="display: none">
           <h2 class="titulo-vitrine">Mais Vendidos do Mês</h2>
           <div class="carrossel-container">
-            <button
-              class="btn-carrossel left"
-              onclick="scrollVitrine(this, 'left')"
-            >
+            <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')">
               <i class="fas fa-chevron-left"></i>
             </button>
             <div class="carrossel-track" id="vitrine-mais-vendidos"></div>
-            <button
-              class="btn-carrossel right"
-              onclick="scrollVitrine(this, 'right')"
-            >
+            <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')">
               <i class="fas fa-chevron-right"></i>
             </button>
           </div>
         </div>
 
         <div class="centralizado" style="margin-top: 40px">
-          <a href="loja.html" class="botao botao-outline-pequeno"
-            >Ver todos os produtos da loja</a
-          >
+          <a href="loja.html" class="botao botao-outline-pequeno">Ver todos os produtos da loja</a>
         </div>
       </div>
     </section>
@@ -463,103 +405,9 @@
           <h2>Não encontrou a peça que precisa?</h2>
           <p>Fale com um consultor agora mesmo!</p>
         </div>
-        <a
-          href="https://wa.me/554984276503?text=Ol%C3%A1%20tudo%20bem?"
-          class="botao botao-outline botao-grande"
-          ><i class="fab fa-whatsapp"></i> Falar no WhatsApp</a
-        >
-      </div>
-    </section>
-
-    <section class="secao-sobre">
-      <div class="container conteudo-sobre">
-        <div class="imagem-sobre">
-          <i
-            class="fas fa-cogs"
-            style="font-size: 8rem; color: rgba(0, 86, 179, 0.15)"
-          ></i>
-
-          <div
-            class="card-flutuante card-2"
-            style="bottom: 30px; right: 30px; top: auto"
-          >
-            <i class="fas fa-shipping-fast"></i>
-            <div>
-              <strong>Agilidade na Entrega</strong>
-              <span
-                style="display: block; font-size: 0.8rem; font-weight: normal"
-                >Para todo o Brasil</span
-              >
-            </div>
-          </div>
-        </div>
-
-        <div class="texto-sobre">
-          <span class="tag-secao">Quem Somos</span>
-
-          <h2>Soluções ágeis para sua máquina não parar</h2>
-
-          <p>
-            Na Dispemaq, entendemos que cada hora de equipamento parado impacta
-            o seu resultado. Por isso, nossa missão é simples: identificar a
-            peça correta e entregá-la com a máxima agilidade. Trabalhamos com
-            uma seleção rigorosa de fornecedores para garantir durabilidade e
-            desempenho.
-          </p>
-
-          <div class="lista-diferenciais">
-            <div class="item-diferencial">
-              <i class="fas fa-check"></i> Peças de reposição linha Premium
-            </div>
-            <div class="item-diferencial">
-              <i class="fas fa-check"></i> Cotação rápida e sem burocracia
-            </div>
-            <div class="item-diferencial">
-              <i class="fas fa-check"></i> Consultoria técnica na venda
-            </div>
-          </div>
-
-          <div class="estatisticas-sobre">
-            <div class="stat-item">
-              <i
-                class="fas fa-award"
-                style="
-                  font-size: 1.5rem;
-                  color: var(--primary-color);
-                  margin-bottom: 5px;
-                "
-              ></i>
-              <strong>Garantia</strong>
-              <span>Procedência</span>
-            </div>
-
-            <div class="stat-item">
-              <i
-                class="fas fa-map-marked-alt"
-                style="
-                  font-size: 1.5rem;
-                  color: var(--primary-color);
-                  margin-bottom: 5px;
-                "
-              ></i>
-              <strong>Nacional</strong>
-              <span>Envio p/ todo país</span>
-            </div>
-
-            <div class="stat-item">
-              <i
-                class="fas fa-boxes"
-                style="
-                  font-size: 1.5rem;
-                  color: var(--primary-color);
-                  margin-bottom: 5px;
-                "
-              ></i>
-              <strong>Completo</strong>
-              <span>Multimarcas</span>
-            </div>
-          </div>
-        </div>
+        <a href="https://wa.me/554984276503?text=Ol%C3%A1%20tudo%20bem?" class="botao botao-outline botao-grande">
+          <i class="fab fa-whatsapp"></i> Falar no WhatsApp
+        </a>
       </div>
     </section>
 
@@ -586,11 +434,7 @@
             </div>
             <h3>WhatsApp</h3>
             <p>Atendimento rápido e envio de fotos</p>
-            <a
-              href="https://wa.me/554984276503?text=Ol%C3%A1%20tudo%20bem?"
-              class="link-contato"
-              >Iniciar Conversa</a
-            >
+            <a href="https://wa.me/554984276503?text=Ol%C3%A1%20tudo%20bem?" class="link-contato">Iniciar Conversa</a>
           </div>
 
           <div class="card-contato">
@@ -613,19 +457,7 @@
           </div>
 
           <div class="container-mapa" style="width: 100%; height: 300px">
-            <iframe
-              width="100%"
-              height="100%"
-              formborder="0"
-              scrolling="no"
-              marginheight="0"
-              marginwidth="0"
-              src="https://maps.google.com/maps?q=Rua%20Camboriú%2C%2099%2C%20Cristo%20Rei%2C%20Chapecó%20SC&t=&z=15&ie=UTF8&iwloc=&output=embed"
-              style="border: 0"
-              allowfullscreen=""
-              loading="lazy"
-            >
-            </iframe>
+            <iframe width="100%" height="100%" formborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q=Rua%20Camboriú%2C%2099%2C%20Cristo%20Rei%2C%20Chapecó%20SC&t=&z=15&ie=UTF8&iwloc=&output=embed" style="border: 0" allowfullscreen="" loading="lazy"></iframe>
           </div>
         </div>
       </div>
@@ -637,8 +469,7 @@
           <div class="coluna-rodape">
             <h3>Sobre Nós</h3>
             <p>
-              Especialistas em peças de reposição para máquinas pesadas e
-              tratores agrícolas. Qualidade e confiança para o seu equipamento.
+              Especialistas em peças de reposição para máquinas pesadas e tratores agrícolas. Qualidade e confiança para o seu equipamento.
             </p>
             <div class="redes-sociais">
               <a href="#"><i class="fab fa-instagram"></i></a>
@@ -663,11 +494,7 @@
               <li><i class="fas fa-phone-alt"></i> (49) 8427-6503</li>
               <li>
                 <i class="fab fa-whatsapp"></i>
-                <a
-                  href="https://wa.me/554984276503?text=Ol%C3%A1%20tudo%20bem?"
-                  class="link-contato"
-                  >Iniciar Conversa</a
-                >
+                <a href="https://wa.me/554984276503?text=Ol%C3%A1%20tudo%20bem?" class="link-contato">Iniciar Conversa</a>
               </li>
               <li>
                 <i class="far fa-envelope"></i> comercial.dispemaq@gmail.com
@@ -699,9 +526,7 @@
     <div class="carrinho-lateral" id="carrinhoLateral">
       <div class="carrinho-header">
         <h3><i class="fas fa-shopping-bag"></i> Seu Carrinho</h3>
-        <button class="fechar-carrinho" onclick="toggleCarrinho(event)">
-          ×
-        </button>
+        <button class="fechar-carrinho" onclick="toggleCarrinho(event)">×</button>
       </div>
       <div class="carrinho-conteudo"></div>
       <div class="carrinho-footer">
@@ -709,10 +534,7 @@
           <span>Total:</span>
           <strong>R$ 0,00</strong>
         </div>
-        <button
-          class="botao botao-primario botao-block"
-          onclick="alert('Finalizar compra em desenvolvimento')"
-        >
+        <button class="botao botao-primario botao-block" onclick="alert('Finalizar compra em desenvolvimento')">
           Finalizar Compra
         </button>
       </div>
@@ -727,79 +549,22 @@
       <i class="fas fa-arrow-up"></i>
     </button>
 
-    <div
-      id="popupAvisoLogin"
-      class="overlay-popup"
-      style="
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.6);
-        z-index: 9999;
-        align-items: center;
-        justify-content: center;
-      "
-    >
-      <div
-        class="box-popup"
-        style="
-          background: white;
-          padding: 30px;
-          border-radius: 10px;
-          text-align: center;
-          max-width: 400px;
-          position: relative;
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        "
-      >
-        <button
-          onclick="
-            document.getElementById('popupAvisoLogin').style.display = 'none';
-            sessionStorage.setItem('popupFechado', 'true');
-          "
-          style="
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            border: none;
-            background: none;
-            font-size: 20px;
-            cursor: pointer;
-          "
-        >
+    <div id="popupAvisoLogin" class="overlay-popup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 9999; align-items: center; justify-content: center;">
+      <div class="box-popup" style="background: white; padding: 30px; border-radius: 10px; text-align: center; max-width: 400px; position: relative; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);">
+        <button onclick="document.getElementById('popupAvisoLogin').style.display = 'none'; sessionStorage.setItem('popupFechado', 'true');" style="position: absolute; top: 10px; right: 15px; border: none; background: none; font-size: 20px; cursor: pointer;">
           ×
         </button>
         <h3 style="color: #333; margin-bottom: 10px">Bem-vindo à Dispemaq!</h3>
-        <p style="color: #666; margin-bottom: 20px">
-          Faça login para salvar seus favoritos e ver seus pedidos.
-        </p>
+        <p style="color: #666; margin-bottom: 20px">Faça login para salvar seus favoritos e ver seus pedidos.</p>
         <div>
-          <a
-            href="cadastro.html"
-            style="
-              background: #ff6600;
-              color: white;
-              padding: 10px 20px;
-              text-decoration: none;
-              border-radius: 5px;
-              font-weight: bold;
-            "
-            >Entrar ou Cadastrar</a
-          >
+          <a href="cadastro.html" style="background: #ff6600; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Entrar ou Cadastrar</a>
         </div>
       </div>
     </div>
 
     <script type="module">
       import {
-        db,
-        doc,
-        getDoc,
-        collection,
-        getDocs,
+        db, doc, getDoc, collection, getDocs,
       } from "./assets/js/firebase-config.js";
 
       let currentIndex = 0;
@@ -824,8 +589,7 @@
             bannersData = docSnap.data().listaBanners;
 
             if (bannersData.length === 0) {
-              track.innerHTML =
-                '<div style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; color:#888;">Sem banners cadastrados</div>';
+              track.innerHTML = '<div style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; color:#888;">Sem banners cadastrados</div>';
               return;
             }
 
@@ -842,8 +606,7 @@
 
             iniciarControles();
           } else {
-            track.innerHTML =
-              '<div style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; color:#888;">Nenhum banner configurado</div>';
+            track.innerHTML = '<div style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; color:#888;">Nenhum banner configurado</div>';
           }
         } catch (error) {
           console.error("Erro ao carregar banners:", error);
@@ -892,9 +655,7 @@
       async function carregarMenusDinamicos() {
         const barraMarcas = document.getElementById("barraMarcasContainer");
         const menuMaisMarcas = document.getElementById("menuMaisMarcas");
-        const listaCategorias = document.getElementById(
-          "listaCategoriasContainer",
-        );
+        const listaCategorias = document.getElementById("listaCategoriasContainer");
         const faixaLaranja = document.getElementById("faixaLaranjaCount");
         const spanCount = document.getElementById("countMarcas");
 
@@ -924,51 +685,55 @@
 
               if (index < 8) {
                 barraMarcas.innerHTML += `
-                              <button class="item-marca" onclick="window.location.href='loja.html?marca=${valorUrl}'">
-                                  ${nomeExibicao}
-                              </button>
-                          `;
+                  <button class="item-marca" onclick="window.location.href='loja.html?marca=${valorUrl}'">
+                      ${nomeExibicao}
+                  </button>
+                `;
               } else {
                 menuMaisMarcas.innerHTML += `
-                              <button class="marca-item-extra" onclick="window.location.href='loja.html?marca=${valorUrl}'">
-                                  ${nomeExibicao}
-                              </button>
-                          `;
+                  <button class="marca-item-extra" onclick="window.location.href='loja.html?marca=${valorUrl}'">
+                      ${nomeExibicao}
+                  </button>
+                `;
               }
             });
 
             if (marcas.length > 8) {
               barraMarcas.innerHTML += `
-                          <div class="dropdown-marcas">
-                              <button id="btnVerMais" class="botao-marcas" onclick="abrirMenuMarcas(event)">
-                                  <i class="fas fa-plus-circle"></i> MARCAS
-                              </button>
-                          </div>
-                      `;
+                <div class="dropdown-marcas">
+                    <button id="btnVerMais" class="botao-marcas" onclick="abrirMenuMarcas(event)">
+                        <i class="fas fa-plus-circle"></i> MARCAS
+                    </button>
+                </div>
+              `;
             }
           }
 
+          // AQUI ESTÁ A CORREÇÃO: Gerando Links verdadeiros na Lista de Categorias
           if (listaCategorias) {
             listaCategorias.innerHTML = "";
             categorias.forEach((cat) => {
               listaCategorias.innerHTML += `
-                          <button class="item-cat-dropdown" onclick="window.location.href='loja.html?categoria=${encodeURIComponent(cat)}'">
-                              <i class="fas fa-chevron-right"></i> ${cat}
-                          </button>
-                      `;
+                  <li>
+                    <a href="loja.html?categoria=${encodeURIComponent(cat)}">
+                        <i class="fas fa-chevron-right" style="font-size: 0.8em; margin-right: 5px;"></i> ${cat}
+                    </a>
+                  </li>
+              `;
             });
 
             listaCategorias.innerHTML += `
-                      <button class="item-cat-dropdown destaque" onclick="window.location.href='loja.html'">
-                           <strong>Ver Tudo na Loja</strong>
-                      </button>
-                  `;
+                <li class="destaque">
+                    <a href="loja.html">
+                        <strong>Ver Todos os Produtos</strong>
+                    </a>
+                </li>
+            `;
           }
         } catch (error) {
           console.error("Erro ao carregar menus:", error);
           if (barraMarcas)
-            barraMarcas.innerHTML =
-              "<span style='color:#fff; padding:10px;'>Erro ao carregar marcas.</span>";
+            barraMarcas.innerHTML = "<span style='color:#fff; padding:10px;'>Erro ao carregar marcas.</span>";
         }
       }
 
@@ -990,50 +755,18 @@
       document.addEventListener("click", function (e) {
         const menu = document.getElementById("menuMaisMarcas");
         const btn = document.getElementById("btnVerMais");
-        if (
-          menu &&
-          menu.classList.contains("ativo") &&
-          e.target !== menu &&
-          (!btn || !btn.contains(e.target))
-        ) {
+        if (menu && menu.classList.contains("ativo") && e.target !== menu && (!btn || !btn.contains(e.target))) {
           menu.classList.remove("ativo");
         }
       });
 
       async function carregarVitrines() {
         const tiposVitrines = [
-          {
-            idHTML: "lancamentos",
-            chaves: ["lancamentos", "lançamentos", "lancamento"],
-          },
-          {
-            idHTML: "destaques",
-            chaves: [
-              "destaques",
-              "destaque",
-              "destaque_semana",
-              "destaques da semana",
-            ],
-          },
+          { idHTML: "lancamentos", chaves: ["lancamentos", "lançamentos", "lancamento"] },
+          { idHTML: "destaques", chaves: ["destaques", "destaque", "destaque_semana", "destaques da semana"] },
           { idHTML: "ofertas", chaves: ["ofertas", "oferta"] },
-          {
-            idHTML: "interesses",
-            chaves: [
-              "interesses",
-              "interessar",
-              "você também pode estar interessado",
-              "voce tambem pode estar interessado",
-            ],
-          },
-          {
-            idHTML: "mais-vendidos",
-            chaves: [
-              "mais-vendidos",
-              "mais_vendidos",
-              "mais vendidos do mês",
-              "mais vendidos do mes",
-            ],
-          },
+          { idHTML: "interesses", chaves: ["interesses", "interessar", "você também pode estar interessado", "voce tambem pode estar interessado"] },
+          { idHTML: "mais-vendidos", chaves: ["mais-vendidos", "mais_vendidos", "mais vendidos do mês", "mais vendidos do mes"] },
         ];
 
         try {
@@ -1046,35 +779,23 @@
           });
 
           tiposVitrines.forEach((vitrine) => {
-            const secaoVitrine = document.getElementById(
-              `secao-${vitrine.idHTML}`,
-            );
-            const trackVitrine = document.getElementById(
-              `vitrine-${vitrine.idHTML}`,
-            );
+            const secaoVitrine = document.getElementById(`secao-${vitrine.idHTML}`);
+            const trackVitrine = document.getElementById(`vitrine-${vitrine.idHTML}`);
 
             if (secaoVitrine && trackVitrine) {
               const produtosDestaVitrine = todosProdutos.filter((prod) => {
                 if (!prod.vitrines) return false;
-
-                // Transforma em lista mesmo se o admin salvou como texto simples
-                const vitrinesDoProduto = Array.isArray(prod.vitrines)
-                  ? prod.vitrines
-                  : [prod.vitrines];
-
-                // Checa se alguma das formas do nome bate
-                return vitrinesDoProduto.some((v) =>
-                  vitrine.chaves.includes(String(v).toLowerCase().trim()),
-                );
+                const vitrinesDoProduto = Array.isArray(prod.vitrines) ? prod.vitrines : [prod.vitrines];
+                return vitrinesDoProduto.some((v) => vitrine.chaves.includes(String(v).toLowerCase().trim()));
               });
 
               if (produtosDestaVitrine.length > 0) {
                 secaoVitrine.style.display = "block";
                 trackVitrine.innerHTML = "";
-
-                // Adiciona os cards encontrados no carrossel
                 produtosDestaVitrine.forEach((prod) => {
-                  criarCardProduto(prod, trackVitrine);
+                  if(typeof criarCardProduto === "function"){
+                      criarCardProduto(prod, trackVitrine);
+                  }
                 });
               }
             }
@@ -1084,77 +805,9 @@
         }
       }
 
-      /* --- 4. RENDERIZAÇÃO DO CARD --- */
-      function criarCardProduto(p, container) {
-        if (!container) return;
-
-        const card = document.createElement("div");
-        card.classList.add("produto-card");
-
-        // CORREÇÃO: Transforma o card inteiro em um botão clicável
-        card.style.cursor = "pointer";
-        card.addEventListener("click", () => {
-          window.location.href = `produto.html?id=${p.id}`;
-        });
-
-        const imgUrl =
-          p.imagem || p.img || p.urlImagem || "./assets/images/sem-foto.png";
-        let precoDisplay = "Consulte";
-
-        if (p.preco) {
-          let valor = p.preco;
-          if (typeof valor === "string") {
-            valor = parseFloat(
-              valor
-                .replace("R$", "")
-                .replace(/\./g, "")
-                .replace(",", ".")
-                .trim(),
-            );
-          }
-          if (!isNaN(valor) && valor > 0) {
-            precoDisplay = valor.toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            });
-          } else {
-            precoDisplay = p.preco;
-          }
-        }
-
-        card.innerHTML = `
-        <div class="img-container">
-            <img src="${imgUrl}" alt="${p.nome}" onerror="this.src='./assets/images/sem-foto.png'">
-        </div>
-        <div class="produto-info">
-            <span class="categoria-tag">${p.marca || p.categoria || "Geral"}</span>
-            <h3 title="${p.nome}">${p.nome}</h3>
-            <p class="codigo">Cód: ${p.codigo || "--"}</p>
-            <div class="preco-box">
-                <span class="preco">${precoDisplay}</span>
-            </div>
-            <button class="botao-comprar btn-add-carrinho">
-                <i class="fas fa-shopping-cart"></i> Comprar
-            </button>
-        </div>
-    `;
-
-        const btn = card.querySelector(".btn-add-carrinho");
-        if (btn) {
-          btn.addEventListener("click", (e) => {
-            e.stopPropagation(); // Garante que clicar aqui NÃO abre a página de detalhes, mas sim vai pro carrinho
-            addCarrinhoLoja(p.id, p);
-          });
-        }
-
-        container.appendChild(card);
-      }
-
-      // --- CONTROLES DOS CARROSSÉIS DE PRODUTOS ---
       window.scrollVitrine = function (btn, direcao) {
         const container = btn.parentElement.querySelector(".carrossel-track");
-        const scrollAmount = 250; // Quantidade de rolagem
-
+        const scrollAmount = 250;
         if (direcao === "left") {
           container.scrollBy({ left: -scrollAmount, behavior: "smooth" });
         } else {
