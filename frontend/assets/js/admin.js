@@ -239,12 +239,10 @@ async function cadastrarProduto(e) {
         const arquivoInput = document.getElementById('arquivoImagem');
         if (arquivoInput.files.length === 0) throw new Error("Selecione uma foto para o produto!");
 
-        // === CAPTURAR QUAIS VITRINES FORAM MARCADAS ===
-        const vitrinesSelecionadas = [];
-        const checkboxesVitrines = document.querySelectorAll('input[name="vitrines"]:checked');
-        checkboxesVitrines.forEach((checkbox) => {
-            vitrinesSelecionadas.push(checkbox.value);
-        });
+        // === CAPTURAR A VITRINE SELECIONADA (NOVA LÓGICA) ===
+        const vitrineSelecionada = document.getElementById('vitrine').value;
+        // Cria a lista: se escolheu algo, põe na lista. Se não escolheu (Nenhuma), lista vazia.
+        const vitrinesDoProduto = vitrineSelecionada ? [vitrineSelecionada] : [];
 
         // Upload da foto
         const arquivo = arquivoInput.files[0];
@@ -261,7 +259,7 @@ async function cadastrarProduto(e) {
             preco: preco,
             descricao: descricao, 
             img: urlFoto, 
-            vitrines: vitrinesSelecionadas, // Salvando a lista de vitrines
+            vitrines: vitrinesDoProduto, // Salvando a lista de vitrines formatada corretamente
             data_cadastro: new Date()
         });
 
@@ -301,7 +299,11 @@ async function carregarProdutos() {
              // Identificar as vitrines para mostrar na tabela
              let vitrinesBadge = "";
              if (p.vitrines && p.vitrines.length > 0) {
-                 vitrinesBadge = `<br><small style="color:#ff6600; font-weight:bold;"><i class="fas fa-star" style="font-size:0.8em;"></i> Vitrines: ${p.vitrines.join(', ')}</small>`;
+                 // Formata o nome da vitrine para ficar mais bonito na tabela (Ex: "destaque_semana" -> "Destaque Semana")
+                 const nomesFormatados = p.vitrines.map(v => v.replace('_', ' ').toUpperCase());
+                 vitrinesBadge = `<br><small style="color:#ff6600; font-weight:bold;"><i class="fas fa-star" style="font-size:0.8em;"></i> Vitrine: ${nomesFormatados.join(', ')}</small>`;
+             } else {
+                 vitrinesBadge = `<br><small style="color:#6c757d;"><i class="fas fa-store" style="font-size:0.8em;"></i> Apenas na Loja</small>`;
              }
 
              tbody.innerHTML += `

@@ -206,57 +206,52 @@
     <section class="secao-loja vitrines-home">
       <div class="container">
         
-        <div class="vitrine-secao">
+        <div class="vitrine-secao" id="secao-lancamentos" style="display: none;">
             <h2 class="titulo-vitrine">Lançamentos</h2>
             <div class="carrossel-container">
                 <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')"><i class="fas fa-chevron-left"></i></button>
                 <div class="carrossel-track" id="vitrine-lancamentos">
-                    <p style="width:100%; text-align:center; padding:20px; color:#777;">Carregando...</p>
-                </div>
+                    </div>
                 <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')"><i class="fas fa-chevron-right"></i></button>
             </div>
         </div>
 
-        <div class="vitrine-secao">
+        <div class="vitrine-secao" id="secao-destaque_semana" style="display: none;">
             <h2 class="titulo-vitrine">Destaques da Semana</h2>
             <div class="carrossel-container">
                 <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')"><i class="fas fa-chevron-left"></i></button>
-                <div class="carrossel-track" id="vitrine-destaques">
-                    <p style="width:100%; text-align:center; padding:20px; color:#777;">Carregando...</p>
-                </div>
+                <div class="carrossel-track" id="vitrine-destaque_semana">
+                     </div>
                 <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')"><i class="fas fa-chevron-right"></i></button>
             </div>
         </div>
 
-        <div class="vitrine-secao">
+        <div class="vitrine-secao" id="secao-ofertas" style="display: none;">
             <h2 class="titulo-vitrine">Ofertas</h2>
             <div class="carrossel-container">
                 <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')"><i class="fas fa-chevron-left"></i></button>
                 <div class="carrossel-track" id="vitrine-ofertas">
-                    <p style="width:100%; text-align:center; padding:20px; color:#777;">Carregando...</p>
-                </div>
+                     </div>
                 <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')"><i class="fas fa-chevron-right"></i></button>
             </div>
         </div>
 
-        <div class="vitrine-secao">
+        <div class="vitrine-secao" id="secao-interessar" style="display: none;">
             <h2 class="titulo-vitrine">Você também pode estar interessado</h2>
             <div class="carrossel-container">
                 <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')"><i class="fas fa-chevron-left"></i></button>
-                <div class="carrossel-track" id="vitrine-interesses">
-                    <p style="width:100%; text-align:center; padding:20px; color:#777;">Carregando...</p>
-                </div>
+                <div class="carrossel-track" id="vitrine-interessar">
+                     </div>
                 <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')"><i class="fas fa-chevron-right"></i></button>
             </div>
         </div>
 
-        <div class="vitrine-secao">
+        <div class="vitrine-secao" id="secao-mais_vendidos" style="display: none;">
             <h2 class="titulo-vitrine">Mais Vendidos do Mês</h2>
             <div class="carrossel-container">
                 <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')"><i class="fas fa-chevron-left"></i></button>
-                <div class="carrossel-track" id="vitrine-mais-vendidos">
-                    <p style="width:100%; text-align:center; padding:20px; color:#777;">Carregando...</p>
-                </div>
+                <div class="carrossel-track" id="vitrine-mais_vendidos">
+                     </div>
                 <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')"><i class="fas fa-chevron-right"></i></button>
             </div>
         </div>
@@ -267,6 +262,7 @@
 
       </div>
     </section>
+
     <div class="barra-beneficios">
       <div class="container">
         <div class="grade-beneficios">
@@ -632,8 +628,7 @@
     </div>
 
     <script type="module">
-      // Importações atualizadas para usar as novas coleções
-      import { db, doc, getDoc, collection, getDocs } from "./assets/js/firebase-config.js";
+      import { db, doc, getDoc, collection, getDocs, query, where } from "./assets/js/firebase-config.js";
 
       // --- CONFIGURAÇÃO CARROSSEL ---
       let currentIndex = 0;
@@ -643,6 +638,7 @@
       document.addEventListener("DOMContentLoaded", async () => {
         await carregarBanners();
         await carregarMenusDinamicos(); 
+        await carregarVitrines(); // <-- AQUI NÓS CHAMAMOS A NOVA FUNÇÃO DAS VITRINES!
       });
 
       // 1. CARREGAR BANNERS
@@ -728,25 +724,21 @@
           const spanCount = document.getElementById('countMarcas');
 
           try {
-              // Busca Marcas da nova coleção
               const snapMarcas = await getDocs(collection(db, "marcas"));
               let marcas = [];
               snapMarcas.forEach(doc => marcas.push(doc.data().nome));
-              marcas.sort((a, b) => a.localeCompare(b)); // Ordem Alfabética
+              marcas.sort((a, b) => a.localeCompare(b)); 
 
-              // Busca Categorias da nova coleção
               const snapCat = await getDocs(collection(db, "categorias"));
               let categorias = [];
               snapCat.forEach(doc => categorias.push(doc.data().nome));
               categorias.sort((a, b) => a.localeCompare(b));
 
-              // Atualiza a FAIXA LARANJA
               if(marcas.length > 0) {
                   if(faixaLaranja) faixaLaranja.style.display = 'block';
                   if(spanCount) spanCount.innerText = marcas.length;
               }
 
-              // --- PREENCHER MARCAS ---
               if (barraMarcas && menuMaisMarcas) {
                   barraMarcas.innerHTML = "";
                   menuMaisMarcas.innerHTML = "";
@@ -770,7 +762,6 @@
                       }
                   });
 
-                  // Botão Ver Mais Marcas
                   if (marcas.length > 8) {
                       barraMarcas.innerHTML += `
                           <div class="dropdown-marcas">
@@ -782,7 +773,6 @@
                   }
               }
 
-              // --- PREENCHER CATEGORIAS ---
               if (listaCategorias) {
                   listaCategorias.innerHTML = "";
                   categorias.forEach(cat => {
@@ -822,7 +812,6 @@
           }
       };
 
-      // Fecha ao clicar fora
       document.addEventListener('click', function(e) {
           const menu = document.getElementById('menuMaisMarcas');
           const btn = document.getElementById('btnVerMais');
@@ -830,6 +819,101 @@
               menu.classList.remove('ativo');
           }
       });
+
+      // 3. CARREGAR VITRINES (NOVO CÓDIGO)
+      async function carregarVitrines() {
+          // Lista das vitrines que configuramos no admin.html
+          const tiposVitrines = [
+              { id: 'lancamentos', titulo: 'Lançamentos' },
+              { id: 'destaque_semana', titulo: 'Destaques da Semana' },
+              { id: 'ofertas', titulo: 'Ofertas' },
+              { id: 'interessar', titulo: 'Você também pode estar interessado' },
+              { id: 'mais_vendidos', titulo: 'Mais Vendidos do Mês' }
+          ];
+
+          try {
+              // Busca TODOS os produtos uma vez só para economizar leitura no Firebase
+              const produtosRef = collection(db, "produtos");
+              const querySnapshot = await getDocs(produtosRef);
+              
+              const todosProdutos = [];
+              querySnapshot.forEach((doc) => {
+                  todosProdutos.push({ id: doc.id, ...doc.data() });
+              });
+
+              // Para cada tipo de vitrine, filtra e desenha na tela
+              tiposVitrines.forEach(vitrine => {
+                  const secaoVitrine = document.getElementById(`secao-${vitrine.id}`);
+                  const trackVitrine = document.getElementById(`vitrine-${vitrine.id}`);
+
+                  if (secaoVitrine && trackVitrine) {
+                      // Filtra os produtos que tem o nome dessa vitrine dentro do array (lista) 'vitrines'
+                      const produtosDestaVitrine = todosProdutos.filter(prod => 
+                          prod.vitrines && Array.isArray(prod.vitrines) && prod.vitrines.includes(vitrine.id)
+                      );
+
+                      // Se não tem produto, esconde a seção inteira. Se tem, exibe.
+                      if (produtosDestaVitrine.length === 0) {
+                          secaoVitrine.style.display = 'none';
+                      } else {
+                          secaoVitrine.style.display = 'block';
+                          trackVitrine.innerHTML = ''; // Limpa o "Carregando..."
+
+                          produtosDestaVitrine.forEach(produto => {
+                              const precoFormatado = produto.preco > 0 
+                                  ? `R$ ${produto.preco.toFixed(2).replace('.', ',')}` 
+                                  : "Sob Consulta";
+                              
+                              const imagemProduto = produto.img || produto.imagem || './assets/images/placeholder.jpg';
+
+                              // Cria o HTML do Card do Produto (Igual ao do loja.html)
+                              const cardHTML = `
+                                  <div class="card-produto">
+                                      <div class="imagem-produto-container">
+                                          <img src="${imagemProduto}" alt="${produto.nome}">
+                                      </div>
+                                      <div class="info-produto">
+                                          <div class="tags-produto">
+                                              <span class="tag-marca">${produto.marca || 'S/M'}</span>
+                                              <span class="tag-categoria">${produto.categoria || 'Geral'}</span>
+                                          </div>
+                                          <h3 class="nome-produto" title="${produto.nome}">${produto.nome}</h3>
+                                          <p class="ref-produto">Ref: ${produto.cod || '--'}</p>
+                                          
+                                          <div class="preco-produto">
+                                              <span class="valor-atual">${precoFormatado}</span>
+                                              ${produto.preco > 0 ? '<span class="parcelamento">ou 12x no cartão</span>' : ''}
+                                          </div>
+                                          
+                                          <button class="botao-comprar" onclick="window.location.href='detalhes.html?id=${produto.id}'">
+                                              <i class="fas fa-search"></i> Ver Detalhes
+                                          </button>
+                                      </div>
+                                  </div>
+                              `;
+                              trackVitrine.innerHTML += cardHTML;
+                          });
+                      }
+                  }
+              });
+
+          } catch (error) {
+              console.error("Erro ao carregar vitrines:", error);
+          }
+      }
+
+      // Função para rolar o carrossel da vitrine para os lados
+      window.scrollVitrine = function(button, direction) {
+          const container = button.parentElement.querySelector('.carrossel-track');
+          const scrollAmount = 300; // Quantidade de pixels para rolar
+          
+          if (direction === 'left') {
+              container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+          } else {
+              container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+          }
+      };
+
     </script>
 
     <script type="module" src="./assets/js/main.js"></script>
