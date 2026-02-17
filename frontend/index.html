@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
@@ -14,130 +14,136 @@
 
     <style>
       .carrossel-container {
-          position: relative;
-          display: flex;
-          align-items: center;
+        position: relative;
+        display: flex;
+        align-items: center;
       }
       .carrossel-track {
-          display: flex;
-          overflow-x: auto;
-          gap: 15px;
-          padding: 15px 5px;
-          scroll-behavior: smooth;
-          flex-wrap: nowrap;
-          width: 100%;
+        display: flex;
+        overflow-x: auto;
+        gap: 15px;
+        padding: 15px 5px;
+        scroll-behavior: smooth;
+        flex-wrap: nowrap;
+        width: 100%;
       }
       .carrossel-track::-webkit-scrollbar {
-          display: none;
+        display: none;
       }
       .btn-carrossel {
-          background: rgba(255, 102, 0, 0.8);
-          color: white;
-          border: none;
-          border-radius: 50%;
-          width: 40px;
-          height: 40px;
-          cursor: pointer;
-          position: absolute;
-          z-index: 10;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: background 0.3s;
+        background: rgba(255, 102, 0, 0.8);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        position: absolute;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.3s;
       }
       .btn-carrossel:hover {
-          background: rgba(204, 82, 0, 1);
+        background: rgba(204, 82, 0, 1);
       }
-      .btn-carrossel.left { left: -10px; }
-      .btn-carrossel.right { right: -10px; }
-      
+      .btn-carrossel.left {
+        left: -10px;
+      }
+      .btn-carrossel.right {
+        right: -10px;
+      }
+
       .produto-card {
-          min-width: 230px;
-          max-width: 230px;
-          flex: 0 0 auto;
-          background: #fff;
-          border: 1px solid #e0e0e0;
-          border-radius: 8px;
-          overflow: hidden;
-          transition: transform 0.2s, box-shadow 0.2s;
-          display: flex;
-          flex-direction: column;
+        min-width: 230px;
+        max-width: 230px;
+        flex: 0 0 auto;
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+        display: flex;
+        flex-direction: column;
       }
       .produto-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
       }
       .img-container {
-          width: 100%;
-          height: 180px;
-          padding: 15px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: #fff;
-          border-bottom: 1px solid #f0f0f0;
+        width: 100%;
+        height: 180px;
+        padding: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        border-bottom: 1px solid #f0f0f0;
       }
       .img-container img {
-          max-width: 100%;
-          max-height: 100%;
-          object-fit: contain;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
       }
       .produto-info {
-          padding: 15px;
-          display: flex;
-          flex-direction: column;
-          flex-grow: 1;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
       }
       .categoria-tag {
-          font-size: 0.75rem;
-          color: #888;
-          text-transform: uppercase;
-          margin-bottom: 5px;
-          font-weight: bold;
+        font-size: 0.75rem;
+        color: #888;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+        font-weight: bold;
       }
       .produto-info h3 {
-          font-size: 0.95rem;
-          line-height: 1.3;
-          margin: 0 0 5px 0;
-          color: #333;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-          height: 38px;
+        font-size: 0.95rem;
+        line-height: 1.3;
+        margin: 0 0 5px 0;
+        color: #333;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        height: 38px;
       }
       .codigo {
-          font-size: 0.8rem;
-          color: #999;
-          margin: 0 0 10px 0;
+        font-size: 0.8rem;
+        color: #999;
+        margin: 0 0 10px 0;
       }
       .preco-box {
-          margin-top: auto;
-          margin-bottom: 15px;
+        margin-top: auto;
+        margin-bottom: 15px;
       }
       .preco {
-          font-size: 1.25rem;
-          font-weight: bold;
-          color: #ff6600;
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #ff6600;
       }
       .botao-comprar {
-          background-color: #0056b3;
-          color: white;
-          border: none;
-          border-radius: 4px;
-          padding: 10px;
-          font-size: 1rem;
-          font-weight: bold;
-          cursor: pointer;
-          transition: background 0.2s;
-          width: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          gap: 8px;
+        background-color: #0056b3;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 10px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.2s;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
       }
       .botao-comprar:hover {
-          background-color: #ff6600;
+        background-color: #ff6600;
       }
     </style>
   </head>
@@ -174,42 +180,81 @@
           </div>
 
           <div class="acoes-usuario">
-            
             <div class="header-btn-container">
               <a href="cadastro.html" class="header-btn-trigger" id="btnAuth">
                 <div class="header-icon-svg">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#000000" viewBox="0 0 256 256"><path d="M230.93,220a8,8,0,0,1-6.93,4H32a8,8,0,0,1-6.92-12c15.23-26.33,38.7-45.21,66.09-54.16a72,72,0,1,1,73.66,0c27.39,8.95,50.86,27.83,66.09,54.16A8,8,0,0,1,230.93,220Z"></path></svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="28"
+                    height="28"
+                    fill="#000000"
+                    viewBox="0 0 256 256"
+                  >
+                    <path
+                      d="M230.93,220a8,8,0,0,1-6.93,4H32a8,8,0,0,1-6.92-12c15.23-26.33,38.7-45.21,66.09-54.16a72,72,0,1,1,73.66,0c27.39,8.95,50.86,27.83,66.09,54.16A8,8,0,0,1,230.93,220Z"
+                    ></path>
+                  </svg>
                 </div>
                 <div class="header-text" id="txtAuth">
-                  <strong>Entre</strong> ou<br><strong>Cadastre-se</strong>
+                  <strong>Entre</strong> ou<br /><strong>Cadastre-se</strong>
                 </div>
               </a>
 
               <div class="login-dropdown-content" id="loginDropdown">
                 <div class="dropdown-arrow">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#fff" viewBox="0 0 256 256"><path d="M215.39,163.06A8,8,0,0,1,208,168H48a8,8,0,0,1-5.66-13.66l80-80a8,8,0,0,1,11.32,0l80,80A8,8,0,0,1,215.39,163.06Z"></path></svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    fill="#fff"
+                    viewBox="0 0 256 256"
+                  >
+                    <path
+                      d="M215.39,163.06A8,8,0,0,1,208,168H48a8,8,0,0,1-5.66-13.66l80-80a8,8,0,0,1,11.32,0l80,80A8,8,0,0,1,215.39,163.06Z"
+                    ></path>
+                  </svg>
                 </div>
                 <div class="dropdown-box-inner">
-                  <span class="dropdown-title">Já possui cadastro?<br>Acesse sua conta</span>
+                  <span class="dropdown-title"
+                    >Já possui cadastro?<br />Acesse sua conta</span
+                  >
                   <a href="login.html" class="btn-entrar-full">ENTRAR</a>
                   <div class="dropdown-bottom-links">
-                    <a href="cadastro.html" title="Cadastrar">Cliente novo? <strong>Cadastrar</strong></a>
-                    <a href="login.html?pedidos=true" title="Consultar pedido">Consulte seu pedido <strong>acompanhe aqui</strong></a>
+                    <a href="cadastro.html" title="Cadastrar"
+                      >Cliente novo? <strong>Cadastrar</strong></a
+                    >
+                    <a href="login.html?pedidos=true" title="Consultar pedido"
+                      >Consulte seu pedido <strong>acompanhe aqui</strong></a
+                    >
                   </div>
                 </div>
               </div>
             </div>
 
             <div class="header-btn-container">
-                <a href="#" class="header-btn-trigger" onclick="toggleCarrinho(event)">
-                  <div class="header-icon-svg">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#000000" viewBox="0 0 256 256"><path d="M222.14,58.87A8,8,0,0,0,216,56H54.68L49.79,29.14A16,16,0,0,0,34.05,16H16a8,8,0,0,0,0,16h18L59.56,172.29a24,24,0,0,0,5.33,11.27,28,28,0,1,0,44.4,8.44h45.42A27.75,27.75,0,0,0,152,204a28,28,0,1,0,28-28H83.17a8,8,0,0,1-7.87-6.57L72.13,152h116a24,24,0,0,0,23.61-19.71l12.16-66.86A8,8,0,0,0,222.14,58.87ZM96,204a12,12,0,1,1-12-12A12,12,0,0,1,96,204Zm96,0a12,12,0,1,1-12-12A12,12,0,0,1,192,204Zm4-74.57A8,8,0,0,1,188.1,136H69.22L57.59,72H206.41Z"></path></svg>
-                    <span class="badge-carrinho" id="badgeCarrinhoLoja">0</span>
-                  </div>
-                  <div class="header-text">
-                    <strong>Meu</strong><br>Carrinho
-                  </div>
-                </a>
+              <a
+                href="#"
+                class="header-btn-trigger"
+                onclick="toggleCarrinho(event)"
+              >
+                <div class="header-icon-svg">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="28"
+                    height="28"
+                    fill="#000000"
+                    viewBox="0 0 256 256"
+                  >
+                    <path
+                      d="M222.14,58.87A8,8,0,0,0,216,56H54.68L49.79,29.14A16,16,0,0,0,34.05,16H16a8,8,0,0,0,0,16h18L59.56,172.29a24,24,0,0,0,5.33,11.27,28,28,0,1,0,44.4,8.44h45.42A27.75,27.75,0,0,0,152,204a28,28,0,1,0,28-28H83.17a8,8,0,0,1-7.87-6.57L72.13,152h116a24,24,0,0,0,23.61-19.71l12.16-66.86A8,8,0,0,0,222.14,58.87ZM96,204a12,12,0,1,1-12-12A12,12,0,0,1,96,204Zm96,0a12,12,0,1,1-12-12A12,12,0,0,1,192,204Zm4-74.57A8,8,0,0,1,188.1,136H69.22L57.59,72H206.41Z"
+                    ></path>
+                  </svg>
+                  <span class="badge-carrinho" id="badgeCarrinhoLoja">0</span>
+                </div>
+                <div class="header-text">
+                  <strong>Meu</strong><br />Carrinho
+                </div>
+              </a>
             </div>
 
             <a
@@ -230,7 +275,7 @@
             >
               <i class="fas fa-cogs"></i> Painel
             </a>
-            
+
             <button class="botao-menu-mobile" id="botaoMenuMobile">
               <span></span>
               <span></span>
@@ -241,21 +286,47 @@
       </div>
     </header>
 
-    <div id="faixaLaranjaCount" style="background-color: #ff6600; color: #fff; text-align: center; padding: 10px; font-weight: bold; font-size: 15px; display: none; text-transform: uppercase; letter-spacing: 1px;">
-      <i class="fas fa-tags"></i> Trabalhamos com mais de <span id="countMarcas" style="font-size: 18px; background: #fff; color: #ff6600; padding: 2px 8px; border-radius: 4px; margin: 0 5px;">0</span> marcas das melhores linhas do mercado!
+    <div
+      id="faixaLaranjaCount"
+      style="
+        background-color: #ff6600;
+        color: #fff;
+        text-align: center;
+        padding: 10px;
+        font-weight: bold;
+        font-size: 15px;
+        display: none;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      "
+    >
+      <i class="fas fa-tags"></i> Trabalhamos com mais de
+      <span
+        id="countMarcas"
+        style="
+          font-size: 18px;
+          background: #fff;
+          color: #ff6600;
+          padding: 2px 8px;
+          border-radius: 4px;
+          margin: 0 5px;
+        "
+        >0</span
+      >
+      marcas das melhores linhas do mercado!
     </div>
 
     <div class="barra-marcas" id="barraMarcasContainer">
-      <span style="color:#fff; padding:10px;">Carregando marcas...</span>
+      <span style="color: #fff; padding: 10px">Carregando marcas...</span>
     </div>
-   
+
     <div id="menuMaisMarcas" class="menu-marcas-superposto"></div>
 
     <div id="menuCategoriasFlutuante" class="menu-cat-dropdown">
       <div class="menu-cat-header" id="tituloMarcaDropdown">Categorias</div>
 
       <div class="lista-cat-scroll" id="listaCategoriasContainer">
-        <p style="padding:10px; color:#666;">Carregando...</p>
+        <p style="padding: 10px; color: #666">Carregando...</p>
       </div>
     </div>
 
@@ -334,56 +405,110 @@
 
     <section class="secao-loja vitrines-home">
       <div class="container">
-        
-        <div class="vitrine-secao" id="secao-lancamentos" style="display: none;">
-            <h2 class="titulo-vitrine">Lançamentos</h2>
-            <div class="carrossel-container">
-                <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')"><i class="fas fa-chevron-left"></i></button>
-                <div class="carrossel-track" id="vitrine-lancamentos"></div>
-                <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')"><i class="fas fa-chevron-right"></i></button>
-            </div>
+        <div class="vitrine-secao" id="secao-lancamentos" style="display: none">
+          <h2 class="titulo-vitrine">Lançamentos</h2>
+          <div class="carrossel-container">
+            <button
+              class="btn-carrossel left"
+              onclick="scrollVitrine(this, 'left')"
+            >
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="carrossel-track" id="vitrine-lancamentos"></div>
+            <button
+              class="btn-carrossel right"
+              onclick="scrollVitrine(this, 'right')"
+            >
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
         </div>
 
-        <div class="vitrine-secao" id="secao-destaques" style="display: none;">
-            <h2 class="titulo-vitrine">Destaques da Semana</h2>
-            <div class="carrossel-container">
-                <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')"><i class="fas fa-chevron-left"></i></button>
-                <div class="carrossel-track" id="vitrine-destaques"></div>
-                <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')"><i class="fas fa-chevron-right"></i></button>
-            </div>
+        <div class="vitrine-secao" id="secao-destaques" style="display: none">
+          <h2 class="titulo-vitrine">Destaques da Semana</h2>
+          <div class="carrossel-container">
+            <button
+              class="btn-carrossel left"
+              onclick="scrollVitrine(this, 'left')"
+            >
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="carrossel-track" id="vitrine-destaques"></div>
+            <button
+              class="btn-carrossel right"
+              onclick="scrollVitrine(this, 'right')"
+            >
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
         </div>
 
-        <div class="vitrine-secao" id="secao-ofertas" style="display: none;">
-            <h2 class="titulo-vitrine">Ofertas</h2>
-            <div class="carrossel-container">
-                <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')"><i class="fas fa-chevron-left"></i></button>
-                <div class="carrossel-track" id="vitrine-ofertas"></div>
-                <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')"><i class="fas fa-chevron-right"></i></button>
-            </div>
+        <div class="vitrine-secao" id="secao-ofertas" style="display: none">
+          <h2 class="titulo-vitrine">Ofertas</h2>
+          <div class="carrossel-container">
+            <button
+              class="btn-carrossel left"
+              onclick="scrollVitrine(this, 'left')"
+            >
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="carrossel-track" id="vitrine-ofertas"></div>
+            <button
+              class="btn-carrossel right"
+              onclick="scrollVitrine(this, 'right')"
+            >
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
         </div>
 
-        <div class="vitrine-secao" id="secao-interesses" style="display: none;">
-            <h2 class="titulo-vitrine">Você também pode estar interessado</h2>
-            <div class="carrossel-container">
-                <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')"><i class="fas fa-chevron-left"></i></button>
-                <div class="carrossel-track" id="vitrine-interesses"></div>
-                <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')"><i class="fas fa-chevron-right"></i></button>
-            </div>
+        <div class="vitrine-secao" id="secao-interesses" style="display: none">
+          <h2 class="titulo-vitrine">Você também pode estar interessado</h2>
+          <div class="carrossel-container">
+            <button
+              class="btn-carrossel left"
+              onclick="scrollVitrine(this, 'left')"
+            >
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="carrossel-track" id="vitrine-interesses"></div>
+            <button
+              class="btn-carrossel right"
+              onclick="scrollVitrine(this, 'right')"
+            >
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
         </div>
 
-        <div class="vitrine-secao" id="secao-mais-vendidos" style="display: none;">
-            <h2 class="titulo-vitrine">Mais Vendidos do Mês</h2>
-            <div class="carrossel-container">
-                <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')"><i class="fas fa-chevron-left"></i></button>
-                <div class="carrossel-track" id="vitrine-mais-vendidos"></div>
-                <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')"><i class="fas fa-chevron-right"></i></button>
-            </div>
+        <div
+          class="vitrine-secao"
+          id="secao-mais-vendidos"
+          style="display: none"
+        >
+          <h2 class="titulo-vitrine">Mais Vendidos do Mês</h2>
+          <div class="carrossel-container">
+            <button
+              class="btn-carrossel left"
+              onclick="scrollVitrine(this, 'left')"
+            >
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="carrossel-track" id="vitrine-mais-vendidos"></div>
+            <button
+              class="btn-carrossel right"
+              onclick="scrollVitrine(this, 'right')"
+            >
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
         </div>
 
         <div class="centralizado" style="margin-top: 40px">
-          <a href="loja.html" class="botao botao-outline-pequeno">Ver todos os produtos da loja</a>
+          <a href="loja.html" class="botao botao-outline-pequeno"
+            >Ver todos os produtos da loja</a
+          >
         </div>
-
       </div>
     </section>
 
@@ -576,19 +701,20 @@
               Atendemos todo o território nacional via transportadora.
             </div>
           </div>
-          
-          <div class="container-mapa" style="width: 100%; height: 300px;">
-            <iframe 
-              width="100%" 
-              height="100%" 
-              formborder="0" 
-              scrolling="no" 
-              marginheight="0" 
-              marginwidth="0" 
+
+          <div class="container-mapa" style="width: 100%; height: 300px">
+            <iframe
+              width="100%"
+              height="100%"
+              formborder="0"
+              scrolling="no"
+              marginheight="0"
+              marginwidth="0"
               src="https://maps.google.com/maps?q=Rua%20Camboriú%2C%2099%2C%20Cristo%20Rei%2C%20Chapecó%20SC&t=&z=15&ie=UTF8&iwloc=&output=embed"
-              style="border:0;" 
-              allowfullscreen="" 
-              loading="lazy">
+              style="border: 0"
+              allowfullscreen=""
+              loading="lazy"
+            >
             </iframe>
           </div>
         </div>
@@ -673,7 +799,10 @@
           <span>Total:</span>
           <strong>R$ 0,00</strong>
         </div>
-        <button class="botao botao-primario botao-block" onclick="alert('Finalizar compra em desenvolvimento')">
+        <button
+          class="botao botao-primario botao-block"
+          onclick="alert('Finalizar compra em desenvolvimento')"
+        >
           Finalizar Compra
         </button>
       </div>
@@ -717,7 +846,10 @@
         "
       >
         <button
-          onclick="document.getElementById('popupAvisoLogin').style.display='none'; sessionStorage.setItem('popupFechado', 'true');"
+          onclick="
+            document.getElementById('popupAvisoLogin').style.display = 'none';
+            sessionStorage.setItem('popupFechado', 'true');
+          "
           style="
             position: absolute;
             top: 10px;
@@ -752,7 +884,13 @@
     </div>
 
     <script type="module">
-      import { db, doc, getDoc, collection, getDocs } from "./assets/js/firebase-config.js";
+      import {
+        db,
+        doc,
+        getDoc,
+        collection,
+        getDocs,
+      } from "./assets/js/firebase-config.js";
 
       let currentIndex = 0;
       let bannersData = [];
@@ -760,8 +898,8 @@
 
       document.addEventListener("DOMContentLoaded", async () => {
         await carregarBanners();
-        await carregarMenusDinamicos(); 
-        await carregarVitrines(); 
+        await carregarMenusDinamicos();
+        await carregarVitrines();
       });
 
       async function carregarBanners() {
@@ -776,7 +914,8 @@
             bannersData = docSnap.data().listaBanners;
 
             if (bannersData.length === 0) {
-              track.innerHTML = '<div style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; color:#888;">Sem banners cadastrados</div>';
+              track.innerHTML =
+                '<div style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; color:#888;">Sem banners cadastrados</div>';
               return;
             }
 
@@ -793,7 +932,8 @@
 
             iniciarControles();
           } else {
-            track.innerHTML = '<div style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; color:#888;">Nenhum banner configurado</div>';
+            track.innerHTML =
+              '<div style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; color:#888;">Nenhum banner configurado</div>';
           }
         } catch (error) {
           console.error("Erro ao carregar banners:", error);
@@ -810,17 +950,19 @@
           track.style.transform = `translateX(-${currentIndex * 100}%)`;
         };
 
-        if (btnNext) btnNext.addEventListener("click", () => {
-          currentIndex = (currentIndex + 1) % total;
-          updateSlide();
-          resetTimer();
-        });
+        if (btnNext)
+          btnNext.addEventListener("click", () => {
+            currentIndex = (currentIndex + 1) % total;
+            updateSlide();
+            resetTimer();
+          });
 
-        if (btnPrev) btnPrev.addEventListener("click", () => {
-          currentIndex = (currentIndex - 1 + total) % total;
-          updateSlide();
-          resetTimer();
-        });
+        if (btnPrev)
+          btnPrev.addEventListener("click", () => {
+            currentIndex = (currentIndex - 1 + total) % total;
+            updateSlide();
+            resetTimer();
+          });
 
         const startTimer = () => {
           intervaloCarrossel = setInterval(() => {
@@ -838,234 +980,277 @@
       }
 
       async function carregarMenusDinamicos() {
-          const barraMarcas = document.getElementById('barraMarcasContainer');
-          const menuMaisMarcas = document.getElementById('menuMaisMarcas');
-          const listaCategorias = document.getElementById('listaCategoriasContainer');
-          const faixaLaranja = document.getElementById('faixaLaranjaCount');
-          const spanCount = document.getElementById('countMarcas');
+        const barraMarcas = document.getElementById("barraMarcasContainer");
+        const menuMaisMarcas = document.getElementById("menuMaisMarcas");
+        const listaCategorias = document.getElementById(
+          "listaCategoriasContainer",
+        );
+        const faixaLaranja = document.getElementById("faixaLaranjaCount");
+        const spanCount = document.getElementById("countMarcas");
 
-          try {
-              const snapMarcas = await getDocs(collection(db, "marcas"));
-              let marcas = [];
-              snapMarcas.forEach(doc => marcas.push(doc.data().nome));
-              marcas.sort((a, b) => a.localeCompare(b)); 
+        try {
+          const snapMarcas = await getDocs(collection(db, "marcas"));
+          let marcas = [];
+          snapMarcas.forEach((doc) => marcas.push(doc.data().nome));
+          marcas.sort((a, b) => a.localeCompare(b));
 
-              const snapCat = await getDocs(collection(db, "categorias"));
-              let categorias = [];
-              snapCat.forEach(doc => categorias.push(doc.data().nome));
-              categorias.sort((a, b) => a.localeCompare(b));
+          const snapCat = await getDocs(collection(db, "categorias"));
+          let categorias = [];
+          snapCat.forEach((doc) => categorias.push(doc.data().nome));
+          categorias.sort((a, b) => a.localeCompare(b));
 
-              if(marcas.length > 0) {
-                  if(faixaLaranja) faixaLaranja.style.display = 'block';
-                  if(spanCount) spanCount.innerText = marcas.length;
-              }
+          if (marcas.length > 0) {
+            if (faixaLaranja) faixaLaranja.style.display = "block";
+            if (spanCount) spanCount.innerText = marcas.length;
+          }
 
-              if (barraMarcas && menuMaisMarcas) {
-                  barraMarcas.innerHTML = "";
-                  menuMaisMarcas.innerHTML = "";
-                  
-                  marcas.forEach((marca, index) => {
-                      const nomeExibicao = marca.toUpperCase();
-                      const valorUrl = encodeURIComponent(marca);
-                      
-                      if (index < 8) {
-                          barraMarcas.innerHTML += `
+          if (barraMarcas && menuMaisMarcas) {
+            barraMarcas.innerHTML = "";
+            menuMaisMarcas.innerHTML = "";
+
+            marcas.forEach((marca, index) => {
+              const nomeExibicao = marca.toUpperCase();
+              const valorUrl = encodeURIComponent(marca);
+
+              if (index < 8) {
+                barraMarcas.innerHTML += `
                               <button class="item-marca" onclick="window.location.href='loja.html?marca=${valorUrl}'">
                                   ${nomeExibicao}
                               </button>
                           `;
-                      } else {
-                          menuMaisMarcas.innerHTML += `
+              } else {
+                menuMaisMarcas.innerHTML += `
                               <button class="marca-item-extra" onclick="window.location.href='loja.html?marca=${valorUrl}'">
                                   ${nomeExibicao}
                               </button>
                           `;
-                      }
-                  });
+              }
+            });
 
-                  if (marcas.length > 8) {
-                      barraMarcas.innerHTML += `
+            if (marcas.length > 8) {
+              barraMarcas.innerHTML += `
                           <div class="dropdown-marcas">
                               <button id="btnVerMais" class="botao-marcas" onclick="abrirMenuMarcas(event)">
                                   <i class="fas fa-plus-circle"></i> MARCAS
                               </button>
                           </div>
                       `;
-                  }
-              }
+            }
+          }
 
-              if (listaCategorias) {
-                  listaCategorias.innerHTML = "";
-                  categorias.forEach(cat => {
-                      listaCategorias.innerHTML += `
+          if (listaCategorias) {
+            listaCategorias.innerHTML = "";
+            categorias.forEach((cat) => {
+              listaCategorias.innerHTML += `
                           <button class="item-cat-dropdown" onclick="window.location.href='loja.html?categoria=${encodeURIComponent(cat)}'">
                               <i class="fas fa-chevron-right"></i> ${cat}
                           </button>
                       `;
-                  });
-                  
-                  listaCategorias.innerHTML += `
+            });
+
+            listaCategorias.innerHTML += `
                       <button class="item-cat-dropdown destaque" onclick="window.location.href='loja.html'">
                            <strong>Ver Tudo na Loja</strong>
                       </button>
                   `;
-              }
-
-          } catch (error) {
-              console.error("Erro ao carregar menus:", error);
-              if (barraMarcas) barraMarcas.innerHTML = "<span style='color:#fff; padding:10px;'>Erro ao carregar marcas.</span>";
           }
+        } catch (error) {
+          console.error("Erro ao carregar menus:", error);
+          if (barraMarcas)
+            barraMarcas.innerHTML =
+              "<span style='color:#fff; padding:10px;'>Erro ao carregar marcas.</span>";
+        }
       }
 
-      window.abrirMenuMarcas = function(event) {
-          event.stopPropagation(); 
-          const menu = document.getElementById('menuMaisMarcas');
-          const btn = event.currentTarget;
-          
-          if(menu.classList.contains('ativo')) {
-              menu.classList.remove('ativo');
-          } else {
-              const rect = btn.getBoundingClientRect();
-              menu.style.top = (rect.bottom + window.scrollY + 5) + 'px';
-              menu.style.left = (rect.left + window.scrollX - 100) + 'px'; 
-              menu.classList.add('ativo');
-          }
+      window.abrirMenuMarcas = function (event) {
+        event.stopPropagation();
+        const menu = document.getElementById("menuMaisMarcas");
+        const btn = event.currentTarget;
+
+        if (menu.classList.contains("ativo")) {
+          menu.classList.remove("ativo");
+        } else {
+          const rect = btn.getBoundingClientRect();
+          menu.style.top = rect.bottom + window.scrollY + 5 + "px";
+          menu.style.left = rect.left + window.scrollX - 100 + "px";
+          menu.classList.add("ativo");
+        }
       };
 
-      document.addEventListener('click', function(e) {
-          const menu = document.getElementById('menuMaisMarcas');
-          const btn = document.getElementById('btnVerMais');
-          if(menu && menu.classList.contains('ativo') && e.target !== menu && (!btn || !btn.contains(e.target))) {
-              menu.classList.remove('ativo');
-          }
+      document.addEventListener("click", function (e) {
+        const menu = document.getElementById("menuMaisMarcas");
+        const btn = document.getElementById("btnVerMais");
+        if (
+          menu &&
+          menu.classList.contains("ativo") &&
+          e.target !== menu &&
+          (!btn || !btn.contains(e.target))
+        ) {
+          menu.classList.remove("ativo");
+        }
       });
 
       async function carregarVitrines() {
-          const tiposVitrines = [
-              { idHTML: 'lancamentos', chaves: ['lancamentos', 'lançamentos', 'lancamento'] },
-              { idHTML: 'destaques', chaves: ['destaques', 'destaque', 'destaque_semana', 'destaques da semana'] },
-              { idHTML: 'ofertas', chaves: ['ofertas', 'oferta'] },
-              { idHTML: 'interesses', chaves: ['interesses', 'interessar', 'você também pode estar interessado', 'voce tambem pode estar interessado'] },
-              { idHTML: 'mais-vendidos', chaves: ['mais-vendidos', 'mais_vendidos', 'mais vendidos do mês', 'mais vendidos do mes'] }
-          ];
+        const tiposVitrines = [
+          {
+            idHTML: "lancamentos",
+            chaves: ["lancamentos", "lançamentos", "lancamento"],
+          },
+          {
+            idHTML: "destaques",
+            chaves: [
+              "destaques",
+              "destaque",
+              "destaque_semana",
+              "destaques da semana",
+            ],
+          },
+          { idHTML: "ofertas", chaves: ["ofertas", "oferta"] },
+          {
+            idHTML: "interesses",
+            chaves: [
+              "interesses",
+              "interessar",
+              "você também pode estar interessado",
+              "voce tambem pode estar interessado",
+            ],
+          },
+          {
+            idHTML: "mais-vendidos",
+            chaves: [
+              "mais-vendidos",
+              "mais_vendidos",
+              "mais vendidos do mês",
+              "mais vendidos do mes",
+            ],
+          },
+        ];
 
-          try {
-              const produtosRef = collection(db, "produtos");
-              const querySnapshot = await getDocs(produtosRef);
-              
-              const todosProdutos = [];
-              querySnapshot.forEach((doc) => {
-                  todosProdutos.push({ id: doc.id, ...doc.data() });
+        try {
+          const produtosRef = collection(db, "produtos");
+          const querySnapshot = await getDocs(produtosRef);
+
+          const todosProdutos = [];
+          querySnapshot.forEach((doc) => {
+            todosProdutos.push({ id: doc.id, ...doc.data() });
+          });
+
+          tiposVitrines.forEach((vitrine) => {
+            const secaoVitrine = document.getElementById(
+              `secao-${vitrine.idHTML}`,
+            );
+            const trackVitrine = document.getElementById(
+              `vitrine-${vitrine.idHTML}`,
+            );
+
+            if (secaoVitrine && trackVitrine) {
+              const produtosDestaVitrine = todosProdutos.filter((prod) => {
+                if (!prod.vitrines) return false;
+
+                // Transforma em lista mesmo se o admin salvou como texto simples
+                const vitrinesDoProduto = Array.isArray(prod.vitrines)
+                  ? prod.vitrines
+                  : [prod.vitrines];
+
+                // Checa se alguma das formas do nome bate
+                return vitrinesDoProduto.some((v) =>
+                  vitrine.chaves.includes(String(v).toLowerCase().trim()),
+                );
               });
 
-              tiposVitrines.forEach(vitrine => {
-                  const secaoVitrine = document.getElementById(`secao-${vitrine.idHTML}`);
-                  const trackVitrine = document.getElementById(`vitrine-${vitrine.idHTML}`);
+              if (produtosDestaVitrine.length > 0) {
+                secaoVitrine.style.display = "block";
+                trackVitrine.innerHTML = "";
 
-                  if (secaoVitrine && trackVitrine) {
-                      
-                      const produtosDestaVitrine = todosProdutos.filter(prod => {
-                          if (!prod.vitrines) return false;
-                          
-                          // Transforma em lista mesmo se o admin salvou como texto simples
-                          const vitrinesDoProduto = Array.isArray(prod.vitrines) ? prod.vitrines : [prod.vitrines];
-                          
-                          // Checa se alguma das formas do nome bate
-                          return vitrinesDoProduto.some(v => 
-                              vitrine.chaves.includes(String(v).toLowerCase().trim())
-                          );
-                      });
-
-                      if (produtosDestaVitrine.length > 0) {
-                          secaoVitrine.style.display = 'block';
-                          trackVitrine.innerHTML = '';
-                          
-                          // Adiciona os cards encontrados no carrossel
-                          produtosDestaVitrine.forEach(prod => {
-                              criarCardProduto(prod, trackVitrine);
-                          });
-                      }
-                  }
-              });
-
-          } catch (error) {
-              console.error("Erro ao carregar vitrines:", error);
-          }
+                // Adiciona os cards encontrados no carrossel
+                produtosDestaVitrine.forEach((prod) => {
+                  criarCardProduto(prod, trackVitrine);
+                });
+              }
+            }
+          });
+        } catch (error) {
+          console.error("Erro ao carregar vitrines:", error);
+        }
       }
 
-      // --- FUNÇÃO PARA CRIAR OS CARDS IDÊNTICOS AOS DA LOJA ---
+      /* --- 4. RENDERIZAÇÃO DO CARD --- */
       function criarCardProduto(p, container) {
-          if(!container) return;
+        if (!container) return;
 
-          const card = document.createElement('div');
-          card.classList.add('produto-card');
-          
-          card.style.cursor = 'pointer';
-          card.addEventListener('click', () => {
-              window.location.href = `produto.html?id=${p.id}`;
+        const card = document.createElement("div");
+        card.classList.add("produto-card");
+
+        // CORREÇÃO: Transforma o card inteiro em um botão clicável
+        card.style.cursor = "pointer";
+        card.addEventListener("click", () => {
+          window.location.href = `produto.html?id=${p.id}`;
+        });
+
+        const imgUrl =
+          p.imagem || p.img || p.urlImagem || "./assets/images/sem-foto.png";
+        let precoDisplay = "Consulte";
+
+        if (p.preco) {
+          let valor = p.preco;
+          if (typeof valor === "string") {
+            valor = parseFloat(
+              valor
+                .replace("R$", "")
+                .replace(/\./g, "")
+                .replace(",", ".")
+                .trim(),
+            );
+          }
+          if (!isNaN(valor) && valor > 0) {
+            precoDisplay = valor.toLocaleString("pt-BR", {
+              style: "currency",
+              currency: "BRL",
+            });
+          } else {
+            precoDisplay = p.preco;
+          }
+        }
+
+        card.innerHTML = `
+        <div class="img-container">
+            <img src="${imgUrl}" alt="${p.nome}" onerror="this.src='./assets/images/sem-foto.png'">
+        </div>
+        <div class="produto-info">
+            <span class="categoria-tag">${p.marca || p.categoria || "Geral"}</span>
+            <h3 title="${p.nome}">${p.nome}</h3>
+            <p class="codigo">Cód: ${p.codigo || "--"}</p>
+            <div class="preco-box">
+                <span class="preco">${precoDisplay}</span>
+            </div>
+            <button class="botao-comprar btn-add-carrinho">
+                <i class="fas fa-shopping-cart"></i> Comprar
+            </button>
+        </div>
+    `;
+
+        const btn = card.querySelector(".btn-add-carrinho");
+        if (btn) {
+          btn.addEventListener("click", (e) => {
+            e.stopPropagation(); // Garante que clicar aqui NÃO abre a página de detalhes, mas sim vai pro carrinho
+            addCarrinhoLoja(p.id, p);
           });
-          
-          const imgUrl = p.imagem || p.img || p.urlImagem || './assets/images/sem-foto.png';
-          let precoDisplay = "Consulte";
-          
-          if (p.preco) {
-              let valor = p.preco;
-              if(typeof valor === 'string') {
-                   valor = parseFloat(valor.replace('R$', '').replace(/\./g, '').replace(',', '.').trim());
-              }
-              if (!isNaN(valor) && valor > 0) {
-                  precoDisplay = valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-              } else {
-                  precoDisplay = p.preco;
-              }
-          }
+        }
 
-          card.innerHTML = `
-              <div class="img-container">
-                  <img src="${imgUrl}" alt="${p.nome}" onerror="this.src='./assets/images/sem-foto.png'">
-              </div>
-              <div class="produto-info">
-                  <span class="categoria-tag">${p.marca || p.categoria || 'Geral'}</span>
-                  <h3 title="${p.nome}">${p.nome}</h3>
-                  <p class="codigo">Cód: ${p.codigo || '--'}</p>
-                  <div class="preco-box">
-                      <span class="preco">${precoDisplay}</span>
-                  </div>
-                  <button class="botao-comprar btn-add-carrinho">
-                      <i class="fas fa-shopping-cart"></i> Comprar
-                  </button>
-              </div>
-          `;
-
-          const btn = card.querySelector('.btn-add-carrinho');
-          if(btn) {
-              btn.addEventListener('click', (e) => {
-                  e.stopPropagation(); // Impede de abrir a página do produto
-                  
-                  // Se existir a função de adicionar ao carrinho na index, chama ela. 
-                  if (typeof window.addCarrinhoLoja === 'function') {
-                      window.addCarrinhoLoja(p.id, p);
-                  } else {
-                      alert('Produto adicionado! (Certifique-se de que a função do carrinho está ligada na home)');
-                  }
-              });
-          }
-
-          container.appendChild(card);
+        container.appendChild(card);
       }
 
       // --- CONTROLES DOS CARROSSÉIS DE PRODUTOS ---
-      window.scrollVitrine = function(btn, direcao) {
-          const container = btn.parentElement.querySelector('.carrossel-track');
-          const scrollAmount = 250; // Quantidade de rolagem 
-          
-          if (direcao === 'left') {
-              container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-          } else {
-              container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-          }
-      };
+      window.scrollVitrine = function (btn, direcao) {
+        const container = btn.parentElement.querySelector(".carrossel-track");
+        const scrollAmount = 250; // Quantidade de rolagem
 
+        if (direcao === "left") {
+          container.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+        } else {
+          container.scrollBy({ left: scrollAmount, behavior: "smooth" });
+        }
+      };
     </script>
   </body>
 </html>
