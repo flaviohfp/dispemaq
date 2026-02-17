@@ -210,18 +210,16 @@
             <h2 class="titulo-vitrine">Lançamentos</h2>
             <div class="carrossel-container">
                 <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')"><i class="fas fa-chevron-left"></i></button>
-                <div class="carrossel-track" id="vitrine-lancamentos">
-                    </div>
+                <div class="carrossel-track" id="vitrine-lancamentos"></div>
                 <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')"><i class="fas fa-chevron-right"></i></button>
             </div>
         </div>
 
-        <div class="vitrine-secao" id="secao-destaque_semana" style="display: none;">
+        <div class="vitrine-secao" id="secao-destaques" style="display: none;">
             <h2 class="titulo-vitrine">Destaques da Semana</h2>
             <div class="carrossel-container">
                 <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')"><i class="fas fa-chevron-left"></i></button>
-                <div class="carrossel-track" id="vitrine-destaque_semana">
-                     </div>
+                <div class="carrossel-track" id="vitrine-destaques"></div>
                 <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')"><i class="fas fa-chevron-right"></i></button>
             </div>
         </div>
@@ -230,28 +228,25 @@
             <h2 class="titulo-vitrine">Ofertas</h2>
             <div class="carrossel-container">
                 <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')"><i class="fas fa-chevron-left"></i></button>
-                <div class="carrossel-track" id="vitrine-ofertas">
-                     </div>
+                <div class="carrossel-track" id="vitrine-ofertas"></div>
                 <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')"><i class="fas fa-chevron-right"></i></button>
             </div>
         </div>
 
-        <div class="vitrine-secao" id="secao-interessar" style="display: none;">
+        <div class="vitrine-secao" id="secao-interesses" style="display: none;">
             <h2 class="titulo-vitrine">Você também pode estar interessado</h2>
             <div class="carrossel-container">
                 <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')"><i class="fas fa-chevron-left"></i></button>
-                <div class="carrossel-track" id="vitrine-interessar">
-                     </div>
+                <div class="carrossel-track" id="vitrine-interesses"></div>
                 <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')"><i class="fas fa-chevron-right"></i></button>
             </div>
         </div>
 
-        <div class="vitrine-secao" id="secao-mais_vendidos" style="display: none;">
+        <div class="vitrine-secao" id="secao-mais-vendidos" style="display: none;">
             <h2 class="titulo-vitrine">Mais Vendidos do Mês</h2>
             <div class="carrossel-container">
                 <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')"><i class="fas fa-chevron-left"></i></button>
-                <div class="carrossel-track" id="vitrine-mais_vendidos">
-                     </div>
+                <div class="carrossel-track" id="vitrine-mais-vendidos"></div>
                 <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')"><i class="fas fa-chevron-right"></i></button>
             </div>
         </div>
@@ -628,9 +623,9 @@
     </div>
 
     <script type="module">
-      import { db, doc, getDoc, collection, getDocs, query, where } from "./assets/js/firebase-config.js";
+      // 1. O ERRO ESTAVA AQUI: Removi o "query" e "where" que travavam o script inteiro
+      import { db, doc, getDoc, collection, getDocs } from "./assets/js/firebase-config.js";
 
-      // --- CONFIGURAÇÃO CARROSSEL ---
       let currentIndex = 0;
       let bannersData = [];
       let intervaloCarrossel;
@@ -638,10 +633,9 @@
       document.addEventListener("DOMContentLoaded", async () => {
         await carregarBanners();
         await carregarMenusDinamicos(); 
-        await carregarVitrines(); // <-- AQUI NÓS CHAMAMOS A NOVA FUNÇÃO DAS VITRINES!
+        await carregarVitrines(); 
       });
 
-      // 1. CARREGAR BANNERS
       async function carregarBanners() {
         const track = document.getElementById("banner-track");
         if (!track) return;
@@ -715,7 +709,6 @@
         startTimer();
       }
 
-      // 2. CARREGAR MENUS DINÂMICOS (MARCAS E CATEGORIAS)
       async function carregarMenusDinamicos() {
           const barraMarcas = document.getElementById('barraMarcasContainer');
           const menuMaisMarcas = document.getElementById('menuMaisMarcas');
@@ -796,7 +789,6 @@
           }
       }
 
-      // Abre Menu flutuante de Marcas Extras
       window.abrirMenuMarcas = function(event) {
           event.stopPropagation(); 
           const menu = document.getElementById('menuMaisMarcas');
@@ -820,19 +812,18 @@
           }
       });
 
-      // 3. CARREGAR VITRINES (NOVO CÓDIGO)
+      // 2. FUNÇÃO INTELIGENTE DE VITRINES
+      // Agora ela encontra o produto independente de como o admin salvou no banco
       async function carregarVitrines() {
-          // Lista das vitrines que configuramos no admin.html
           const tiposVitrines = [
-              { id: 'lancamentos', titulo: 'Lançamentos' },
-              { id: 'destaque_semana', titulo: 'Destaques da Semana' },
-              { id: 'ofertas', titulo: 'Ofertas' },
-              { id: 'interessar', titulo: 'Você também pode estar interessado' },
-              { id: 'mais_vendidos', titulo: 'Mais Vendidos do Mês' }
+              { idHTML: 'lancamentos', chaves: ['lancamentos', 'lançamentos', 'lancamento'] },
+              { idHTML: 'destaques', chaves: ['destaques', 'destaque', 'destaque_semana', 'destaques da semana'] },
+              { idHTML: 'ofertas', chaves: ['ofertas', 'oferta'] },
+              { idHTML: 'interesses', chaves: ['interesses', 'interessar', 'você também pode estar interessado', 'voce tambem pode estar interessado'] },
+              { idHTML: 'mais-vendidos', chaves: ['mais-vendidos', 'mais_vendidos', 'mais vendidos do mês', 'mais vendidos do mes'] }
           ];
 
           try {
-              // Busca TODOS os produtos uma vez só para economizar leitura no Firebase
               const produtosRef = collection(db, "produtos");
               const querySnapshot = await getDocs(produtosRef);
               
@@ -841,32 +832,37 @@
                   todosProdutos.push({ id: doc.id, ...doc.data() });
               });
 
-              // Para cada tipo de vitrine, filtra e desenha na tela
               tiposVitrines.forEach(vitrine => {
-                  const secaoVitrine = document.getElementById(`secao-${vitrine.id}`);
-                  const trackVitrine = document.getElementById(`vitrine-${vitrine.id}`);
+                  const secaoVitrine = document.getElementById(`secao-${vitrine.idHTML}`);
+                  const trackVitrine = document.getElementById(`vitrine-${vitrine.idHTML}`);
 
                   if (secaoVitrine && trackVitrine) {
-                      // Filtra os produtos que tem o nome dessa vitrine dentro do array (lista) 'vitrines'
-                      const produtosDestaVitrine = todosProdutos.filter(prod => 
-                          prod.vitrines && Array.isArray(prod.vitrines) && prod.vitrines.includes(vitrine.id)
-                      );
+                      
+                      const produtosDestaVitrine = todosProdutos.filter(prod => {
+                          if (!prod.vitrines) return false;
+                          
+                          // Transforma em lista mesmo se o admin salvou como texto simples
+                          const vitrinesDoProduto = Array.isArray(prod.vitrines) ? prod.vitrines : [prod.vitrines];
+                          
+                          // Checa se alguma das formas do nome bate
+                          return vitrinesDoProduto.some(v => 
+                              vitrine.chaves.includes(String(v).toLowerCase().trim())
+                          );
+                      });
 
-                      // Se não tem produto, esconde a seção inteira. Se tem, exibe.
                       if (produtosDestaVitrine.length === 0) {
                           secaoVitrine.style.display = 'none';
                       } else {
                           secaoVitrine.style.display = 'block';
-                          trackVitrine.innerHTML = ''; // Limpa o "Carregando..."
+                          trackVitrine.innerHTML = ''; 
 
                           produtosDestaVitrine.forEach(produto => {
                               const precoFormatado = produto.preco > 0 
-                                  ? `R$ ${produto.preco.toFixed(2).replace('.', ',')}` 
+                                  ? `R$ ${parseFloat(produto.preco).toFixed(2).replace('.', ',')}` 
                                   : "Sob Consulta";
                               
                               const imagemProduto = produto.img || produto.imagem || './assets/images/placeholder.jpg';
 
-                              // Cria o HTML do Card do Produto (Igual ao do loja.html)
                               const cardHTML = `
                                   <div class="card-produto">
                                       <div class="imagem-produto-container">
@@ -902,10 +898,9 @@
           }
       }
 
-      // Função para rolar o carrossel da vitrine para os lados
       window.scrollVitrine = function(button, direction) {
           const container = button.parentElement.querySelector('.carrossel-track');
-          const scrollAmount = 300; // Quantidade de pixels para rolar
+          const scrollAmount = 300; 
           
           if (direction === 'left') {
               container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
