@@ -43,19 +43,17 @@ async function carregarProdutosDestaque() {
             const preco = parseFloat(produto.preco || 0);
             const linkDetalhes = `produto.html?id=${id}`;
             
+            // CORREÇÃO: O card inteiro se tornou clicável via onclick e cursor: pointer
+            // Retiramos as tags <a> internas que ficaram redundantes
             const htmlProduto = `
-                <div class="card-produto">
+                <div class="card-produto" style="cursor: pointer;" onclick="window.location.href='${linkDetalhes}'">
                     <div class="produto-imagem">
                         ${produto.promocao ? '<span class="badge-desconto">Oferta</span>' : ''}
-                        <a href="${linkDetalhes}" style="display:block; width:100%; height:100%;">
-                            <img src="${imagem}" alt="${produto.nome}" style="cursor:pointer;">
-                        </a>
+                        <img src="${imagem}" alt="${produto.nome}">
                     </div>
                     <div class="produto-info">
                         <span class="produto-categoria">${produto.categoria || 'Peças'}</span>
-                        <a href="${linkDetalhes}" style="text-decoration:none; color:inherit;">
-                            <h3 class="produto-nome">${produto.nome}</h3>
-                        </a>
+                        <h3 class="produto-nome">${produto.nome}</h3>
                         <span class="produto-codigo">Cód: ${produto.cod || produto.codigo || '--'}</span>
                         <div class="produto-precos">
                             <span class="preco-atual">R$ ${preco.toFixed(2).replace('.', ',')}</span>
@@ -63,7 +61,7 @@ async function carregarProdutosDestaque() {
                         </div>
                         <div class="produto-acoes">
                             <button class="botao-adicionar" 
-                                onclick="adicionarAoCarrinho(this)"
+                                onclick="event.stopPropagation(); adicionarAoCarrinho(this)"
                                 data-id="${id}"
                                 data-nome="${produto.nome}"
                                 data-preco="${preco}"

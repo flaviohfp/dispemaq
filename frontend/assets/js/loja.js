@@ -33,9 +33,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 3. Lê filtros da URL (Vindo da Home ou refresh)
     const params = new URLSearchParams(window.location.search);
-    const marca = params.get('marca');
-    const cat = params.get('categoria') || params.get('cat'); 
-    const busca = params.get('busca');
+    let marca = params.get('marca');
+    let cat = params.get('categoria') || params.get('cat'); 
+    let busca = params.get('busca');
+
+    // CORREÇÃO: Limpeza de "sujeiras" da URL (espaços ou a string "null")
+    if (marca === 'null' || marca === 'undefined' || marca === '') marca = null;
+    if (cat === 'null' || cat === 'undefined' || cat === '') cat = null;
+    if (busca === 'null' || busca === 'undefined' || busca === '') busca = null;
+
+    if (marca) marca = marca.trim();
+    if (cat) cat = cat.trim();
+    if (busca) busca = busca.trim();
 
     // 4. Configura busca do header
     configurarBuscaHeader();
@@ -259,6 +268,12 @@ function criarCardProduto(p, container) {
     const card = document.createElement('div');
     card.classList.add('produto-card');
     
+    // CORREÇÃO: Transforma o card inteiro em um botão clicável
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', () => {
+        window.location.href = `produto.html?id=${p.id}`;
+    });
+    
     const imgUrl = p.imagem || p.img || p.urlImagem || './assets/images/sem-foto.png';
     let precoDisplay = "Consulte";
     
@@ -294,7 +309,7 @@ function criarCardProduto(p, container) {
     const btn = card.querySelector('.btn-add-carrinho');
     if(btn) {
         btn.addEventListener('click', (e) => {
-            e.stopPropagation();
+            e.stopPropagation(); // Garante que clicar aqui NÃO abre a página de detalhes, mas sim vai pro carrinho
             addCarrinhoLoja(p.id, p);
         });
     }
