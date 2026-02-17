@@ -13,7 +13,7 @@ let timeoutMenuMais = null;
 const EMAIL_ADMIN = "admin@dispemaq.com"; 
 
 /* ============================================================
-   2. CARREGAR PRODUTOS DESTAQUE E VITRINES (ATUALIZADO)
+   2. CARREGAR PRODUTOS DESTAQUE E VITRINES (BLINDADO)
    ============================================================ */
 async function carregarProdutosDestaque() {
     // Mantemos o container antigo para garantir compatibilidade
@@ -47,7 +47,7 @@ async function carregarProdutosDestaque() {
             const preco = parseFloat(produto.preco || 0);
             const linkDetalhes = `produto.html?id=${id}`;
             
-            // Monta o visual (card) do produto apenas uma vez
+            // Monta o visual (card) do produto apenas uma vez (Igual ao da Loja)
             const htmlProduto = `
                 <div class="card-produto" style="cursor: pointer;" onclick="window.location.href='${linkDetalhes}'">
                     <div class="produto-imagem">
@@ -64,7 +64,7 @@ async function carregarProdutosDestaque() {
                         </div>
                         <div class="produto-acoes">
                             <button class="botao-adicionar" 
-                                onclick="event.stopPropagation(); adicionarAoCarrinho(this)"
+                                onclick="event.stopPropagation(); window.adicionarAoCarrinho(this)"
                                 data-id="${id}"
                                 data-nome="${produto.nome}"
                                 data-preco="${preco}"
@@ -83,10 +83,23 @@ async function carregarProdutosDestaque() {
             }
 
             // LÓGICA 2: Alimenta os Carrosséis/Vitrines dinâmicos baseados no Firebase
-            if (produto.vitrines && Array.isArray(produto.vitrines)) {
-                produto.vitrines.forEach(nomeVitrine => {
+            let vitrinesDoProduto = produto.vitrines || produto.vitrine || [];
+            
+            // Se o admin salvou como texto ("ofertas, lancamentos"), convertemos para array
+            if (typeof vitrinesDoProduto === 'string') {
+                vitrinesDoProduto = vitrinesDoProduto.split(',');
+            }
+
+            if (Array.isArray(vitrinesDoProduto)) {
+                vitrinesDoProduto.forEach(nomeVitrine => {
+                    if (!nomeVitrine) return;
+                    
+                    // Limpa espaços extras e deixa minúsculo para garantir compatibilidade
+                    const idVitrineLimpo = nomeVitrine.trim().toLowerCase();
+                    
                     // Procura na tela o elemento com id "track-ofertas", "track-lancamentos", etc.
-                    const trackCorreta = document.getElementById(`track-${nomeVitrine}`);
+                    const trackCorreta = document.getElementById(`track-${idVitrineLimpo}`);
+                    
                     if (trackCorreta) {
                         trackCorreta.innerHTML += htmlProduto;
                     }
@@ -145,13 +158,13 @@ function renderizarCarrinho() {
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <span style="font-weight: bold; color: #ff6600;">R$ ${(item.preco * item.qtd).toFixed(2).replace('.',',')}</span>
                             <div style="border: 1px solid #ddd; border-radius: 4px; display:flex; align-items:center;">
-                                <button onclick="alterarQuantidade('${item.id}', 'diminuir')" style="border:none; background:none; padding: 2px 8px; cursor:pointer;">-</button>
+                                <button onclick="window.alterarQuantidade('${item.id}', 'diminuir')" style="border:none; background:none; padding: 2px 8px; cursor:pointer;">-</button>
                                 <span style="font-size: 0.8rem; padding: 2px 5px; font-weight:bold;">${item.qtd}</span>
-                                <button onclick="alterarQuantidade('${item.id}', 'aumentar')" style="border:none; background:none; padding: 2px 8px; cursor:pointer;">+</button>
+                                <button onclick="window.alterarQuantidade('${item.id}', 'aumentar')" style="border:none; background:none; padding: 2px 8px; cursor:pointer;">+</button>
                             </div>
                         </div>
                     </div>
-                    <button onclick="removerItem('${item.id}')" style="border:none; background:none; color: #dc3545; cursor:pointer; font-size:16px;">
+                    <button onclick="window.removerItem('${item.id}')" style="border:none; background:none; color: #dc3545; cursor:pointer; font-size:16px;">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -245,7 +258,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // -------------------------------------------------------------
-    // DELEGAÇÃO DE EVENTOS PARA OS MENUS (Pois são gerados dinamicamente)
+    // DELEGAÇÃO DE EVENTOS PARA OS MENUS
     // -------------------------------------------------------------
     document.addEventListener('mouseover', function(e) {
         const btnVerMais = e.target.closest('#btnVerMais');
@@ -255,7 +268,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const isInsideMenuCat = e.target.closest('#menuCategoriasFlutuante');
         const isInsideMenuMais = e.target.closest('#menuMaisMarcas');
 
-        // Hover no Botão de Ver Mais ou dentro do próprio menu
         if (btnVerMais || isInsideMenuMais) {
             clearTimeout(timeoutMenuMais);
             if(btnVerMais && menuMaisMarcas) {
@@ -268,19 +280,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Hover nas Marcas
         if (btnMarca && menuCategorias) {
             clearTimeout(timeoutMenuCat);
             if (btnMarca.classList.contains('marca-item-extra')) {
                 clearTimeout(timeoutMenuMais);
             }
 
-            // Pega o nome da marca para o título das categorias
             marcaAtualSelecionada = btnMarca.innerText.trim();
             const tituloMenuCat = document.getElementById('tituloMarcaDropdown');
             if(tituloMenuCat) tituloMenuCat.innerText = "Categorias para " + marcaAtualSelecionada;
 
-            // Posicionamento do menu de categorias
             const rect = btnMarca.getBoundingClientRect();
             const ehMenuExtra = btnMarca.classList.contains('marca-item-extra');
             let top, left;
@@ -304,7 +313,6 @@ document.addEventListener('DOMContentLoaded', function() {
             menuCategorias.style.display = 'block';
         }
 
-        // Hover dentro do menu de categorias
         if (isInsideMenuCat) {
             clearTimeout(timeoutMenuCat);
             clearTimeout(timeoutMenuMais);
@@ -333,7 +341,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // -------------------------------------------------------------
-    // REDIRECIONAMENTO CORRETO DAS CATEGORIAS (Juntando Marca + Categoria)
+    // REDIRECIONAMENTO CORRETO DAS CATEGORIAS
     // -------------------------------------------------------------
     document.addEventListener('click', function(e) {
         const btnCat = e.target.closest('.item-cat-dropdown');
@@ -343,11 +351,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             let url = 'loja.html';
             
-            // Se clicou em "Ver tudo", manda pra loja pura ou da marca
             if (btnCat.classList.contains('destaque')) {
                 if (marcaAtualSelecionada) url += `?marca=${encodeURIComponent(marcaAtualSelecionada)}`;
             } else {
-                // Se clicou numa categoria específica
                 url += `?categoria=${encodeURIComponent(nomeCategoria)}`;
                 if (marcaAtualSelecionada) {
                     url += `&marca=${encodeURIComponent(marcaAtualSelecionada)}`;
@@ -366,7 +372,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if(menuCategorias) menuCategorias.style.display = 'none';
         if(menuMaisMarcas) menuMaisMarcas.classList.remove('ativo');
         
-        // Botão de Subir ao Topo
         const btnTopo = document.getElementById("btnTopo");
         if (btnTopo) {
             if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
@@ -415,17 +420,12 @@ document.addEventListener('DOMContentLoaded', function() {
    5. CARROSSEL DAS VITRINES (DESTAQUES, OFERTAS, ETC)
    ============================================================ */
 window.scrollVitrine = function(botao, direcao) {
-    // Pega o container pai do botão clicado (a div .carrossel-container)
     const container = botao.parentElement;
-    
-    // Encontra a trilha de produtos exata que está dentro desse container
     const track = container.querySelector('.carrossel-track');
     if (!track) return;
 
-    // Define o quanto vai rolar (rola 600px ou a largura da tela se for menor)
     const tamanhoRolagem = track.clientWidth > 600 ? 600 : track.clientWidth;
     
-    // Faz a rolagem suave
     if (direcao === 'left') {
         track.scrollBy({ left: -tamanhoRolagem, behavior: 'smooth' });
     } else if (direcao === 'right') {
