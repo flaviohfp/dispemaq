@@ -13,29 +13,33 @@ let timeoutMenuMais = null;
 const EMAIL_ADMIN = "admin@dispemaq.com"; 
 
 /* ============================================================
-   2. CARREGAR PRODUTOS DESTAQUE
+   2. CARREGAR PRODUTOS DESTAQUE E VITRINES (ATUALIZADO)
    ============================================================ */
 async function carregarProdutosDestaque() {
+    // Mantemos o container antigo para garantir compatibilidade
     const container = document.getElementById('gradeDestaques');
-    if (!container) return; 
-
-    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 20px;">Carregando produtos...</p>';
+    
+    if (container) {
+        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 20px;">Carregando produtos...</p>';
+    }
 
     try {
         const querySnapshot = await getDocs(collection(db, "produtos"));
-        container.innerHTML = ''; 
-
-        if (querySnapshot.empty) {
-            container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Nenhum produto cadastrado.</p>';
-            return;
+        
+        if (container) {
+            container.innerHTML = ''; 
+            if (querySnapshot.empty) {
+                container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Nenhum produto cadastrado.</p>';
+            }
         }
 
-        // Para os destaques, vamos pegar apenas os 8 primeiros ou produtos com "promocao"
-        let contador = 0;
+        // Limpa todas as trilhas de vitrines (carrosséis) na tela antes de preenchê-las
+        const tracksVitrines = document.querySelectorAll('.carrossel-track');
+        tracksVitrines.forEach(track => track.innerHTML = '');
+
+        let contadorGrade = 0;
 
         querySnapshot.forEach((docSnap) => {
-            if (contador >= 8) return; // Limita a 8 na home
-            
             const produto = docSnap.data();
             const id = docSnap.id; 
             
@@ -43,8 +47,7 @@ async function carregarProdutosDestaque() {
             const preco = parseFloat(produto.preco || 0);
             const linkDetalhes = `produto.html?id=${id}`;
             
-            // CORREÇÃO: O card inteiro se tornou clicável via onclick e cursor: pointer
-            // Retiramos as tags <a> internas que ficaram redundantes
+            // Monta o visual (card) do produto apenas uma vez
             const htmlProduto = `
                 <div class="card-produto" style="cursor: pointer;" onclick="window.location.href='${linkDetalhes}'">
                     <div class="produto-imagem">
@@ -72,13 +75,37 @@ async function carregarProdutosDestaque() {
                     </div>
                 </div>
             `;
-            container.innerHTML += htmlProduto;
-            contador++;
+            
+            // LÓGICA 1: Alimenta a grade antiga (Mantido igualzinho era antes)
+            if (container && contadorGrade < 8) {
+                container.innerHTML += htmlProduto;
+                contadorGrade++;
+            }
+
+            // LÓGICA 2: Alimenta os Carrosséis/Vitrines dinâmicos baseados no Firebase
+            if (produto.vitrines && Array.isArray(produto.vitrines)) {
+                produto.vitrines.forEach(nomeVitrine => {
+                    // Procura na tela o elemento com id "track-ofertas", "track-lancamentos", etc.
+                    const trackCorreta = document.getElementById(`track-${nomeVitrine}`);
+                    if (trackCorreta) {
+                        trackCorreta.innerHTML += htmlProduto;
+                    }
+                });
+            }
+        });
+
+        // Fallback: Se alguma vitrine ficar sem produtos, exibe um aviso bonitinho
+        tracksVitrines.forEach(track => {
+            if (track.innerHTML.trim() === '') {
+                track.innerHTML = '<div style="width: 100%; text-align: center; padding: 30px; color: #aaa; font-size: 0.95rem;">Nenhum produto nesta vitrine no momento.</div>';
+            }
         });
 
     } catch (error) {
         console.error("Erro ao carregar produtos:", error);
-        container.innerHTML = '<p style="text-align:center;">Erro ao carregar produtos.</p>';
+        if (container) {
+            container.innerHTML = '<p style="text-align:center;">Erro ao carregar produtos.</p>';
+        }
     }
 }
 
@@ -383,3 +410,25 @@ document.addEventListener('DOMContentLoaded', function() {
         btnMenu.addEventListener('click', () => navMenu.classList.toggle('ativo'));
     }
 });
+
+/* ============================================================
+   5. CARROSSEL DAS VITRINES (DESTAQUES, OFERTAS, ETC)
+   ============================================================ */
+window.scrollVitrine = function(botao, direcao) {
+    // Pega o container pai do botão clicado (a div .carrossel-container)
+    const container = botao.parentElement;
+    
+    // Encontra a trilha de produtos exata que está dentro desse container
+    const track = container.querySelector('.carrossel-track');
+    if (!track) return;
+
+    // Define o quanto vai rolar (rola 600px ou a largura da tela se for menor)
+    const tamanhoRolagem = track.clientWidth > 600 ? 600 : track.clientWidth;
+    
+    // Faz a rolagem suave
+    if (direcao === 'left') {
+        track.scrollBy({ left: -tamanhoRolagem, behavior: 'smooth' });
+    } else if (direcao === 'right') {
+        track.scrollBy({ left: tamanhoRolagem, behavior: 'smooth' });
+    }
+};

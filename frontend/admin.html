@@ -183,6 +183,28 @@
               <label>Foto do Produto</label>
               <input type="file" id="arquivoImagem" accept="image/*" required />
             </div>
+
+            <div class="form-group" style="grid-column: 1 / -1; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
+              <label style="font-weight: bold; margin-bottom: 10px; display: block; color: #333;">Exibir nas Vitrines (Opcional - Pode marcar mais de uma)</label>
+              <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                  <input type="checkbox" name="vitrines" value="lancamentos"> Lançamentos
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                  <input type="checkbox" name="vitrines" value="ofertas"> Ofertas
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                  <input type="checkbox" name="vitrines" value="mais_vendidos"> Mais Vendidos do Mês
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                  <input type="checkbox" name="vitrines" value="destaque_semana"> Destaque da Semana
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                  <input type="checkbox" name="vitrines" value="interessar"> Você também pode se interessar
+                </label>
+              </div>
+            </div>
+
           </div>
 
           <div class="input-group">

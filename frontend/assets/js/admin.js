@@ -168,7 +168,6 @@ async function adicionarFiltro(colecao) {
     }
 
     try {
-        // Usa addDoc para criar um ID único automaticamente (mais seguro para edições)
         await addDoc(collection(db, colecao), { 
             nome: nome 
         });
@@ -240,6 +239,13 @@ async function cadastrarProduto(e) {
         const arquivoInput = document.getElementById('arquivoImagem');
         if (arquivoInput.files.length === 0) throw new Error("Selecione uma foto para o produto!");
 
+        // === CAPTURAR QUAIS VITRINES FORAM MARCADAS ===
+        const vitrinesSelecionadas = [];
+        const checkboxesVitrines = document.querySelectorAll('input[name="vitrines"]:checked');
+        checkboxesVitrines.forEach((checkbox) => {
+            vitrinesSelecionadas.push(checkbox.value);
+        });
+
         // Upload da foto
         const arquivo = arquivoInput.files[0];
         const storageRef = ref(storage, `produtos/${Date.now()}_${arquivo.name}`);
@@ -255,6 +261,7 @@ async function cadastrarProduto(e) {
             preco: preco,
             descricao: descricao, 
             img: urlFoto, 
+            vitrines: vitrinesSelecionadas, // Salvando a lista de vitrines
             data_cadastro: new Date()
         });
 
@@ -279,7 +286,6 @@ async function carregarProdutos() {
     tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Carregando produtos...</td></tr>';
 
     try {
-        // Busca ordenando pelos mais recentes (Exige índice no Firebase se quiser usar orderBy('data_cadastro', 'desc'))
         const querySnapshot = await getDocs(prodCollection);
         tbody.innerHTML = "";
 
@@ -291,11 +297,17 @@ async function carregarProdutos() {
         querySnapshot.forEach((docItem) => {
              const p = docItem.data();
              const valorFormatado = p.preco > 0 ? `R$ ${p.preco.toFixed(2).replace('.', ',')}` : "Sob Consulta";
+             
+             // Identificar as vitrines para mostrar na tabela
+             let vitrinesBadge = "";
+             if (p.vitrines && p.vitrines.length > 0) {
+                 vitrinesBadge = `<br><small style="color:#ff6600; font-weight:bold;"><i class="fas fa-star" style="font-size:0.8em;"></i> Vitrines: ${p.vitrines.join(', ')}</small>`;
+             }
 
              tbody.innerHTML += `
                  <tr style="border-bottom: 1px solid #eee;">
                      <td style="padding:10px;"><img src="${p.img || p.imagem}" style="width:50px; height:50px; object-fit:cover; border-radius:4px; border:1px solid #ddd;"></td>
-                     <td><strong>${p.nome}</strong><br><small style="color:#777;">Cód: ${p.cod || '--'}</small></td>
+                     <td><strong>${p.nome}</strong><br><small style="color:#777;">Cód: ${p.cod || '--'}</small>${vitrinesBadge}</td>
                      <td>${p.marca}<br><small style="color:#777;">${p.categoria}</small></td>
                      <td style="color:green; font-weight:bold;">${valorFormatado}</td>
                      <td>
@@ -353,7 +365,6 @@ async function adicionarBanner() {
         const docSnap = await getDoc(docRef);
         
         let listaAtual = [];
-        // Checa com segurança se o documento e a lista existem
         if (docSnap.exists() && docSnap.data() && docSnap.data().listaBanners) {
             listaAtual = docSnap.data().listaBanners;
         }
@@ -363,7 +374,6 @@ async function adicionarBanner() {
             criadoEm: Date.now()
         });
 
-        // O merge:true garante que ele vai criar o documento caso seja o primeiro acesso da vida da loja
         await setDoc(docRef, { listaBanners: listaAtual }, { merge: true });
 
         alert("Banner adicionado ao site com sucesso!");

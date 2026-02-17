@@ -720,6 +720,90 @@ body {
     width: 20px;
     text-align: center;
 }
+
+/* =========================================
+   CARROSSÉIS DA HOME (VITRINES)
+   ========================================= */
+.vitrine-secao {
+    margin-bottom: 50px;
+}
+
+.titulo-vitrine {
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ff6600;
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+.carrossel-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.carrossel-track {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 15px 5px;
+    /* Esconder a barra de rolagem nativa */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE e Edge */
+}
+
+.carrossel-track::-webkit-scrollbar {
+    display: none; /* Chrome, Safari e Opera */
+}
+
+/* Garante que o card não diminua de tamanho para caber na tela */
+.carrossel-track .card-produto {
+    min-width: 260px; /* Ajuste para a largura exata que seus cards costumam ter */
+    flex: 0 0 auto;
+}
+
+/* Botões de navegação lateral */
+.btn-carrossel {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #fff;
+    color: #ff6600;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-carrossel:hover {
+    background: #ff6600;
+    color: #fff;
+}
+
+.btn-carrossel.left {
+    left: -20px;
+}
+
+.btn-carrossel.right {
+    right: -20px;
+}
+
+/* Ocultar setas no mobile, deixando apenas o scroll pelo toque do dedo */
+@media (max-width: 768px) {
+    .btn-carrossel {
+        display: none;
+    }
+}
 /* =========================================
    GRID DA LOJA & CARDS DE PRODUTOS
    ========================================= */

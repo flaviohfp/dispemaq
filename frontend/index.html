@@ -203,27 +203,70 @@
       </button>
     </section>
 
-    <section class="secao-loja">
+    <section class="secao-loja vitrines-home">
       <div class="container">
-        <div class="cabecalho-secao">
-          <h2>Destaques da Semana</h2>
-          <div class="filtros-produtos">
-            <a href="loja.html" class="filtro-btn ativo">Ver Loja</a>
-          </div>
+        
+        <div class="vitrine-secao">
+            <h2 class="titulo-vitrine">Lançamentos</h2>
+            <div class="carrossel-container">
+                <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')"><i class="fas fa-chevron-left"></i></button>
+                <div class="carrossel-track" id="vitrine-lancamentos">
+                    <p style="width:100%; text-align:center; padding:20px; color:#777;">Carregando...</p>
+                </div>
+                <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')"><i class="fas fa-chevron-right"></i></button>
+            </div>
         </div>
 
-        <div id="gradeDestaques" class="grade-produtos">
-             <p style="width:100%; text-align:center; padding:20px; color:#777;">Acesse nossa loja para ver todos os produtos.</p>
+        <div class="vitrine-secao">
+            <h2 class="titulo-vitrine">Destaques da Semana</h2>
+            <div class="carrossel-container">
+                <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')"><i class="fas fa-chevron-left"></i></button>
+                <div class="carrossel-track" id="vitrine-destaques">
+                    <p style="width:100%; text-align:center; padding:20px; color:#777;">Carregando...</p>
+                </div>
+                <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+
+        <div class="vitrine-secao">
+            <h2 class="titulo-vitrine">Ofertas</h2>
+            <div class="carrossel-container">
+                <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')"><i class="fas fa-chevron-left"></i></button>
+                <div class="carrossel-track" id="vitrine-ofertas">
+                    <p style="width:100%; text-align:center; padding:20px; color:#777;">Carregando...</p>
+                </div>
+                <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+
+        <div class="vitrine-secao">
+            <h2 class="titulo-vitrine">Você também pode estar interessado</h2>
+            <div class="carrossel-container">
+                <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')"><i class="fas fa-chevron-left"></i></button>
+                <div class="carrossel-track" id="vitrine-interesses">
+                    <p style="width:100%; text-align:center; padding:20px; color:#777;">Carregando...</p>
+                </div>
+                <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+
+        <div class="vitrine-secao">
+            <h2 class="titulo-vitrine">Mais Vendidos do Mês</h2>
+            <div class="carrossel-container">
+                <button class="btn-carrossel left" onclick="scrollVitrine(this, 'left')"><i class="fas fa-chevron-left"></i></button>
+                <div class="carrossel-track" id="vitrine-mais-vendidos">
+                    <p style="width:100%; text-align:center; padding:20px; color:#777;">Carregando...</p>
+                </div>
+                <button class="btn-carrossel right" onclick="scrollVitrine(this, 'right')"><i class="fas fa-chevron-right"></i></button>
+            </div>
         </div>
 
         <div class="centralizado" style="margin-top: 40px">
-          <a href="loja.html" class="botao botao-outline-pequeno"
-            >Ver todos os produtos</a
-          >
+          <a href="loja.html" class="botao botao-outline-pequeno">Ver todos os produtos da loja</a>
         </div>
+
       </div>
     </section>
-
     <div class="barra-beneficios">
       <div class="container">
         <div class="grade-beneficios">
