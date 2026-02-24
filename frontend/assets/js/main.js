@@ -16,7 +16,6 @@ const EMAIL_ADMIN = "admin@dispemaq.com";
    2. CARREGAR PRODUTOS DESTAQUE E VITRINES (BLINDADO)
    ============================================================ */
 async function carregarProdutosDestaque() {
-    // Mantemos o container antigo para garantir compatibilidade
     const container = document.getElementById('gradeDestaques');
     
     if (container) {
@@ -33,7 +32,6 @@ async function carregarProdutosDestaque() {
             }
         }
 
-        // Limpa todas as trilhas de vitrines (carrosséis) na tela antes de preenchê-las
         const tracksVitrines = document.querySelectorAll('.carrossel-track');
         tracksVitrines.forEach(track => track.innerHTML = '');
 
@@ -47,7 +45,6 @@ async function carregarProdutosDestaque() {
             const preco = parseFloat(produto.preco || 0);
             const linkDetalhes = `produto.html?id=${id}`;
             
-            // Monta o visual (card) do produto apenas uma vez (Igual ao da Loja)
             const htmlProduto = `
                 <div class="card-produto" style="cursor: pointer;" onclick="window.location.href='${linkDetalhes}'">
                     <div class="produto-imagem">
@@ -76,16 +73,13 @@ async function carregarProdutosDestaque() {
                 </div>
             `;
             
-            // LÓGICA 1: Alimenta a grade antiga (Mantido igualzinho era antes)
             if (container && contadorGrade < 8) {
                 container.innerHTML += htmlProduto;
                 contadorGrade++;
             }
 
-            // LÓGICA 2: Alimenta os Carrosséis/Vitrines dinâmicos baseados no Firebase
             let vitrinesDoProduto = produto.vitrines || produto.vitrine || [];
             
-            // Se o admin salvou como texto ("ofertas, lancamentos"), convertemos para array
             if (typeof vitrinesDoProduto === 'string') {
                 vitrinesDoProduto = vitrinesDoProduto.split(',');
             }
@@ -94,10 +88,7 @@ async function carregarProdutosDestaque() {
                 vitrinesDoProduto.forEach(nomeVitrine => {
                     if (!nomeVitrine) return;
                     
-                    // Limpa espaços extras e deixa minúsculo para garantir compatibilidade
                     const idVitrineLimpo = nomeVitrine.trim().toLowerCase();
-                    
-                    // Procura na tela o elemento com id "track-ofertas", "track-lancamentos", etc.
                     const trackCorreta = document.getElementById(`track-${idVitrineLimpo}`);
                     
                     if (trackCorreta) {
@@ -107,7 +98,6 @@ async function carregarProdutosDestaque() {
             }
         });
 
-        // Fallback: Se alguma vitrine ficar sem produtos, exibe um aviso bonitinho
         tracksVitrines.forEach(track => {
             if (track.innerHTML.trim() === '') {
                 track.innerHTML = '<div style="width: 100%; text-align: center; padding: 30px; color: #aaa; font-size: 0.95rem;">Nenhum produto nesta vitrine no momento.</div>';
@@ -123,7 +113,7 @@ async function carregarProdutosDestaque() {
 }
 
 /* ============================================================
-   3. FUNÇÕES DO CARRINHO (Acessíveis Globalmente)
+   3. FUNÇÕES DO CARRINHO
    ============================================================ */
 function atualizarBadge() {
     const badges = document.querySelectorAll('.badge-carrinho'); 
@@ -238,9 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
     carregarProdutosDestaque();
     atualizarBadge();
 
-    // -------------------------------------------------------------
-    // SISTEMA DE BUSCA (Search Bar)
-    // -------------------------------------------------------------
+    // SISTEMA DE BUSCA
     const btnBuscar = document.getElementById('botaoBuscar');
     const campoBusca = document.getElementById('campoBusca');
     
@@ -257,38 +245,58 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // -------------------------------------------------------------
-    // DELEGAÇÃO DE EVENTOS PARA OS MENUS
-    // -------------------------------------------------------------
+    /* ----------------------------------------------------------------
+       MENU FLUTUANTE (CATEGORIAS E MARCAS) - LÓGICA CORRIGIDA 100%
+       ---------------------------------------------------------------- */
     document.addEventListener('mouseover', function(e) {
         const btnVerMais = e.target.closest('#btnVerMais');
         const menuMaisMarcas = document.getElementById("menuMaisMarcas");
         const btnMarca = e.target.closest('.item-marca, .marca-item-extra');
         const menuCategorias = document.getElementById('menuCategoriasFlutuante');
+        
         const isInsideMenuCat = e.target.closest('#menuCategoriasFlutuante');
         const isInsideMenuMais = e.target.closest('#menuMaisMarcas');
 
-        if (btnVerMais || isInsideMenuMais) {
+        // LÓGICA: BOTÃO "VER MAIS MARCAS"
+        if (isInsideMenuMais) {
             clearTimeout(timeoutMenuMais);
-            if(btnVerMais && menuMaisMarcas) {
-                const rect = btnVerMais.getBoundingClientRect(); 
-                menuMaisMarcas.style.top = (rect.bottom + window.scrollY + 5) + "px"; 
-                let leftPos = rect.left + window.scrollX;
-                if (leftPos + 220 > window.innerWidth) leftPos = window.innerWidth - 230;
-                menuMaisMarcas.style.left = leftPos + "px";
-                menuMaisMarcas.classList.add("ativo");
+        } else if (btnVerMais && menuMaisMarcas) {
+            clearTimeout(timeoutMenuMais);
+            const rect = btnVerMais.getBoundingClientRect(); 
+            
+            menuMaisMarcas.style.display = 'block'; // Mostra antes de calcular tamanho
+            let leftPos = rect.left + window.scrollX;
+            if (leftPos + menuMaisMarcas.offsetWidth > window.innerWidth) {
+                leftPos = window.innerWidth - menuMaisMarcas.offsetWidth - 10;
             }
+            
+            menuMaisMarcas.style.top = (rect.bottom + window.scrollY + 5) + "px"; 
+            menuMaisMarcas.style.left = leftPos + "px";
+            menuMaisMarcas.classList.add("ativo");
         }
 
-        if (btnMarca && menuCategorias) {
+        // LÓGICA: BOTÃO DA "MARCA" ABRE AS CATEGORIAS
+        if (isInsideMenuCat) {
+            clearTimeout(timeoutMenuCat); // Se o mouse tá dentro do menu, não fecha
+            clearTimeout(timeoutMenuMais); // Se for uma marca extra, mantém o menu pai aberto
+        } else if (btnMarca && menuCategorias) {
             clearTimeout(timeoutMenuCat);
+            
             if (btnMarca.classList.contains('marca-item-extra')) {
                 clearTimeout(timeoutMenuMais);
             }
 
-            marcaAtualSelecionada = btnMarca.innerText.trim();
-            const tituloMenuCat = document.getElementById('tituloMarcaDropdown');
-            if(tituloMenuCat) tituloMenuCat.innerText = "Categorias para " + marcaAtualSelecionada;
+            const novaMarca = btnMarca.innerText.trim();
+            // Só muda o texto se for uma marca diferente da atual
+            if (marcaAtualSelecionada !== novaMarca) {
+                marcaAtualSelecionada = novaMarca;
+                const tituloMenuCat = document.getElementById('tituloMarcaDropdown');
+                if(tituloMenuCat) tituloMenuCat.innerText = "Categorias " + marcaAtualSelecionada;
+            }
+
+            // Exibir o menu ANTES de calcular a posição para não dar erro de largura 0
+            menuCategorias.style.display = 'block';
+            menuCategorias.classList.add('ativo');
 
             const rect = btnMarca.getBoundingClientRect();
             const ehMenuExtra = btnMarca.classList.contains('marca-item-extra');
@@ -296,52 +304,65 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (ehMenuExtra) {
                 top = rect.top + window.scrollY; 
-                left = rect.right + window.scrollX + 5; 
+                left = rect.right + window.scrollX; 
             } else {
                 top = rect.bottom + window.scrollY;
                 left = rect.left + window.scrollX;
             }
 
-            if (left + 280 > window.innerWidth) {
-                if (ehMenuExtra) left = rect.left + window.scrollX - 290; 
-                else left = window.innerWidth - 290;
+            // Evita que o menu passe da largura da tela direita
+            if (left + menuCategorias.offsetWidth > window.innerWidth) {
+                if (ehMenuExtra) left = rect.left + window.scrollX - menuCategorias.offsetWidth - 5; 
+                else left = window.innerWidth - menuCategorias.offsetWidth - 15;
             }
             if (left < 0) left = 10;
 
             menuCategorias.style.top = top + 'px';
             menuCategorias.style.left = left + 'px';
-            menuCategorias.style.display = 'block';
-        }
-
-        if (isInsideMenuCat) {
-            clearTimeout(timeoutMenuCat);
-            clearTimeout(timeoutMenuMais);
         }
     });
 
     document.addEventListener('mouseout', function(e) {
-        const btnVerMais = e.target.closest('#btnVerMais');
-        const isInsideMenuMais = e.target.closest('#menuMaisMarcas');
-        const btnMarca = e.target.closest('.item-marca, .marca-item-extra');
-        const isInsideMenuCat = e.target.closest('#menuCategoriasFlutuante');
+        const destino = e.relatedTarget; // Pra onde o mouse está indo?
+        
+        const saiuDeMarcaOuMenuCat = e.target.closest('.item-marca, .marca-item-extra') || e.target.closest('#menuCategoriasFlutuante');
+        const saiuDeVerMaisOuMenuMais = e.target.closest('#btnVerMais') || e.target.closest('#menuMaisMarcas');
 
-        if (btnVerMais || isInsideMenuMais) {
-            timeoutMenuMais = setTimeout(() => {
-                const menu = document.getElementById("menuMaisMarcas");
-                if(menu) menu.classList.remove("ativo");
-            }, 200);
-        }
-
-        if (btnMarca || isInsideMenuCat) {
+        // FECHAR MENU CATEGORIAS
+        if (saiuDeMarcaOuMenuCat) {
+            // Se o mouse tá indo pra DENTRO de um botão de marca ou pra DENTRO do próprio menu, não fazemos nada.
+            if (destino && (destino.closest('.item-marca, .marca-item-extra') || destino.closest('#menuCategoriasFlutuante'))) {
+                return;
+            }
+            
             timeoutMenuCat = setTimeout(() => {
                 const menu = document.getElementById('menuCategoriasFlutuante');
-                if(menu) menu.style.display = 'none';
-            }, 200);
+                if(menu) {
+                    menu.style.display = 'none';
+                    menu.classList.remove('ativo');
+                }
+            }, 250); // Tolerância
+        }
+
+        // FECHAR MENU MAIS MARCAS
+        if (saiuDeVerMaisOuMenuMais) {
+            // Se ele foi pro menu flutuante de categorias, mantemos o menu de "Mais Marcas" aberto
+            if (destino && (destino.closest('#menuMaisMarcas') || destino.closest('#btnVerMais') || destino.closest('#menuCategoriasFlutuante'))) {
+                return;
+            }
+
+            timeoutMenuMais = setTimeout(() => {
+                const menu = document.getElementById("menuMaisMarcas");
+                if(menu) {
+                    menu.classList.remove("ativo");
+                    menu.style.display = 'none';
+                }
+            }, 250);
         }
     });
 
     // -------------------------------------------------------------
-    // REDIRECIONAMENTO CORRETO DAS CATEGORIAS
+    // REDIRECIONAMENTO CORRETO DAS CATEGORIAS (LOJA.HTML)
     // -------------------------------------------------------------
     document.addEventListener('click', function(e) {
         const btnCat = e.target.closest('.item-cat-dropdown');
@@ -369,8 +390,14 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('scroll', function() {
         const menuCategorias = document.getElementById('menuCategoriasFlutuante');
         const menuMaisMarcas = document.getElementById('menuMaisMarcas');
-        if(menuCategorias) menuCategorias.style.display = 'none';
-        if(menuMaisMarcas) menuMaisMarcas.classList.remove('ativo');
+        if(menuCategorias) {
+            menuCategorias.style.display = 'none';
+            menuCategorias.classList.remove('ativo');
+        }
+        if(menuMaisMarcas) {
+            menuMaisMarcas.style.display = 'none';
+            menuMaisMarcas.classList.remove('ativo');
+        }
         
         const btnTopo = document.getElementById("btnTopo");
         if (btnTopo) {
